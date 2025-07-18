@@ -116,8 +116,10 @@ export function Header() {
                 </Link>
               </Button>
               <Sheet>
-                <SheetTrigger asChild className="md:hidden">
-                  <Button variant="ghost" size="icon"><Menu /></Button>
+                <SheetTrigger asChild>
+                  <Button variant="outline" size="icon" className="md:hidden">
+                    <Menu />
+                  </Button>
                 </SheetTrigger>
                 <SheetContent>
                   {renderNavLinks(true)}
