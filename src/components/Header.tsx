@@ -15,8 +15,9 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import { LogIn, Menu, Car, FileText, LogOut, Home, User, ShoppingBag, ShieldCheck } from 'lucide-react';
+import { LogIn, Menu, Car, FileText, LogOut, Home, User, ShoppingBag, ShieldCheck, Settings, Globe } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { Separator } from './ui/separator';
 
 export function Header() {
   const context = useContext(AppContext);
@@ -83,7 +84,7 @@ export function Header() {
         <div className="flex-grow py-4">
             {user?.role === 'driver' && (
               <div className='flex flex-col gap-4'>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="hidden md:grid grid-cols-2 gap-4">
                     {driverLinks.map(link => (
                         <Button 
                             key={link.href}
@@ -127,6 +128,18 @@ export function Header() {
                 </div>
               </div>
             )}
+            <div className="md:hidden mt-4 space-y-2">
+                 <Separator />
+                <p className='pt-2 text-sm text-muted-foreground'>Settings</p>
+                <div className='flex justify-between items-center bg-muted p-2 rounded-lg'>
+                  <span className='text-sm font-medium'>Language</span>
+                  <LanguageSwitcher />
+                </div>
+                <div className='flex justify-between items-center bg-muted p-2 rounded-lg'>
+                  <span className='text-sm font-medium'>Theme</span>
+                  <ThemeToggle />
+                </div>
+            </div>
         </div>
         <div className="mt-auto flex flex-col gap-2">
             {user?.role === 'driver' && driverBottomLinks.map(link => (
@@ -151,6 +164,41 @@ export function Header() {
       </SheetContent>
     </Sheet>
   );
+
+  const renderGuestMenu = () => (
+    <Sheet>
+       <SheetTrigger asChild>
+        <Button variant="ghost" size="icon" className='md:hidden'>
+          <Menu className="h-6 w-6" />
+        </Button>
+      </SheetTrigger>
+      <SheetContent className="flex flex-col">
+          <SheetHeader>
+              <SheetTitle>{t.menu || "Menu"}</SheetTitle>
+          </SheetHeader>
+          <div className="flex-grow py-4 flex flex-col gap-4">
+              <Button asChild className="w-full h-20 text-base">
+                  <Link href="/admin/login">
+                    <LogIn className="mr-2 h-5 w-5" />
+                    {t.loginAsDriver}
+                  </Link>
+              </Button>
+          </div>
+          <div className="mt-auto space-y-2">
+              <Separator />
+              <p className='pt-2 text-sm text-muted-foreground'>Settings</p>
+              <div className='flex justify-between items-center bg-muted p-2 rounded-lg'>
+                <span className='text-sm font-medium'>Language</span>
+                <LanguageSwitcher />
+              </div>
+              <div className='flex justify-between items-center bg-muted p-2 rounded-lg'>
+                <span className='text-sm font-medium'>Theme</span>
+                <ThemeToggle />
+              </div>
+          </div>
+      </SheetContent>
+    </Sheet>
+  );
   
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -161,15 +209,21 @@ export function Header() {
         </Link>
         
         <div className="flex flex-1 items-center justify-end space-x-2">
-          <ThemeToggle />
-          <LanguageSwitcher />
+          <div className='hidden md:flex items-center space-x-2'>
+            <ThemeToggle />
+            <LanguageSwitcher />
+          </div>
+
           {loading ? null : user ? renderUserMenu() : (
-            <Button asChild>
-              <Link href="/admin/login">
-                <LogIn className="mr-2 h-4 w-4" />
-                {t.loginAsDriver}
-              </Link>
-            </Button>
+            <>
+              <Button asChild className='hidden md:inline-flex'>
+                <Link href="/admin/login">
+                  <LogIn className="mr-2 h-4 w-4" />
+                  {t.loginAsDriver}
+                </Link>
+              </Button>
+              {renderGuestMenu()}
+            </>
           )}
         </div>
       </div>

@@ -4,6 +4,7 @@ import { AppProvider } from '@/components/AppProvider';
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { Header } from '@/components/Header';
 import { Toaster } from "@/components/ui/toaster"
+import { BottomNav } from '@/components/BottomNav';
 
 export const metadata: Metadata = {
   title: 'Vodiy GO',
@@ -32,9 +33,10 @@ export default function RootLayout({
           <AppProvider>
             <div className="relative flex min-h-screen w-full flex-col">
               <Header />
-              <main className="flex-1 pt-4">
+              <main className="flex-1 pt-4 pb-20 md:pb-0">
                 {children}
               </main>
+              <BottomNav />
             </div>
             <Toaster />
           </AppProvider>
