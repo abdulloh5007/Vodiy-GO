@@ -82,7 +82,7 @@ export function Header() {
                             key={link.href}
                             variant={pathname === link.href ? 'secondary' : 'outline'} 
                             asChild 
-                            className="h-24 flex-col gap-2 text-sm"
+                            className="h-28 flex-col gap-2 text-sm rounded-lg"
                         >
                             <Link href={link.href}><link.icon className="mb-1"/><span>{link.label}</span></Link>
                         </Button>
@@ -92,7 +92,7 @@ export function Header() {
                     key={driverWideLink.href}
                     variant={pathname === driverWideLink.href ? 'secondary' : 'outline'} 
                     asChild
-                    className="w-full"
+                    className="w-full h-14 rounded-lg"
                 >
                     <Link href={driverWideLink.href}><driverWideLink.icon/><span>{driverWideLink.label}</span></Link>
                 </Button>
@@ -100,13 +100,13 @@ export function Header() {
             )}
              {user?.role === 'admin' && (
               <div className='flex flex-col gap-4'>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4">
                     {adminLinks.map(link => (
                         <Button 
                             key={link.href}
                             variant={pathname === link.href ? 'secondary' : 'outline'} 
                             asChild 
-                            className="h-24 flex-col gap-2 text-sm"
+                            className="h-28 flex-col gap-2 text-sm rounded-lg"
                         >
                             <Link href={link.href}><link.icon className="mb-1"/><span>{link.label}</span></Link>
                         </Button>
@@ -121,11 +121,16 @@ export function Header() {
                     key={link.href}
                     variant={pathname === link.href ? 'secondary' : 'ghost'} 
                     asChild
+                    className="justify-start border rounded-lg"
                 >
                     <Link href={link.href}><link.icon/><span>{link.label}</span></Link>
                 </Button>
             ))}
-             <Button variant="outline" onClick={logout} className="w-full justify-center text-destructive hover:text-destructive border-destructive/50 hover:bg-destructive/10">
+             <Button 
+                variant="destructive" 
+                onClick={logout} 
+                className="w-full justify-start rounded-lg bg-red-600/90 hover:bg-red-600 text-white"
+             >
                 <LogOut />
                 <span>{t.logout}</span>
             </Button>
