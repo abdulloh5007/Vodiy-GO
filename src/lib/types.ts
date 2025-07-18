@@ -21,6 +21,7 @@ export type Ride = {
   to: string;
   price: number;
   info: string;
+  time?: string; // Optional departure time
   createdAt: any; // Allow server timestamp
 };
 
@@ -35,5 +36,5 @@ export type Order = {
 export type Language = 'en' | 'ru' | 'uz';
 
 export type Translations = {
-  [key: string]: string | { [key: string]: string };
+  [key: string]: any;
 };

@@ -5,7 +5,7 @@ import { AppContext } from '@/contexts/AppContext';
 import { Driver, Ride, Order, Language, Translations, User } from '@/lib/types';
 import { initialTranslations } from '@/lib/i18n';
 import { db, auth } from '@/lib/firebase';
-import { collection, doc, getDoc, setDoc, onSnapshot, query, orderBy, serverTimestamp, writeBatch } from "firebase/firestore";
+import { collection, doc, getDoc, setDoc, onSnapshot, query, orderBy, serverTimestamp, writeBatch, where, getDocs, deleteDoc } from "firebase/firestore";
 import { signInWithEmailAndPassword, onAuthStateChanged, signOut, createUserWithEmailAndPassword, User as FirebaseAuthUser } from "firebase/auth";
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
@@ -18,9 +18,18 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Get saved language from local storage
+    const savedLang = localStorage.getItem('roadpilot-lang') as Language;
+    if (savedLang && ['en', 'ru', 'uz'].includes(savedLang)) {
+      setLanguage(savedLang);
+    }
+  }, []);
+
+  useEffect(() => {
     const loadTranslations = async () => {
         const i18n = await import(`@/lib/locales/${language}.json`);
         setTranslations(i18n.default);
+        localStorage.setItem('roadpilot-lang', language);
     };
     loadTranslations();
   }, [language]);
@@ -51,7 +60,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         if (userDocSnap.exists()) {
             setUser({ uid: firebaseUser.uid, ...userDocSnap.data() } as User);
         } else {
-            // Handle case where user exists in Auth but not in Firestore
+            // This case might happen for users created before the users collection was standard
             const newUser: User = { uid: firebaseUser.uid, email: firebaseUser.email, role: 'driver' };
             await setDoc(userDocRef, newUser);
             setUser(newUser);
@@ -89,6 +98,18 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   };
 
   const addRide = async (rideData: Omit<Ride, 'id' | 'createdAt'>) => {
+    if (!user) throw new Error("User not logged in");
+
+    // Delete previous rides by the same driver
+    const q = query(collection(db, "rides"), where("driverId", "==", user.uid));
+    const querySnapshot = await getDocs(q);
+    const batch = writeBatch(db);
+    querySnapshot.forEach((doc) => {
+      batch.delete(doc.ref);
+    });
+    await batch.commit();
+
+    // Add the new ride
     await setDoc(doc(collection(db, "rides")), {
       ...rideData,
       createdAt: serverTimestamp(),

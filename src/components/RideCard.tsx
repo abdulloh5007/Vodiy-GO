@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '@/components/ui/button';
 import { AppContext } from '@/contexts/AppContext';
 import { Ride } from '@/lib/types';
-import { User, Car, Tag, ArrowRight } from 'lucide-react';
+import { User, Car, Tag, ArrowRight, Clock } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -58,6 +58,8 @@ export function RideCard({ ride }: RideCardProps) {
       return null; // Or a loading skeleton
   }
 
+  const formattedPrice = new Intl.NumberFormat('fr-FR').format(ride.price);
+
   return (
     <>
       <Card className="flex flex-col overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300">
@@ -75,9 +77,17 @@ export function RideCard({ ride }: RideCardProps) {
             <CardTitle className="font-headline text-xl flex items-center justify-between">
                 <span className="flex items-center gap-2">{ride.from} <ArrowRight className="h-5 w-5" /> {ride.to}</span>
             </CardTitle>
-            <CardDescription className="flex items-center gap-2 pt-2">
-                <Tag className="h-4 w-4 text-primary" />
-                {new Intl.NumberFormat('uz-UZ', { style: 'currency', currency: 'UZS', minimumFractionDigits: 0 }).format(ride.price)} / {t.pricePerSeat}
+            <CardDescription className="flex flex-col gap-2 pt-2">
+                 <div className="flex items-center gap-2">
+                    <Tag className="h-4 w-4 text-primary" />
+                    {formattedPrice} UZS / {t.pricePerSeat}
+                 </div>
+                 {ride.time && (
+                    <div className="flex items-center gap-2">
+                        <Clock className="h-4 w-4 text-primary" />
+                        <span>{t.departureTime}: {ride.time}</span>
+                    </div>
+                 )}
             </CardDescription>
           </div>
         </CardHeader>

@@ -54,7 +54,7 @@ export default function RegisterDriverPage() {
   const router = useRouter();
 
   const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
+  const [phone, setPhone] = useState('+998');
   const [carModel, setCarModel] = useState('');
   const [carNumber, setCarNumber] = useState('');
   const [carPhotoUrl, setCarPhotoUrl] = useState('');
@@ -70,14 +70,37 @@ export default function RegisterDriverPage() {
   
   useEffect(() => {
       if (driverProfile) {
-          setName(driverProfile.name);
-          setPhone(driverProfile.phone);
-          setCarModel(driverProfile.carModel);
-          setCarNumber(driverProfile.carNumber);
-          setCarPhotoUrl(driverProfile.carPhotoUrl);
+          setName(driverProfile.name || '');
+          setPhone(driverProfile.phone || '+998');
+          setCarModel(driverProfile.carModel || '');
+          setCarNumber(driverProfile.carNumber || '');
+          setCarPhotoUrl(driverProfile.carPhotoUrl || '');
       }
   }, [driverProfile]);
 
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value;
+    if (!value.startsWith('+998')) {
+      value = '+998';
+    }
+
+    const digits = value.replace(/\D/g, '').slice(3); // remove '+998' and non-digits
+    let formatted = '+998';
+    if (digits.length > 0) {
+      formatted += ` (${digits.substring(0, 2)}`;
+    }
+    if (digits.length >= 3) {
+      formatted += `) ${digits.substring(2, 5)}`;
+    }
+    if (digits.length >= 6) {
+      formatted += `-${digits.substring(5, 7)}`;
+    }
+    if (digits.length >= 8) {
+      formatted += `-${digits.substring(7, 9)}`;
+    }
+    
+    setPhone(formatted.slice(0, 19)); // +998 (XX) XXX-XX-XX
+  };
 
   if (loading || !t.home) {
     return <RegisterDriverSkeleton />;
@@ -91,7 +114,7 @@ export default function RegisterDriverPage() {
                     <CardTitle className="flex items-center justify-center gap-2"><ShieldAlert className="text-destructive h-8 w-8"/>{t.accessDenied}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <p>Please log in to register as a driver.</p>
+                    <p>{t.loginPrompt}</p>
                 </CardContent>
             </Card>
         </div>
@@ -100,10 +123,10 @@ export default function RegisterDriverPage() {
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !phone || !carModel || !carNumber || !carPhotoUrl) {
+    if (!name || phone.replace(/\D/g, '').length !== 12 || !carModel || !carNumber || !carPhotoUrl) {
       toast({
         title: "Validation Error",
-        description: "Please fill all fields.",
+        description: "Please fill all fields. Phone number must be complete.",
         variant: "destructive",
       });
       return;
@@ -126,7 +149,7 @@ export default function RegisterDriverPage() {
       <Card className="w-full max-w-2xl">
         <CardHeader>
           <CardTitle className="font-headline text-2xl">{t.driverRegistration}</CardTitle>
-          <CardDescription>{driverProfile?.status ? `Your current status: ${driverProfile.status}` : t.fillTheForm}</CardDescription>
+          <CardDescription>{driverProfile?.status ? `${t.currentStatus}: ${t[driverProfile.status] || driverProfile.status}` : t.fillTheForm}</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -136,21 +159,21 @@ export default function RegisterDriverPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="phone">{t.yourPhone}</Label>
-              <Input id="phone" type="tel" value={phone} onChange={e => setPhone(e.target.value)} required />
+              <Input id="phone" type="tel" value={phone} onChange={handlePhoneChange} placeholder="+998 (XX) XXX-XX-XX" required />
             </div>
             <div className="space-y-2">
               <Label htmlFor="carModel">{t.carModel}</Label>
-              <Input id="carModel" value={carModel} onChange={e => setCarModel(e.target.value)} placeholder="e.g., Chevrolet Cobalt" required />
+              <Input id="carModel" value={carModel} onChange={e => setCarModel(e.target.value)} placeholder={t.carModelPlaceholder} required />
             </div>
             <div className="space-y-2">
               <Label htmlFor="carNumber">{t.carNumber}</Label>
-              <Input id="carNumber" value={carNumber} onChange={e => setCarNumber(e.target.value)} placeholder="e.g., 01 A 123 BC" required />
+              <Input id="carNumber" value={carNumber} onChange={e => setCarNumber(e.target.value)} placeholder={t.carNumberPlaceholder} required />
             </div>
             <div className="space-y-2">
               <Label htmlFor="carPhotoUrl">{t.carPhotoUrl}</Label>
               <Input id="carPhotoUrl" type="url" value={carPhotoUrl} onChange={e => setCarPhotoUrl(e.target.value)} placeholder="https://placehold.co/600x400.png" required />
             </div>
-            <Button type="submit" className="w-full">{driverProfile && driverProfile.status !== 'unsubmitted' ? 'Update Application' : t.submitApplication}</Button>
+            <Button type="submit" className="w-full">{driverProfile && driverProfile.status !== 'unsubmitted' ? t.updateApplication : t.submitApplication}</Button>
           </form>
         </CardContent>
       </Card>

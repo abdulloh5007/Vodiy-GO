@@ -15,7 +15,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import { LogIn, Menu, Car, FileText, LogOut, Home } from 'lucide-react';
+import { LogIn, Menu, Car, FileText, LogOut, Home, User, ShoppingBag } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export function Header() {
@@ -23,7 +23,11 @@ export function Header() {
   const pathname = usePathname();
 
   if (!context) {
-    return null;
+    return (
+       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container flex h-16 items-center" />
+      </header>
+    )
   }
 
   const { translations, user, logout, loading } = context;
@@ -41,7 +45,8 @@ export function Header() {
     { href: '/', label: t.home, icon: Home, roles: ['driver', 'admin'] },
     { href: '/admin', label: t.registrationApplications, icon: FileText, roles: ['admin'] },
     { href: '/register-driver', label: t.carSettings || "Car Settings", icon: Car, roles: ['driver'] },
-    { href: '/create-ride', label: t.createRide, icon: FileText, roles: ['driver'] },
+    { href: '/create-ride', label: t.publishNewRide, icon: FileText, roles: ['driver'] },
+    { href: '/my-orders', label: t.myOrders, icon: ShoppingBag, roles: ['driver'] }
   ];
 
   const renderUserMenu = () => (
