@@ -16,7 +16,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import { LogIn, Menu, Car, FileText, LogOut, Home, User, ShoppingBag, ShieldCheck } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
 
 export function Header() {
   const context = useContext(AppContext);
@@ -30,13 +30,20 @@ export function Header() {
     )
   }
 
-  const { translations, user, logout, loading, drivers } = context;
+  const { translations, user, logout, loading, drivers, rides, orders } = context;
   const t = translations;
   
   const driverProfile = useMemo(() => {
     if (!user) return null;
     return drivers.find(d => d.id === user.uid)
   }, [user, drivers]);
+
+  const newOrdersCount = useMemo(() => {
+    if (!user) return 0;
+    const myRideIds = rides.filter(ride => ride.driverId === user.uid).map(r => r.id);
+    if (myRideIds.length === 0) return 0;
+    return orders.filter(order => myRideIds.includes(order.rideId) && order.status === 'new').length;
+  }, [user, rides, orders]);
 
   if (!t.home) {
     return (
@@ -48,7 +55,7 @@ export function Header() {
 
   const driverLinks = [
     { href: '/', label: t.home, icon: Home },
-    { href: '/my-orders', label: t.myOrders, icon: ShoppingBag }
+    { href: '/my-orders', label: t.myOrders, icon: ShoppingBag, badge: newOrdersCount > 0 ? newOrdersCount : 0 },
   ];
   
   const driverWideLink = { href: '/create-ride', label: t.publishNewRide, icon: FileText };
@@ -82,9 +89,15 @@ export function Header() {
                             key={link.href}
                             variant={pathname === link.href ? 'secondary' : 'outline'} 
                             asChild 
-                            className="h-28 flex-col gap-2 text-sm rounded-lg"
+                            className="h-28 flex-col gap-2 text-sm rounded-lg relative"
                         >
-                            <Link href={link.href}><link.icon className="mb-1 h-8 w-8"/><span>{link.label}</span></Link>
+                            <Link href={link.href}>
+                              {link.badge && link.badge > 0 && (
+                                <Badge className="absolute top-2 right-2">{link.badge}</Badge>
+                              )}
+                              <link.icon className="mb-1 h-8 w-8"/>
+                              <span>{link.label}</span>
+                            </Link>
                         </Button>
                     ))}
                 </div>

@@ -3,7 +3,8 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import Image from 'next/image';
 import { X } from 'lucide-react';
-import { Dialog, DialogContent, DialogOverlay, DialogPortal } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogOverlay, DialogPortal, DialogTitle } from '@/components/ui/dialog';
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 
 interface ImageViewerProps {
   imageUrl: string | null;
@@ -27,15 +28,19 @@ export function ImageViewer({ imageUrl, onOpenChange }: ImageViewerProps) {
                          />
                     </DialogOverlay>
                     <DialogContent 
-                        className="bg-transparent border-0 shadow-none p-0 w-full h-full max-w-full max-h-full flex items-center justify-center"
+                        className="bg-transparent border-0 shadow-none p-0 w-screen h-screen max-w-none flex items-center justify-center"
                         onOpenAutoFocus={(e) => e.preventDefault()}
                     >
+                         <VisuallyHidden>
+                            <DialogTitle>Image Viewer</DialogTitle>
+                         </VisuallyHidden>
                         <motion.div
-                            className="relative w-full h-full"
+                            className="relative w-full h-full flex items-center justify-center"
                             drag="y"
                             dragConstraints={{ top: 0, bottom: 0 }}
+                            dragElastic={0.1}
                             onDragEnd={(_, info) => {
-                                if (info.offset.y > 100) {
+                                if (info.offset.y > 150) {
                                     onOpenChange(false);
                                 }
                             }}
@@ -51,19 +56,12 @@ export function ImageViewer({ imageUrl, onOpenChange }: ImageViewerProps) {
                                     <Image
                                         src={imageUrl}
                                         alt="Fullscreen view"
-                                        width={1200}
-                                        height={800}
-                                        className="max-w-full max-h-full object-contain rounded-lg"
-                                        style={{ width: 'auto', height: 'auto' }}
+                                        layout="fill"
+                                        objectFit="contain"
+                                        className="rounded-lg"
                                     />
                                 )}
                             </motion.div>
-                             <button
-                                onClick={() => onOpenChange(false)}
-                                className="absolute top-4 right-4 text-white bg-black/50 rounded-full p-2"
-                            >
-                                <X className="h-6 w-6" />
-                            </button>
                         </motion.div>
                     </DialogContent>
                 </DialogPortal>
