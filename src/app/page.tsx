@@ -55,7 +55,6 @@ function HomeSkeleton() {
   );
 }
 
-
 export default function Home() {
   const context = useContext(AppContext);
   if (!context) {
