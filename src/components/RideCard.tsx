@@ -46,6 +46,8 @@ export function RideCard({ ride }: RideCardProps) {
         clientPhone,
     });
     setIsBooking(false);
+    setClientName('');
+    setClientPhone('');
     toast({
         title: t.bookingSuccessful,
         description: t.yourRideIsBooked,
@@ -60,8 +62,8 @@ export function RideCard({ ride }: RideCardProps) {
             <Image
               src={driver.carPhotoUrl}
               alt={driver.carModel}
-              layout="fill"
-              objectFit="cover"
+              fill
+              className="object-cover"
               data-ai-hint="car side"
             />
           </div>

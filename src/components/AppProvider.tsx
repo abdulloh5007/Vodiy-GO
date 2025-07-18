@@ -1,83 +1,110 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { AppContext } from '@/contexts/AppContext';
 import { Driver, Ride, Order, Language, Translations } from '@/lib/types';
 import { translations } from '@/lib/i18n';
+import { db, auth } from '@/lib/firebase';
+import { collection, getDocs, addDoc, doc, updateDoc, onSnapshot, query, orderBy, where } from "firebase/firestore";
+import { signInWithEmailAndPassword, onAuthStateChanged, signOut, User as FirebaseAuthUser } from "firebase/auth";
 
-const initialDrivers: Driver[] = [
-  { id: 1, name: 'Azizbek Anvarov', phone: '+998901234567', carModel: 'Chevrolet Cobalt', carNumber: '01 A 123 BC', carPhotoUrl: 'https://placehold.co/600x400.png', status: 'verified' },
-  { id: 2, name: 'Sardor Komilov', phone: '+998902345678', carModel: 'Chevrolet Lacetti', carNumber: '10 B 456 CD', carPhotoUrl: 'https://placehold.co/600x400.png', status: 'pending' },
-  { id: 3, name: 'Alisher Usmanov', phone: '+998903456789', carModel: 'Daewoo Nexia 3', carNumber: '30 C 789 DE', carPhotoUrl: 'https://placehold.co/600x400.png', status: 'verified' },
-];
-
-const initialRides: Ride[] = [
-  { id: 1, driverId: 1, from: 'Tashkent', to: 'Andijan', price: 100000, info: 'Pickup from metro Chilonzor.', createdAt: new Date().toISOString() },
-  { id: 2, driverId: 3, from: 'Fergana', to: 'Tashkent', price: 90000, info: 'White car, clean interior.', createdAt: new Date().toISOString() },
-  { id: 3, driverId: 1, from: 'Andijan', to: 'Tashkent', price: 100000, info: 'Only 2 seats left!', createdAt: new Date().toISOString() },
-];
 
 interface User {
-  id: number;
-  name: string;
+  uid: string;
+  email: string | null;
   role: 'driver' | 'admin';
 }
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguage] = useState<Language>('en');
   const [user, setUser] = useState<User | null>(null);
-  const [drivers, setDrivers] = useState<Driver[]>(initialDrivers);
-  const [rides, setRides] = useState<Ride[]>(initialRides);
+  const [drivers, setDrivers] = useState<Driver[]>([]);
+  const [rides, setRides] = useState<Ride[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const addDriverApplication = (driverData: Omit<Driver, 'id' | 'status'>) => {
-    const newDriver: Driver = {
-      ...driverData,
-      id: Date.now(),
-      status: 'pending',
+  useEffect(() => {
+    setLoading(true);
+    const unsubscribeDrivers = onSnapshot(collection(db, "drivers"), (snapshot) => {
+      const driversData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Driver));
+      setDrivers(driversData);
+    });
+
+    const ridesQuery = query(collection(db, "rides"), orderBy("createdAt", "desc"));
+    const unsubscribeRides = onSnapshot(ridesQuery, (snapshot) => {
+      const ridesData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Ride));
+      setRides(ridesData);
+    });
+    
+    // Assuming orders are fetched for a specific driver or admin.
+    // This will need to be adjusted based on user role.
+    const unsubscribeOrders = onSnapshot(collection(db, "orders"), (snapshot) => {
+      const ordersData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Order));
+      setOrders(ordersData);
+    });
+
+    const unsubscribeAuth = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser) {
+        // Here you might want to fetch user role from Firestore
+        setUser({ uid: firebaseUser.uid, email: firebaseUser.email, role: 'admin' }); // Assuming all logged in users are admins for now
+      } else {
+        setUser(null);
+      }
+      setLoading(false);
+    });
+
+    return () => {
+      unsubscribeDrivers();
+      unsubscribeRides();
+      unsubscribeOrders();
+      unsubscribeAuth();
     };
-    setDrivers(prev => [...prev, newDriver]);
-  };
+  }, []);
 
-  const updateDriverStatus = (driverId: number, status: 'verified' | 'rejected') => {
-    setDrivers(prev => prev.map(d => d.id === driverId ? { ...d, status } : d));
-  };
-
-  const addRide = (rideData: Omit<Ride, 'id' | 'createdAt'>) => {
-    const newRide: Ride = {
-      ...rideData,
-      id: Date.now(),
-      createdAt: new Date().toISOString(),
-    };
-    setRides(prev => [newRide, ...prev]);
-  };
-
-  const addOrder = (orderData: Omit<Order, 'id' | 'status'>) => {
-    const newOrder: Order = {
-      ...orderData,
-      id: Date.now(),
-      status: 'new',
-    };
-    setOrders(prev => [...prev, newOrder]);
-  };
-
-  const loginAsDriver = (driverId: number) => {
-    const driver = drivers.find(d => d.id === driverId);
-    if (driver && driver.status === 'verified') {
-      setUser({ id: driver.id, name: driver.name, role: 'driver' });
-    } else if (driver) {
-      alert('Your application is not verified yet.');
-    } else {
-      alert('Driver not found');
+  const addDriverApplication = async (driverData: Omit<Driver, 'id' | 'status'>) => {
+    try {
+      await addDoc(collection(db, "drivers"), {
+        ...driverData,
+        status: 'pending',
+      });
+    } catch (error) {
+      console.error("Error adding driver application: ", error);
     }
   };
 
-  const loginAsAdmin = () => {
-    setUser({ id: 999, name: 'Admin', role: 'admin' });
+  const updateDriverStatus = async (driverId: string, status: 'verified' | 'rejected') => {
+    const driverDoc = doc(db, "drivers", driverId);
+    await updateDoc(driverDoc, { status });
+  };
+
+  const addRide = async (rideData: Omit<Ride, 'id' | 'createdAt'>) => {
+    await addDoc(collection(db, "rides"), {
+      ...rideData,
+      createdAt: new Date().toISOString(),
+    });
+  };
+
+  const addOrder = async (orderData: Omit<Order, 'id' | 'status'>) => {
+    await addDoc(collection(db, "orders"), {
+      ...orderData,
+      status: 'new',
+    });
+  };
+
+  const loginAsAdmin = async (email: string, password: string):Promise<void> => {
+     try {
+        await signInWithEmailAndPassword(auth, email, password);
+     } catch (error) {
+        console.error("Admin login failed:", error);
+        if (error instanceof Error) {
+            throw new Error(error.message);
+        }
+        throw new Error('An unknown error occurred during login.');
+     }
   };
   
-  const logout = () => {
-    setUser(null);
+  const logout = async () => {
+    await signOut(auth);
   };
 
 
@@ -88,7 +115,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       drivers, rides, orders, 
       addDriverApplication, updateDriverStatus,
       addRide, addOrder,
-      loginAsDriver, loginAsAdmin, logout
+      loginAsAdmin, logout,
+      loading
     }}>
       {children}
     </AppContext.Provider>

@@ -26,10 +26,13 @@ export default function CreateRidePage() {
     throw new Error('CreateRidePage must be used within an AppProvider');
   }
 
-  const { user, addRide, language, translations } = context;
+  const { user, addRide, language, translations, drivers } = context;
   const t = translations[language];
 
-  if (!user || user.role !== 'driver') {
+  // A logged-in admin is not a driver. This logic checks if the user is a verified driver.
+  const isVerifiedDriver = user && drivers.some(d => d.id === user.uid && d.status === 'verified');
+
+  if (!isVerifiedDriver) {
     return (
         <div className="container mx-auto py-8 px-4 flex justify-center items-center h-[calc(100vh-8rem)]">
             <Card className="w-full max-w-md text-center">
@@ -55,23 +58,25 @@ export default function CreateRidePage() {
       return;
     }
     
-    addRide({
-      driverId: user.id,
-      from,
-      to,
-      price: Number(price),
-      info,
-    });
-    
-    toast({
-        title: t.ridePublished,
-        description: t.yourRideIsNowLive,
-    });
+    if (user) {
+        addRide({
+          driverId: user.uid,
+          from,
+          to,
+          price: Number(price),
+          info,
+        });
+        
+        toast({
+            title: t.ridePublished,
+            description: t.yourRideIsNowLive,
+        });
 
-    setFrom('');
-    setTo('');
-    setPrice('');
-    setInfo('');
+        setFrom('');
+        setTo('');
+        setPrice('');
+        setInfo('');
+    }
   };
 
   return (
@@ -79,7 +84,7 @@ export default function CreateRidePage() {
       <Card className="w-full max-w-2xl">
         <CardHeader>
           <CardTitle className="font-headline text-2xl">{t.publishNewRide}</CardTitle>
-          <CardDescription>{t.youMustBeVerified}</CardDescription>
+          <CardDescription>{t.fillTheForm}</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">

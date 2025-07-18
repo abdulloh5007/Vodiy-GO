@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Check, X, ShieldAlert } from 'lucide-react';
+import { Check, X, ShieldAlert, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 
 export default function AdminPage() {
@@ -16,8 +16,16 @@ export default function AdminPage() {
     throw new Error('AdminPage must be used within an AppProvider');
   }
   
-  const { drivers, updateDriverStatus, user, language, translations } = context;
+  const { drivers, updateDriverStatus, user, language, translations, loading } = context;
   const t = translations[language];
+
+  if (loading) {
+    return (
+        <div className="container mx-auto py-8 px-4 flex justify-center items-center h-[calc(100vh-8rem)]">
+            <Loader2 className="h-16 w-16 animate-spin text-primary" />
+        </div>
+    );
+  }
 
   if (!user || user.role !== 'admin') {
     return (
@@ -41,7 +49,7 @@ export default function AdminPage() {
       <Card>
         <CardHeader>
           <CardTitle className="font-headline text-2xl">{t.registrationApplications}</CardTitle>
-          <CardDescription>{t.noPendingApplications}</CardDescription>
+          <CardDescription>{pendingDrivers.length > 0 ? `You have ${pendingDrivers.length} pending applications.` : t.noPendingApplications}</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>

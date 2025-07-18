@@ -1,5 +1,5 @@
 export type Driver = {
-  id: number;
+  id: string; // Changed to string for Firestore document IDs
   name: string;
   phone: string;
   carModel: string;
@@ -9,8 +9,8 @@ export type Driver = {
 };
 
 export type Ride = {
-  id: number;
-  driverId: number;
+  id: string; // Changed to string for Firestore document IDs
+  driverId: string; // Can be string if it refers to driver doc ID
   from: string;
   to: string;
   price: number;
@@ -19,8 +19,8 @@ export type Ride = {
 };
 
 export type Order = {
-  id: number;
-  rideId: number;
+  id: string; // Changed to string for Firestore document IDs
+  rideId: string;
   clientName: string;
   clientPhone: string;
   status: 'new' | 'accepted' | 'rejected';
