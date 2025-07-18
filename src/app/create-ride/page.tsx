@@ -9,9 +9,45 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { ShieldAlert } from 'lucide-react';
+import { ShieldAlert, Loader2 } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const locations = ["Tashkent", "Andijan", "Fergana", "Samarkand", "Bukhara"];
+
+
+function CreateRideSkeleton() {
+    return (
+        <div className="container mx-auto py-8 px-4 flex justify-center">
+            <Card className="w-full max-w-2xl">
+                <CardHeader>
+                    <Skeleton className="h-8 w-1/2" />
+                    <Skeleton className="h-5 w-3/4" />
+                </CardHeader>
+                <CardContent className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Skeleton className="h-5 w-16" />
+                            <Skeleton className="h-10 w-full" />
+                        </div>
+                        <div className="space-y-2">
+                             <Skeleton className="h-5 w-16" />
+                            <Skeleton className="h-10 w-full" />
+                        </div>
+                    </div>
+                     <div className="space-y-2">
+                        <Skeleton className="h-5 w-16" />
+                        <Skeleton className="h-10 w-full" />
+                    </div>
+                     <div className="space-y-2">
+                        <Skeleton className="h-5 w-32" />
+                        <Skeleton className="h-20 w-full" />
+                    </div>
+                    <Skeleton className="h-10 w-full" />
+                </CardContent>
+            </Card>
+        </div>
+    )
+}
 
 export default function CreateRidePage() {
   const context = useContext(AppContext);
@@ -26,14 +62,13 @@ export default function CreateRidePage() {
     throw new Error('CreateRidePage must be used within an AppProvider');
   }
 
-  const { user, addRide, language, translations, drivers } = context;
+  const { user, addRide, translations, drivers, loading } = context;
   const t = translations;
 
-  // A logged-in admin is not a driver. This logic checks if the user is a verified driver.
   const isVerifiedDriver = user && drivers.some(d => d.id === user.uid && d.status === 'verified');
 
-  if (!t.home) {
-      return <div>Loading...</div>
+  if (loading || !t.home) {
+      return <CreateRideSkeleton />;
   }
 
   if (!isVerifiedDriver) {

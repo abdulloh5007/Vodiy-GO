@@ -8,6 +8,61 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Check, X, ShieldAlert, Loader2 } from 'lucide-react';
 import Image from 'next/image';
+import { Skeleton } from '@/components/ui/skeleton';
+
+
+function AdminPageSkeleton() {
+    return (
+        <div className="container mx-auto py-8 px-4">
+            <Card>
+                <CardHeader>
+                    <Skeleton className="h-8 w-1/2" />
+                    <Skeleton className="h-5 w-1/3" />
+                </CardHeader>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead><Skeleton className="h-5 w-20" /></TableHead>
+                        <TableHead><Skeleton className="h-5 w-24" /></TableHead>
+                        <TableHead><Skeleton className="h-5 w-16" /></TableHead>
+                        <TableHead className="text-right"><Skeleton className="h-5 w-20" /></TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {[...Array(3)].map((_, i) => (
+                           <TableRow key={i}>
+                                <TableCell>
+                                    <Skeleton className="h-5 w-24 mb-2" />
+                                    <Skeleton className="h-4 w-32" />
+                                </TableCell>
+                                <TableCell>
+                                    <div className="flex items-center gap-3">
+                                        <Skeleton className="h-10 w-16 rounded-md" />
+                                        <div>
+                                            <Skeleton className="h-5 w-28 mb-2" />
+                                            <Skeleton className="h-4 w-20" />
+                                        </div>
+                                    </div>
+                                </TableCell>
+                                <TableCell>
+                                    <Skeleton className="h-6 w-16 rounded-full" />
+                                </TableCell>
+                                <TableCell className="text-right">
+                                    <div className="flex justify-end gap-2">
+                                        <Skeleton className="h-8 w-8 rounded-md" />
+                                        <Skeleton className="h-8 w-8 rounded-md" />
+                                    </div>
+                                </TableCell>
+                           </TableRow>
+                        ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+            </Card>
+        </div>
+    )
+}
 
 export default function AdminPage() {
   const context = useContext(AppContext);
@@ -16,20 +71,13 @@ export default function AdminPage() {
     throw new Error('AdminPage must be used within an AppProvider');
   }
   
-  const { drivers, updateDriverStatus, user, language, translations, loading } = context;
+  const { drivers, updateDriverStatus, user, translations, loading } = context;
   const t = translations;
 
-  if (loading) {
-    return (
-        <div className="container mx-auto py-8 px-4 flex justify-center items-center h-[calc(100vh-8rem)]">
-            <Loader2 className="h-16 w-16 animate-spin text-primary" />
-        </div>
-    );
+  if (loading || !t.home) {
+    return <AdminPageSkeleton />;
   }
   
-  if (!t.home) {
-      return <div>Loading...</div>
-  }
 
   if (!user || user.role !== 'admin') {
     return (

@@ -9,6 +9,44 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, ShieldAlert } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+
+
+function RegisterDriverSkeleton() {
+    return (
+         <div className="container mx-auto py-8 px-4 flex justify-center">
+            <Card className="w-full max-w-2xl">
+                <CardHeader>
+                    <Skeleton className="h-8 w-1/2" />
+                    <Skeleton className="h-5 w-3/4" />
+                </CardHeader>
+                <CardContent className="space-y-6 pt-6">
+                    <div className="space-y-2">
+                        <Skeleton className="h-5 w-24" />
+                        <Skeleton className="h-10 w-full" />
+                    </div>
+                     <div className="space-y-2">
+                        <Skeleton className="h-5 w-24" />
+                        <Skeleton className="h-10 w-full" />
+                    </div>
+                     <div className="space-y-2">
+                        <Skeleton className="h-5 w-24" />
+                        <Skeleton className="h-10 w-full" />
+                    </div>
+                     <div className="space-y-2">
+                        <Skeleton className="h-5 w-24" />
+                        <Skeleton className="h-10 w-full" />
+                    </div>
+                     <div className="space-y-2">
+                        <Skeleton className="h-5 w-24" />
+                        <Skeleton className="h-10 w-full" />
+                    </div>
+                    <Skeleton className="h-10 w-full" />
+                </CardContent>
+            </Card>
+        </div>
+    );
+}
 
 export default function RegisterDriverPage() {
   const context = useContext(AppContext);
@@ -25,7 +63,7 @@ export default function RegisterDriverPage() {
     throw new Error('RegisterDriverPage must be used within an AppProvider');
   }
 
-  const { user, addDriverApplication, language, translations, drivers, loading } = context;
+  const { user, addDriverApplication, translations, drivers, loading } = context;
   const t = translations;
 
   const driverProfile = user ? drivers.find(d => d.id === user.uid) : undefined;
@@ -41,12 +79,8 @@ export default function RegisterDriverPage() {
   }, [driverProfile]);
 
 
-  if (loading) {
-    return <div className="container mx-auto py-8 px-4 flex justify-center items-center h-[calc(100vh-8rem)]"><Loader2 className="h-16 w-16 animate-spin text-primary" /></div>;
-  }
-  
-  if (!t.home) {
-      return <div>Loading...</div>
+  if (loading || !t.home) {
+    return <RegisterDriverSkeleton />;
   }
 
   if (!user) {
@@ -116,7 +150,7 @@ export default function RegisterDriverPage() {
               <Label htmlFor="carPhotoUrl">{t.carPhotoUrl}</Label>
               <Input id="carPhotoUrl" type="url" value={carPhotoUrl} onChange={e => setCarPhotoUrl(e.target.value)} placeholder="https://placehold.co/600x400.png" required />
             </div>
-            <Button type="submit" className="w-full">{driverProfile ? 'Update Application' : t.submitApplication}</Button>
+            <Button type="submit" className="w-full">{driverProfile && driverProfile.status !== 'unsubmitted' ? 'Update Application' : t.submitApplication}</Button>
           </form>
         </CardContent>
       </Card>

@@ -1,20 +1,67 @@
 'use client';
 
 import { useState, useMemo, useContext } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { AppContext } from '@/contexts/AppContext';
 import { RideCard } from '@/components/RideCard';
 import { Ride } from '@/lib/types';
-import { MapPin } from 'lucide-react';
+import { MapPin, Loader2 } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+
+function HomeSkeleton() {
+  return (
+    <div className="container mx-auto py-8 px-4">
+      <Card className="mb-8">
+        <CardHeader>
+           <Skeleton className="h-8 w-48" />
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+            <div className="space-y-1">
+              <Skeleton className="h-5 w-16" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+            <div className="space-y-1">
+              <Skeleton className="h-5 w-16" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+            <Skeleton className="h-10 w-full md:w-auto" />
+          </div>
+        </CardContent>
+      </Card>
+      <div>
+        <Skeleton className="h-9 w-64 mb-6" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[...Array(3)].map((_, i) => (
+            <Card key={i}>
+              <CardHeader className="p-0">
+                <Skeleton className="h-48 w-full" />
+              </CardHeader>
+              <CardContent className="p-4">
+                <Skeleton className="h-6 w-3/4 mb-4" />
+                <Skeleton className="h-5 w-1/2 mb-2" />
+                <Skeleton className="h-5 w-full" />
+              </CardContent>
+              <CardFooter className="p-4">
+                <Skeleton className="h-10 w-full" />
+              </CardFooter>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 
 export default function Home() {
   const context = useContext(AppContext);
   if (!context) {
     throw new Error('Home must be used within an AppProvider');
   }
-  const { rides, drivers, translations, language } = context;
+  const { rides, drivers, translations, language, loading } = context;
 
   const [from, setFrom] = useState('all');
   const [to, setTo] = useState('all');
@@ -47,8 +94,8 @@ export default function Home() {
     console.log(`Searching from: ${from}, to: ${to}`);
   };
   
-  if (!t.home) {
-      return <div>Loading...</div>
+  if (loading || !t.home) {
+      return <HomeSkeleton />;
   }
 
   return (

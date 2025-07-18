@@ -2,6 +2,7 @@
 
 import { useContext } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { AppContext } from '@/contexts/AppContext';
 import { RoadPilotLogo } from '@/components/icons';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
@@ -14,10 +15,12 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import { LogIn, Menu, Car, FileText, LogOut } from 'lucide-react';
+import { LogIn, Menu, Car, FileText, LogOut, Home } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 export function Header() {
   const context = useContext(AppContext);
+  const pathname = usePathname();
 
   if (!context) {
     return null;
@@ -34,6 +37,13 @@ export function Header() {
     )
   }
 
+  const navLinks = [
+    { href: '/', label: t.home, icon: Home, roles: ['driver', 'admin'] },
+    { href: '/admin', label: t.registrationApplications, icon: FileText, roles: ['admin'] },
+    { href: '/register-driver', label: t.carSettings || "Car Settings", icon: Car, roles: ['driver'] },
+    { href: '/create-ride', label: t.createRide, icon: FileText, roles: ['driver'] },
+  ];
+
   const renderUserMenu = () => (
     <Sheet>
       <SheetTrigger asChild>
@@ -41,27 +51,26 @@ export function Header() {
           <Menu className="h-6 w-6" />
         </Button>
       </SheetTrigger>
-      <SheetContent>
+      <SheetContent className="flex flex-col">
         <SheetHeader>
           <SheetTitle>{user?.email}</SheetTitle>
         </SheetHeader>
-        <div className="grid grid-cols-2 gap-4 py-8">
-            {user?.role === 'admin' && (
-                <Button variant="outline" asChild className="h-24 flex-col gap-2">
-                    <Link href="/admin"><FileText/><span>{t.registrationApplications}</span></Link>
-                </Button>
-            )}
-            {user?.role === 'driver' && (
-            <>
-                <Button variant="outline" asChild className="h-24 flex-col gap-2">
-                    <Link href="/register-driver"><Car /><span>{t.carSettings || "Car Settings"}</span></Link>
-                </Button>
-                <Button variant="outline" asChild className="h-24 flex-col gap-2">
-                    <Link href="/create-ride"><FileText/><span>{t.createRide}</span></Link>
-                </Button>
-            </>
-            )}
-             <Button variant="outline" onClick={logout} className="h-24 flex-col gap-2 text-destructive hover:text-destructive">
+        <div className="flex-grow py-4">
+            <div className="grid grid-cols-2 gap-4">
+                {navLinks.filter(link => user?.role && link.roles.includes(user.role)).map(link => (
+                    <Button 
+                        key={link.href}
+                        variant={pathname === link.href ? 'secondary' : 'outline'} 
+                        asChild 
+                        className="h-24 flex-col gap-2"
+                    >
+                        <Link href={link.href}><link.icon/><span>{link.label}</span></Link>
+                    </Button>
+                ))}
+            </div>
+        </div>
+        <div className="mt-auto">
+             <Button variant="ghost" onClick={logout} className="w-full justify-center text-destructive hover:text-destructive">
                 <LogOut />
                 <span>{t.logout}</span>
             </Button>
@@ -82,7 +91,7 @@ export function Header() {
           <ThemeToggle />
           <LanguageSwitcher />
           {loading ? null : user ? renderUserMenu() : (
-            <Button asChild variant="ghost">
+            <Button asChild>
               <Link href="/admin/login">
                 <LogIn className="mr-2 h-4 w-4" />
                 {t.loginAsDriver}
