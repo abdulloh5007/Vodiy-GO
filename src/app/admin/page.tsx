@@ -17,7 +17,7 @@ export default function AdminPage() {
   }
   
   const { drivers, updateDriverStatus, user, language, translations, loading } = context;
-  const t = translations[language];
+  const t = translations;
 
   if (loading) {
     return (
@@ -25,6 +25,10 @@ export default function AdminPage() {
             <Loader2 className="h-16 w-16 animate-spin text-primary" />
         </div>
     );
+  }
+  
+  if (!t.home) {
+      return <div>Loading...</div>
   }
 
   if (!user || user.role !== 'admin') {

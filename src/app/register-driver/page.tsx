@@ -1,16 +1,19 @@
 'use client';
 
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { AppContext } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useToast } from "@/hooks/use-toast"
+import { useToast } from "@/hooks/use-toast";
+import { Loader2, ShieldAlert } from 'lucide-react';
 
 export default function RegisterDriverPage() {
   const context = useContext(AppContext);
   const { toast } = useToast();
+  const router = useRouter();
 
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -22,10 +25,46 @@ export default function RegisterDriverPage() {
     throw new Error('RegisterDriverPage must be used within an AppProvider');
   }
 
-  const { addDriverApplication, language, translations } = context;
-  const t = translations[language];
+  const { user, addDriverApplication, language, translations, drivers, loading } = context;
+  const t = translations;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const driverProfile = user ? drivers.find(d => d.id === user.uid) : undefined;
+  
+  useEffect(() => {
+      if (driverProfile) {
+          setName(driverProfile.name);
+          setPhone(driverProfile.phone);
+          setCarModel(driverProfile.carModel);
+          setCarNumber(driverProfile.carNumber);
+          setCarPhotoUrl(driverProfile.carPhotoUrl);
+      }
+  }, [driverProfile]);
+
+
+  if (loading) {
+    return <div className="container mx-auto py-8 px-4 flex justify-center items-center h-[calc(100vh-8rem)]"><Loader2 className="h-16 w-16 animate-spin text-primary" /></div>;
+  }
+  
+  if (!t.home) {
+      return <div>Loading...</div>
+  }
+
+  if (!user) {
+     return (
+        <div className="container mx-auto py-8 px-4 flex justify-center items-center h-[calc(100vh-8rem)]">
+            <Card className="w-full max-w-md text-center">
+                <CardHeader>
+                    <CardTitle className="flex items-center justify-center gap-2"><ShieldAlert className="text-destructive h-8 w-8"/>{t.accessDenied}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <p>Please log in to register as a driver.</p>
+                </CardContent>
+            </Card>
+        </div>
+    );
+  }
+  
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !phone || !carModel || !carNumber || !carPhotoUrl) {
       toast({
@@ -36,19 +75,16 @@ export default function RegisterDriverPage() {
       return;
     }
     
-    addDriverApplication({ name, phone, carModel, carNumber, carPhotoUrl });
+    if (user) {
+        await addDriverApplication({ name, phone, carModel, carNumber, carPhotoUrl });
 
-    toast({
-        title: t.applicationSubmitted,
-        description: t.weWillReviewYourApplication,
-    });
-
-    // Reset form
-    setName('');
-    setPhone('');
-    setCarModel('');
-    setCarNumber('');
-    setCarPhotoUrl('');
+        toast({
+            title: t.applicationSubmitted,
+            description: t.weWillReviewYourApplication,
+        });
+        
+        router.push('/');
+    }
   };
 
   return (
@@ -56,7 +92,7 @@ export default function RegisterDriverPage() {
       <Card className="w-full max-w-2xl">
         <CardHeader>
           <CardTitle className="font-headline text-2xl">{t.driverRegistration}</CardTitle>
-          <CardDescription>{t.fillTheForm}</CardDescription>
+          <CardDescription>{driverProfile?.status ? `Your current status: ${driverProfile.status}` : t.fillTheForm}</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -80,7 +116,7 @@ export default function RegisterDriverPage() {
               <Label htmlFor="carPhotoUrl">{t.carPhotoUrl}</Label>
               <Input id="carPhotoUrl" type="url" value={carPhotoUrl} onChange={e => setCarPhotoUrl(e.target.value)} placeholder="https://placehold.co/600x400.png" required />
             </div>
-            <Button type="submit" className="w-full">{t.submitApplication}</Button>
+            <Button type="submit" className="w-full">{driverProfile ? 'Update Application' : t.submitApplication}</Button>
           </form>
         </CardContent>
       </Card>

@@ -1,25 +1,31 @@
+export type User = {
+  uid: string;
+  email: string | null;
+  role: 'driver' | 'admin';
+};
+
 export type Driver = {
-  id: string; // Changed to string for Firestore document IDs
+  id: string; 
   name: string;
   phone: string;
   carModel: string;
   carNumber: string;
   carPhotoUrl: string;
-  status: 'pending' | 'verified' | 'rejected';
+  status: 'pending' | 'verified' | 'rejected' | 'unsubmitted';
 };
 
 export type Ride = {
-  id: string; // Changed to string for Firestore document IDs
-  driverId: string; // Can be string if it refers to driver doc ID
+  id: string; 
+  driverId: string; 
   from: string;
   to: string;
   price: number;
   info: string;
-  createdAt: string;
+  createdAt: any; // Allow server timestamp
 };
 
 export type Order = {
-  id: string; // Changed to string for Firestore document IDs
+  id: string; 
   rideId: string;
   clientName: string;
   clientPhone: string;
@@ -29,5 +35,5 @@ export type Order = {
 export type Language = 'en' | 'ru' | 'uz';
 
 export type Translations = {
-  [key: string]: string;
+  [key: string]: string | { [key: string]: string };
 };

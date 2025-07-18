@@ -5,12 +5,12 @@ import { getAuth } from "firebase/auth";
 
 // TODO: Add your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyBdz-2bJjg8zyUY30MRvQI-ZQ9UwKvizPM",
+  authDomain: "gameroom-booking.firebaseapp.com",
+  projectId: "gameroom-booking",
+  storageBucket: "gameroom-booking.firebasestorage.app",
+  messagingSenderId: "505009384076",
+  appId: "1:505009384076:web:f285d98d0f6dbd6a23a9a9"
 };
 
 // Initialize Firebase

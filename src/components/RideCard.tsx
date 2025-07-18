@@ -25,7 +25,7 @@ export function RideCard({ ride }: RideCardProps) {
 
   if (!context) return null;
   const { drivers, translations, language, addOrder } = context;
-  const t = translations[language];
+  const t = translations;
 
   const driver = drivers.find(d => d.id === ride.driverId);
 
@@ -53,6 +53,10 @@ export function RideCard({ ride }: RideCardProps) {
         description: t.yourRideIsBooked,
     });
   };
+  
+  if (!t.home) {
+      return null; // Or a loading skeleton
+  }
 
   return (
     <>

@@ -19,7 +19,7 @@ export default function Home() {
   const [from, setFrom] = useState('all');
   const [to, setTo] = useState('all');
 
-  const t = translations[language];
+  const t = translations;
 
   const availableLocations = useMemo(() => {
     const locations = new Set<string>();
@@ -46,6 +46,10 @@ export default function Home() {
     // In a real app, this might trigger an API call.
     console.log(`Searching from: ${from}, to: ${to}`);
   };
+  
+  if (!t.home) {
+      return <div>Loading...</div>
+  }
 
   return (
     <div className="container mx-auto py-8 px-4">

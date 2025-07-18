@@ -27,10 +27,14 @@ export default function CreateRidePage() {
   }
 
   const { user, addRide, language, translations, drivers } = context;
-  const t = translations[language];
+  const t = translations;
 
   // A logged-in admin is not a driver. This logic checks if the user is a verified driver.
   const isVerifiedDriver = user && drivers.some(d => d.id === user.uid && d.status === 'verified');
+
+  if (!t.home) {
+      return <div>Loading...</div>
+  }
 
   if (!isVerifiedDriver) {
     return (
