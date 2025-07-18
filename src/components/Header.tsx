@@ -84,7 +84,7 @@ export function Header() {
                             asChild 
                             className="h-28 flex-col gap-2 text-sm rounded-lg"
                         >
-                            <Link href={link.href}><link.icon className="mb-1"/><span>{link.label}</span></Link>
+                            <Link href={link.href}><link.icon className="mb-1 h-6 w-6"/><span>{link.label}</span></Link>
                         </Button>
                     ))}
                 </div>
@@ -108,7 +108,7 @@ export function Header() {
                             asChild 
                             className="h-28 flex-col gap-2 text-sm rounded-lg"
                         >
-                            <Link href={link.href}><link.icon className="mb-1"/><span>{link.label}</span></Link>
+                            <Link href={link.href}><link.icon className="mb-1 h-8 w-8"/><span>{link.label}</span></Link>
                         </Button>
                     ))}
                 </div>
