@@ -1,9 +1,13 @@
 {
     "home": "Bosh sahifa",
+    "login": "Kirish",
+    "register": "Ro'yxatdan o'tish",
+    "loginDescription": "Hisobingizga kirish uchun ma'lumotlaringizni kiriting.",
+    "registerDescription": "Boshlash uchun yangi hisob yarating.",
     "registerDriver": "Haydovchi bo'lish",
     "createRide": "Qatnov e'lon qilish",
     "adminPanel": "Admin Paneli",
-    "loginAsDriver": "Haydovchi bo'lib kirish",
+    "loginAsDriver": "Haydovchi Kirish/Ro'yxatdan o'tish",
     "loginAsAdmin": "Admin bo'lib kirish",
     "logout": "Chiqish",
     "findRide": "Qatnov topish",
@@ -52,5 +56,17 @@
     "accessDenied": "Ruxsat yo'q",
     "onlyAdminsCanAccess": "Ushbu sahifaga faqat administratorlar kira oladi.",
     "loading": "Yuklanmoqda...",
-    "carSettings": "Mashina sozlamalari"
+    "carSettings": "Mashina sozlamalari",
+    "validationErrorTitle": "Validatsiya xatosi",
+    "validationErrorDesc": "Iltimos, email va parolni kiriting.",
+    "loginSuccessTitle": "Muvaffaqiyatli kirish",
+    "registrationSuccessTitle": "Muvaffaqiyatli ro'yxatdan o'tish",
+    "redirecting": "Yo'naltirilmoqda...",
+    "loginFailedTitle": "Kirishda xatolik",
+    "registrationFailedTitle": "Ro'yxatdan o'tishda xatolik",
+    "errorInvalidCredential": "Noto'g'ri email yoki parol.",
+    "errorEmailInUse": "Bu email allaqachon ishlatilgan.",
+    "errorWeakPassword": "Parol kamida 6 belgidan iborat bo'lishi kerak.",
+    "unknownAuthError": "Kutilmagan autentifikatsiya xatosi yuz berdi.",
+    "unknownError": "Noma'lum xato yuz berdi."
 }

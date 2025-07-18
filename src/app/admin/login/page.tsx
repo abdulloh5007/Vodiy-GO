@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { FirebaseError } from 'firebase/app';
 
 export default function LoginPage() {
   const context = useContext(AppContext);
@@ -23,15 +24,15 @@ export default function LoginPage() {
     throw new Error('LoginPage must be used within an AppProvider');
   }
 
-  const { login, register, language, translations } = context;
+  const { login, register, translations } = context;
   const t = translations;
 
   const handleAuth = async (action: 'login' | 'register', e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) {
       toast({
-        title: "Validation Error",
-        description: "Please enter email and password.",
+        title: t.validationErrorTitle,
+        description: t.validationErrorDesc,
         variant: "destructive",
       });
       return;
@@ -42,21 +43,37 @@ export default function LoginPage() {
       if (action === 'login') {
         await login(email, password);
         toast({
-          title: "Login Successful",
-          description: "Redirecting...",
+          title: t.loginSuccessTitle,
+          description: t.redirecting,
         });
       } else {
         await register(email, password);
         toast({
-          title: "Registration Successful",
-          description: "Redirecting...",
+          title: t.registrationSuccessTitle,
+          description: t.redirecting,
         });
       }
       router.push('/');
     } catch (error) {
+        let errorMessage = t.unknownError;
+        if (error instanceof FirebaseError) {
+            switch (error.code) {
+                case 'auth/invalid-credential':
+                    errorMessage = t.errorInvalidCredential;
+                    break;
+                case 'auth/email-already-in-use':
+                    errorMessage = t.errorEmailInUse;
+                    break;
+                case 'auth/weak-password':
+                    errorMessage = t.errorWeakPassword;
+                    break;
+                default:
+                    errorMessage = t.unknownAuthError;
+            }
+        }
       toast({
-        title: action === 'login' ? "Login Failed" : "Registration Failed",
-        description: (error as Error).message,
+        title: action === 'login' ? t.loginFailedTitle : t.registrationFailedTitle,
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -72,14 +89,14 @@ export default function LoginPage() {
     <div className="container mx-auto py-8 px-4 flex justify-center">
         <Tabs defaultValue="login" className="w-full max-w-md">
             <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="login">Login</TabsTrigger>
-                <TabsTrigger value="register">Register</TabsTrigger>
+                <TabsTrigger value="login">{t.login}</TabsTrigger>
+                <TabsTrigger value="register">{t.register}</TabsTrigger>
             </TabsList>
             <TabsContent value="login">
                 <Card>
                     <CardHeader>
                         <CardTitle className="font-headline text-2xl">{t.loginAsDriver}</CardTitle>
-                        <CardDescription>Enter your credentials to access your account.</CardDescription>
+                        <CardDescription>{t.loginDescription}</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <form onSubmit={(e) => handleAuth('login', e)} className="space-y-6">
@@ -91,7 +108,7 @@ export default function LoginPage() {
                                 <Label htmlFor="login-password">Password</Label>
                                 <Input id="login-password" type="password" value={password} onChange={e => setPassword(e.target.value)} required />
                             </div>
-                            <Button type="submit" className="w-full" disabled={isSubmitting}>Login</Button>
+                            <Button type="submit" className="w-full" disabled={isSubmitting}>{t.login}</Button>
                         </form>
                     </CardContent>
                 </Card>
@@ -99,8 +116,8 @@ export default function LoginPage() {
             <TabsContent value="register">
                 <Card>
                     <CardHeader>
-                        <CardTitle className="font-headline text-2xl">Register as a Driver</CardTitle>
-                        <CardDescription>Create a new account to get started.</CardDescription>
+                        <CardTitle className="font-headline text-2xl">{t.registerAsDriver}</CardTitle>
+                        <CardDescription>{t.registerDescription}</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <form onSubmit={(e) => handleAuth('register', e)} className="space-y-6">
@@ -112,7 +129,7 @@ export default function LoginPage() {
                                 <Label htmlFor="register-password">Password</Label>
                                 <Input id="register-password" type="password" value={password} onChange={e => setPassword(e.target.value)} required />
                             </div>
-                            <Button type="submit" className="w-full" disabled={isSubmitting}>Register</Button>
+                            <Button type="submit" className="w-full" disabled={isSubmitting}>{t.register}</Button>
                         </form>
                     </CardContent>
                 </Card>

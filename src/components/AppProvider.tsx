@@ -103,50 +103,33 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   };
 
   const login = async (email: string, password: string):Promise<void> => {
-     try {
-        await signInWithEmailAndPassword(auth, email, password);
-     } catch (error) {
-        console.error("Login failed:", error);
-        if (error instanceof Error) {
-            throw new Error(error.message);
-        }
-        throw new Error('An unknown error occurred during login.');
-     }
+    await signInWithEmailAndPassword(auth, email, password);
   };
   
   const register = async (email: string, password: string): Promise<void> => {
-    try {
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        const firebaseUser = userCredential.user;
-        
-        const batch = writeBatch(db);
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const firebaseUser = userCredential.user;
+    
+    const batch = writeBatch(db);
 
-        // Create user document in 'users' collection
-        const userDocRef = doc(db, "users", firebaseUser.uid);
-        const newUser: User = { uid: firebaseUser.uid, email: firebaseUser.email, role: 'driver' };
-        batch.set(userDocRef, newUser);
-        
-        // Create an initial empty driver profile
-        const driverDocRef = doc(db, "drivers", firebaseUser.uid);
-        const newDriverProfile: Partial<Driver> = {
-            name: '',
-            phone: '',
-            carModel: '',
-            carNumber: '',
-            carPhotoUrl: '',
-            status: 'unsubmitted'
-        }
-        batch.set(driverDocRef, newDriverProfile);
-        
-        await batch.commit();
-
-    } catch (error) {
-        console.error("Registration failed:", error);
-         if (error instanceof Error) {
-            throw new Error(error.message);
-        }
-        throw new Error('An unknown error occurred during registration.');
+    // Create user document in 'users' collection
+    const userDocRef = doc(db, "users", firebaseUser.uid);
+    const newUser: User = { uid: firebaseUser.uid, email: firebaseUser.email, role: 'driver' };
+    batch.set(userDocRef, newUser);
+    
+    // Create an initial empty driver profile
+    const driverDocRef = doc(db, "drivers", firebaseUser.uid);
+    const newDriverProfile: Partial<Driver> = {
+        name: '',
+        phone: '',
+        carModel: '',
+        carNumber: '',
+        carPhotoUrl: '',
+        status: 'unsubmitted'
     }
+    batch.set(driverDocRef, newDriverProfile);
+    
+    await batch.commit();
   };
   
   const logout = async () => {

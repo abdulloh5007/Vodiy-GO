@@ -1,9 +1,13 @@
 {
     "home": "Главная",
+    "login": "Вход",
+    "register": "Регистрация",
+    "loginDescription": "Введите свои данные для входа в аккаунт.",
+    "registerDescription": "Создайте новый аккаунт, чтобы начать.",
     "registerDriver": "Стать водителем",
     "createRide": "Опубликовать поездку",
     "adminPanel": "Админ-панель",
-    "loginAsDriver": "Вход для водителя",
+    "loginAsDriver": "Вход/Регистрация водителя",
     "loginAsAdmin": "Войти как админ",
     "logout": "Выйти",
     "findRide": "Найти поездку",
@@ -52,5 +56,17 @@
     "accessDenied": "Доступ запрещен",
     "onlyAdminsCanAccess": "Только администраторы могут получить доступ к этой странице.",
     "loading": "Загрузка...",
-    "carSettings": "Настройки машины"
+    "carSettings": "Настройки машины",
+    "validationErrorTitle": "Ошибка валидации",
+    "validationErrorDesc": "Пожалуйста, введите почту и пароль.",
+    "loginSuccessTitle": "Вход выполнен успешно",
+    "registrationSuccessTitle": "Регистрация прошла успешно",
+    "redirecting": "Перенаправление...",
+    "loginFailedTitle": "Ошибка входа",
+    "registrationFailedTitle": "Ошибка регистрации",
+    "errorInvalidCredential": "Неправильная почта или пароль.",
+    "errorEmailInUse": "Эта почта уже используется.",
+    "errorWeakPassword": "Пароль должен содержать не менее 6 символов.",
+    "unknownAuthError": "Произошла непредвиденная ошибка аутентификации.",
+    "unknownError": "Произошла неизвестная ошибка."
 }

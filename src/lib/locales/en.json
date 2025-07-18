@@ -1,9 +1,13 @@
 {
     "home": "Home",
+    "login": "Login",
+    "register": "Register",
+    "loginDescription": "Enter your credentials to access your account.",
+    "registerDescription": "Create a new account to get started.",
     "registerDriver": "Become a Driver",
     "createRide": "Publish a Ride",
     "adminPanel": "Admin Panel",
-    "loginAsDriver": "Driver Login",
+    "loginAsDriver": "Driver Login/Sign Up",
     "loginAsAdmin": "Login as Admin",
     "logout": "Logout",
     "findRide": "Find a Ride",
@@ -52,5 +56,17 @@
     "accessDenied": "Access Denied",
     "onlyAdminsCanAccess": "Only administrators can access this page.",
     "loading": "Loading...",
-    "carSettings": "Car Settings"
+    "carSettings": "Car Settings",
+    "validationErrorTitle": "Validation Error",
+    "validationErrorDesc": "Please enter email and password.",
+    "loginSuccessTitle": "Login Successful",
+    "registrationSuccessTitle": "Registration Successful",
+    "redirecting": "Redirecting...",
+    "loginFailedTitle": "Login Failed",
+    "registrationFailedTitle": "Registration Failed",
+    "errorInvalidCredential": "Incorrect email or password.",
+    "errorEmailInUse": "This email is already in use.",
+    "errorWeakPassword": "Password should be at least 6 characters.",
+    "unknownAuthError": "An unexpected authentication error occurred.",
+    "unknownError": "An unknown error occurred."
 }

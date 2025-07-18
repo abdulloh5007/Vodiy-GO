@@ -5,22 +5,16 @@ import Link from 'next/link';
 import { AppContext } from '@/contexts/AppContext';
 import { RoadPilotLogo } from '@/components/icons';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import {
   Sheet,
   SheetContent,
+  SheetHeader,
+  SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { User, LogIn, Menu, Car, FileText } from 'lucide-react';
+import { LogIn, Menu, Car, FileText, LogOut } from 'lucide-react';
 
 export function Header() {
   const context = useContext(AppContext);
@@ -29,71 +23,53 @@ export function Header() {
     return null;
   }
 
-  const { language, translations, user, logout, loading } = context;
+  const { translations, user, logout, loading } = context;
   const t = translations;
 
-  // Wait for translations to be loaded
   if (!t.home) {
     return (
        <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-16 items-center">
-            {/* Render a minimal header or a loading state */}
-        </div>
+        <div className="container flex h-16 items-center" />
       </header>
     )
   }
 
-  const getAvatarFallback = (email: string | null | undefined) => {
-    return email ? email.charAt(0).toUpperCase() : <User className="h-5 w-5" />;
-  };
-
   const renderUserMenu = () => (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-          <Avatar className="h-8 w-8">
-            <AvatarImage src="/avatars/01.png" alt={user?.email || ''} />
-            <AvatarFallback>{getAvatarFallback(user?.email)}</AvatarFallback>
-          </Avatar>
+    <Sheet>
+      <SheetTrigger asChild>
+        <Button variant="ghost" size="icon">
+          <Menu className="h-6 w-6" />
         </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56" align="end" forceMount>
-        <DropdownMenuLabel className="font-normal">
-          <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">{user?.role}</p>
-            <p className="text-xs leading-none text-muted-foreground">
-              {user?.email}
-            </p>
-          </div>
-        </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        {user?.role === 'admin' && (
-           <DropdownMenuItem asChild>
-             <Link href="/admin"><FileText className="mr-2 h-4 w-4" /><span>{t.registrationApplications}</span></Link>
-           </DropdownMenuItem>
-        )}
-        {user?.role === 'driver' && (
-          <>
-            <DropdownMenuItem asChild>
-              <Link href="/register-driver"><Car className="mr-2 h-4 w-4" /><span>{t.carSettings || "Car Settings"}</span></Link>
-            </DropdownMenuItem>
-             <DropdownMenuItem asChild>
-              <Link href="/create-ride"><FileText className="mr-2 h-4 w-4" /><span>{t.createRide}</span></Link>
-            </DropdownMenuItem>
-          </>
-        )}
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={logout}>{t.logout}</DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+      </SheetTrigger>
+      <SheetContent>
+        <SheetHeader>
+          <SheetTitle>{user?.email}</SheetTitle>
+        </SheetHeader>
+        <div className="grid grid-cols-2 gap-4 py-8">
+            {user?.role === 'admin' && (
+                <Button variant="outline" asChild className="h-24 flex-col gap-2">
+                    <Link href="/admin"><FileText/><span>{t.registrationApplications}</span></Link>
+                </Button>
+            )}
+            {user?.role === 'driver' && (
+            <>
+                <Button variant="outline" asChild className="h-24 flex-col gap-2">
+                    <Link href="/register-driver"><Car /><span>{t.carSettings || "Car Settings"}</span></Link>
+                </Button>
+                <Button variant="outline" asChild className="h-24 flex-col gap-2">
+                    <Link href="/create-ride"><FileText/><span>{t.createRide}</span></Link>
+                </Button>
+            </>
+            )}
+             <Button variant="outline" onClick={logout} className="h-24 flex-col gap-2 text-destructive hover:text-destructive">
+                <LogOut />
+                <span>{t.logout}</span>
+            </Button>
+        </div>
+      </SheetContent>
+    </Sheet>
   );
   
-  const renderNavLinksForMobile = () => (
-      <nav className="flex flex-col space-y-4 pt-6 text-sm font-medium">
-         {/* Future mobile links can go here */}
-      </nav>
-  );
-
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center">
@@ -102,35 +78,16 @@ export function Header() {
           <span className="font-bold font-headline sm:inline-block">RoadPilot</span>
         </Link>
         
-        <div className="flex flex-1 items-center justify-end space-x-4">
+        <div className="flex flex-1 items-center justify-end space-x-2">
+          <ThemeToggle />
           <LanguageSwitcher />
           {loading ? null : user ? renderUserMenu() : (
-            <>
-              <Button asChild variant="ghost" size="sm" className="hidden md:inline-flex">
-                <Link href="/admin/login">
-                  <LogIn className="mr-2 h-4 w-4" />
-                  {t.loginAsDriver}
-                </Link>
-              </Button>
-              <Sheet>
-                <SheetTrigger asChild>
-                  <Button variant="outline" size="icon" className="md:hidden">
-                    <Menu />
-                  </Button>
-                </SheetTrigger>
-                <SheetContent>
-                  {renderNavLinksForMobile()}
-                  <div className="mt-6">
-                     <Button asChild className="w-full">
-                       <Link href="/admin/login">
-                         <LogIn className="mr-2 h-4 w-4" />
-                         {t.loginAsDriver}
-                       </Link>
-                     </Button>
-                  </div>
-                </SheetContent>
-              </Sheet>
-            </>
+            <Button asChild variant="ghost">
+              <Link href="/admin/login">
+                <LogIn className="mr-2 h-4 w-4" />
+                {t.loginAsDriver}
+              </Link>
+            </Button>
           )}
         </div>
       </div>
