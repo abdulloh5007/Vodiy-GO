@@ -6,7 +6,7 @@ import { Header } from '@/components/Header';
 import { Toaster } from "@/components/ui/toaster"
 
 export const metadata: Metadata = {
-  title: 'RoadPilot',
+  title: 'Vodiy GO',
   description: 'Reliable rides, anytime.',
 };
 
