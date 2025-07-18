@@ -19,6 +19,8 @@ interface AppContextType {
   register: (email: string, password: string) => Promise<void>;
   logout: () => void;
   loading: boolean;
+  selectedImage: string | null;
+  setSelectedImage: (url: string | null) => void;
 }
 
 export const AppContext = React.createContext<AppContextType | null>(null);

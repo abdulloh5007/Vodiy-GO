@@ -65,6 +65,7 @@
     "carSettings": "Mashina sozlamalari",
     "validationErrorTitle": "Validatsiya xatosi",
     "validationErrorDesc": "Iltimos, email va parolni kiriting.",
+    "validationErrorDescBooking": "Iltimos, ismingizni va to'liq telefon raqamingizni kiriting.",
     "loginSuccessTitle": "Muvaffaqiyatli kirish",
     "registrationSuccessTitle": "Muvaffaqiyatli ro'yxatdan o'tish",
     "redirecting": "Yo'naltirilmoqda...",

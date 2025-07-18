@@ -71,7 +71,7 @@ export default function AdminPage() {
     throw new Error('AdminPage must be used within an AppProvider');
   }
   
-  const { drivers, updateDriverStatus, user, translations, loading } = context;
+  const { drivers, updateDriverStatus, user, translations, loading, setSelectedImage } = context;
   const t = translations;
 
   if (loading || !t.home) {
@@ -123,7 +123,15 @@ export default function AdminPage() {
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-3">
-                        <Image src={driver.carPhotoUrl} alt={driver.carModel} width={64} height={40} className="rounded-md object-cover" data-ai-hint="car side" />
+                         <Image 
+                            src={driver.carPhotoUrl} 
+                            alt={driver.carModel} 
+                            width={64} 
+                            height={40} 
+                            className="rounded-md object-cover cursor-pointer" 
+                            data-ai-hint="car side"
+                            onClick={() => setSelectedImage(driver.carPhotoUrl)}
+                          />
                         <div>
                             <div>{driver.carModel}</div>
                             <div className="text-sm text-muted-foreground">{driver.carNumber}</div>

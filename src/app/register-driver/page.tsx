@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, ShieldAlert } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { formatPhoneNumber } from '@/lib/utils';
 
 
 function RegisterDriverSkeleton() {
@@ -79,27 +80,8 @@ export default function RegisterDriverPage() {
   }, [driverProfile]);
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let value = e.target.value;
-    if (!value.startsWith('+998')) {
-      value = '+998';
-    }
-
-    const digits = value.replace(/\D/g, '').slice(3); // remove '+998' and non-digits
-    let formatted = '+998';
-    if (digits.length > 0) {
-      formatted += ` (${digits.substring(0, 2)}`;
-    }
-    if (digits.length >= 3) {
-      formatted += `) ${digits.substring(2, 5)}`;
-    }
-    if (digits.length >= 6) {
-      formatted += `-${digits.substring(5, 7)}`;
-    }
-    if (digits.length >= 8) {
-      formatted += `-${digits.substring(7, 9)}`;
-    }
-    
-    setPhone(formatted.slice(0, 19)); // +998 (XX) XXX-XX-XX
+    const formatted = formatPhoneNumber(e.target.value);
+    setPhone(formatted);
   };
 
   if (loading || !t.home) {

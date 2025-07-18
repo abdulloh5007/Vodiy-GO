@@ -65,6 +65,7 @@
     "carSettings": "Car Settings",
     "validationErrorTitle": "Validation Error",
     "validationErrorDesc": "Please enter email and password.",
+    "validationErrorDescBooking": "Please fill in your name and a complete phone number.",
     "loginSuccessTitle": "Login Successful",
     "registrationSuccessTitle": "Registration Successful",
     "redirecting": "Redirecting...",

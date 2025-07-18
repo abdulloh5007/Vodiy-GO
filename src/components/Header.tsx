@@ -1,6 +1,6 @@
 'use client';
 
-import { useContext } from 'react';
+import { useContext, useMemo } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { AppContext } from '@/contexts/AppContext';
@@ -15,7 +15,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import { LogIn, Menu, Car, FileText, LogOut, Home, User, ShoppingBag } from 'lucide-react';
+import { LogIn, Menu, Car, FileText, LogOut, Home, User, ShoppingBag, ShieldCheck } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export function Header() {
@@ -30,8 +30,13 @@ export function Header() {
     )
   }
 
-  const { translations, user, logout, loading } = context;
+  const { translations, user, logout, loading, drivers } = context;
   const t = translations;
+  
+  const driverProfile = useMemo(() => {
+    if (!user) return null;
+    return drivers.find(d => d.id === user.uid)
+  }, [user, drivers]);
 
   if (!t.home) {
     return (
@@ -41,13 +46,21 @@ export function Header() {
     )
   }
 
-  const navLinks = [
-    { href: '/', label: t.home, icon: Home, roles: ['driver', 'admin'] },
-    { href: '/admin', label: t.registrationApplications, icon: FileText, roles: ['admin'] },
-    { href: '/register-driver', label: t.carSettings || "Car Settings", icon: Car, roles: ['driver'] },
-    { href: '/create-ride', label: t.publishNewRide, icon: FileText, roles: ['driver'] },
-    { href: '/my-orders', label: t.myOrders, icon: ShoppingBag, roles: ['driver'] }
+  const driverLinks = [
+    { href: '/', label: t.home, icon: Home },
+    { href: '/my-orders', label: t.myOrders, icon: ShoppingBag }
   ];
+  
+  const driverWideLink = { href: '/create-ride', label: t.publishNewRide, icon: FileText };
+  
+  const driverBottomLinks = [
+    { href: '/register-driver', label: t.carSettings || "Car Settings", icon: Car },
+  ];
+
+  const adminLinks = [
+    { href: '/admin', label: t.registrationApplications, icon: ShieldCheck }
+  ];
+
 
   const renderUserMenu = () => (
     <Sheet>
@@ -58,24 +71,61 @@ export function Header() {
       </SheetTrigger>
       <SheetContent className="flex flex-col">
         <SheetHeader>
-          <SheetTitle>{user?.email}</SheetTitle>
+          <SheetTitle>{driverProfile?.name || user?.email}</SheetTitle>
         </SheetHeader>
         <div className="flex-grow py-4">
-            <div className="grid grid-cols-2 gap-4">
-                {navLinks.filter(link => user?.role && link.roles.includes(user.role)).map(link => (
-                    <Button 
-                        key={link.href}
-                        variant={pathname === link.href ? 'secondary' : 'outline'} 
-                        asChild 
-                        className="h-24 flex-col gap-2"
-                    >
-                        <Link href={link.href}><link.icon/><span>{link.label}</span></Link>
-                    </Button>
-                ))}
-            </div>
+            {user?.role === 'driver' && (
+              <div className='flex flex-col gap-4'>
+                <div className="grid grid-cols-2 gap-4">
+                    {driverLinks.map(link => (
+                        <Button 
+                            key={link.href}
+                            variant={pathname === link.href ? 'secondary' : 'outline'} 
+                            asChild 
+                            className="h-24 flex-col gap-2 text-sm"
+                        >
+                            <Link href={link.href}><link.icon className="mb-1"/><span>{link.label}</span></Link>
+                        </Button>
+                    ))}
+                </div>
+                <Button 
+                    key={driverWideLink.href}
+                    variant={pathname === driverWideLink.href ? 'secondary' : 'outline'} 
+                    asChild
+                    className="w-full"
+                >
+                    <Link href={driverWideLink.href}><driverWideLink.icon/><span>{driverWideLink.label}</span></Link>
+                </Button>
+              </div>
+            )}
+             {user?.role === 'admin' && (
+              <div className='flex flex-col gap-4'>
+                <div className="grid grid-cols-2 gap-4">
+                    {adminLinks.map(link => (
+                        <Button 
+                            key={link.href}
+                            variant={pathname === link.href ? 'secondary' : 'outline'} 
+                            asChild 
+                            className="h-24 flex-col gap-2 text-sm"
+                        >
+                            <Link href={link.href}><link.icon className="mb-1"/><span>{link.label}</span></Link>
+                        </Button>
+                    ))}
+                </div>
+              </div>
+            )}
         </div>
-        <div className="mt-auto">
-             <Button variant="ghost" onClick={logout} className="w-full justify-center text-destructive hover:text-destructive">
+        <div className="mt-auto flex flex-col gap-2">
+            {user?.role === 'driver' && driverBottomLinks.map(link => (
+               <Button 
+                    key={link.href}
+                    variant={pathname === link.href ? 'secondary' : 'ghost'} 
+                    asChild
+                >
+                    <Link href={link.href}><link.icon/><span>{link.label}</span></Link>
+                </Button>
+            ))}
+             <Button variant="outline" onClick={logout} className="w-full justify-center text-destructive hover:text-destructive border-destructive/50 hover:bg-destructive/10">
                 <LogOut />
                 <span>{t.logout}</span>
             </Button>

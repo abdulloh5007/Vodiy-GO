@@ -61,7 +61,7 @@ export default function Home() {
   if (!context) {
     throw new Error('Home must be used within an AppProvider');
   }
-  const { rides, drivers, translations, language, loading } = context;
+  const { rides, drivers, translations, language, loading, setSelectedImage } = context;
 
   const [from, setFrom] = useState('all');
   const [to, setTo] = useState('all');
@@ -144,7 +144,7 @@ export default function Home() {
         {filteredRides.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredRides.map(ride => (
-              <RideCard key={ride.id} ride={ride} />
+              <RideCard key={ride.id} ride={ride} onImageClick={setSelectedImage} />
             ))}
           </div>
         ) : (

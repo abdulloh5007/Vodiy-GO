@@ -65,6 +65,7 @@
     "carSettings": "Настройки машины",
     "validationErrorTitle": "Ошибка валидации",
     "validationErrorDesc": "Пожалуйста, введите почту и пароль.",
+    "validationErrorDescBooking": "Пожалуйста, введите ваше имя и полный номер телефона.",
     "loginSuccessTitle": "Вход выполнен успешно",
     "registrationSuccessTitle": "Регистрация прошла успешно",
     "redirecting": "Перенаправление...",

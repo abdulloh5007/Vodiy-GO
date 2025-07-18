@@ -11,16 +11,18 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
+import { formatPhoneNumber } from '@/lib/utils';
 
 interface RideCardProps {
   ride: Ride;
+  onImageClick: (url: string) => void;
 }
 
-export function RideCard({ ride }: RideCardProps) {
+export function RideCard({ ride, onImageClick }: RideCardProps) {
   const context = useContext(AppContext);
   const [isBooking, setIsBooking] = useState(false);
   const [clientName, setClientName] = useState('');
-  const [clientPhone, setClientPhone] = useState('');
+  const [clientPhone, setClientPhone] = useState('+998');
   const { toast } = useToast();
 
   if (!context) return null;
@@ -31,11 +33,16 @@ export function RideCard({ ride }: RideCardProps) {
 
   if (!driver) return null;
 
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatPhoneNumber(e.target.value);
+    setClientPhone(formatted);
+  };
+
   const handleBooking = () => {
-    if (!clientName || !clientPhone) {
+    if (!clientName || clientPhone.replace(/\D/g, '').length !== 12) {
         toast({
-            title: "Validation Error",
-            description: "Please fill in your name and phone number.",
+            title: t.validationErrorTitle,
+            description: t.validationErrorDescBooking || "Please fill in your name and a complete phone number.",
             variant: "destructive",
         });
         return;
@@ -47,7 +54,7 @@ export function RideCard({ ride }: RideCardProps) {
     });
     setIsBooking(false);
     setClientName('');
-    setClientPhone('');
+    setClientPhone('+998');
     toast({
         title: t.bookingSuccessful,
         description: t.yourRideIsBooked,
@@ -69,8 +76,9 @@ export function RideCard({ ride }: RideCardProps) {
               src={driver.carPhotoUrl}
               alt={driver.carModel}
               fill
-              className="object-cover"
+              className="object-cover cursor-pointer"
               data-ai-hint="car side"
+              onClick={() => onImageClick(driver.carPhotoUrl)}
             />
           </div>
           <div className="p-4">
@@ -128,7 +136,7 @@ export function RideCard({ ride }: RideCardProps) {
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
                     <Label htmlFor="phone" className="text-right">{t.yourPhone}</Label>
-                    <Input id="phone" value={clientPhone} onChange={(e) => setClientPhone(e.target.value)} className="col-span-3" />
+                    <Input id="phone" type="tel" value={clientPhone} onChange={handlePhoneChange} className="col-span-3" placeholder="+998 (XX) XXX-XX-XX" />
                 </div>
             </div>
             <DialogFooter>

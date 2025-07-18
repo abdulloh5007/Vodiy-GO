@@ -7,6 +7,7 @@ import { initialTranslations } from '@/lib/i18n';
 import { db, auth } from '@/lib/firebase';
 import { collection, doc, getDoc, setDoc, onSnapshot, query, orderBy, serverTimestamp, writeBatch, where, getDocs, deleteDoc } from "firebase/firestore";
 import { signInWithEmailAndPassword, onAuthStateChanged, signOut, createUserWithEmailAndPassword, User as FirebaseAuthUser } from "firebase/auth";
+import { ImageViewer } from './ImageViewer';
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguage] = useState<Language>('en');
@@ -16,6 +17,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [rides, setRides] = useState<Ride[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   useEffect(() => {
     // Get saved language from local storage
@@ -166,9 +168,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       addDriverApplication, updateDriverStatus,
       addRide, addOrder,
       login, register, logout,
-      loading
+      loading,
+      selectedImage, setSelectedImage
     }}>
       {children}
+      <ImageViewer imageUrl={selectedImage} onOpenChange={(open) => !open && setSelectedImage(null)} />
     </AppContext.Provider>
   );
 }
