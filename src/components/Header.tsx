@@ -88,10 +88,9 @@ export function Header() {
     </DropdownMenu>
   );
   
-  const renderNavLinks = (isMobile = false) => (
-      <nav className={`flex items-center space-x-6 text-sm font-medium ${isMobile ? 'flex-col space-x-0 space-y-4 pt-6' : 'hidden md:flex'}`}>
-        <Link href="/" className="transition-colors hover:text-primary">{t.home}</Link>
-        {/* Other general links can go here */}
+  const renderNavLinksForMobile = () => (
+      <nav className="flex flex-col space-y-4 pt-6 text-sm font-medium">
+         {/* Future mobile links can go here */}
       </nav>
   );
 
@@ -103,8 +102,6 @@ export function Header() {
           <span className="font-bold font-headline sm:inline-block">RoadPilot</span>
         </Link>
         
-        {renderNavLinks()}
-
         <div className="flex flex-1 items-center justify-end space-x-4">
           <LanguageSwitcher />
           {loading ? null : user ? renderUserMenu() : (
@@ -122,7 +119,7 @@ export function Header() {
                   </Button>
                 </SheetTrigger>
                 <SheetContent>
-                  {renderNavLinks(true)}
+                  {renderNavLinksForMobile()}
                   <div className="mt-6">
                      <Button asChild className="w-full">
                        <Link href="/admin/login">
