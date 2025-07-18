@@ -84,7 +84,7 @@ export function Header() {
                             asChild 
                             className="h-28 flex-col gap-2 text-sm rounded-lg"
                         >
-                            <Link href={link.href}><link.icon className="mb-1 h-6 w-6"/><span>{link.label}</span></Link>
+                            <Link href={link.href}><link.icon className="mb-1 h-8 w-8"/><span>{link.label}</span></Link>
                         </Button>
                     ))}
                 </div>
@@ -92,9 +92,9 @@ export function Header() {
                     key={driverWideLink.href}
                     variant={pathname === driverWideLink.href ? 'secondary' : 'outline'} 
                     asChild
-                    className="w-full h-14 rounded-lg"
+                    className="w-full h-20 rounded-lg"
                 >
-                    <Link href={driverWideLink.href}><driverWideLink.icon/><span>{driverWideLink.label}</span></Link>
+                    <Link href={driverWideLink.href}><driverWideLink.icon className="h-6 w-6"/><span>{driverWideLink.label}</span></Link>
                 </Button>
               </div>
             )}
