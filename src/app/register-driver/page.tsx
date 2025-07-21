@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useContext, useEffect } from 'react';
+import { useState, useContext, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { AppContext } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
@@ -8,9 +8,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, ShieldAlert } from 'lucide-react';
+import { Loader2, ShieldAlert, ArrowLeft } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatPhoneNumber } from '@/lib/utils';
+import { Progress } from '@/components/ui/progress';
 
 
 function RegisterDriverSkeleton() {
@@ -49,12 +50,17 @@ function RegisterDriverSkeleton() {
     );
 }
 
+const TOTAL_STEPS = 2;
+
 export default function RegisterDriverPage() {
   const context = useContext(AppContext);
   const { toast } = useToast();
   const router = useRouter();
 
+  const [step, setStep] = useState(1);
+
   const [name, setName] = useState('');
+  const [idCardNumber, setIdCardNumber] = useState('');
   const [phone, setPhone] = useState('+998');
   const [carModel, setCarModel] = useState('');
   const [carNumber, setCarNumber] = useState('');
@@ -72,6 +78,7 @@ export default function RegisterDriverPage() {
   useEffect(() => {
       if (driverProfile) {
           setName(driverProfile.name || '');
+          setIdCardNumber(driverProfile.idCardNumber || '');
           setPhone(driverProfile.phone || '+998');
           setCarModel(driverProfile.carModel || '');
           setCarNumber(driverProfile.carNumber || '');
@@ -82,6 +89,26 @@ export default function RegisterDriverPage() {
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formatted = formatPhoneNumber(e.target.value);
     setPhone(formatted);
+  };
+  
+  const progress = useMemo(() => (step / TOTAL_STEPS) * 100, [step]);
+
+  const handleNextStep = () => {
+    if (step === 1) {
+      if (!name || !idCardNumber) {
+        toast({
+          title: "Validation Error",
+          description: "Please fill all fields for this step.",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+    setStep(prev => prev + 1);
+  };
+
+  const handlePrevStep = () => {
+    setStep(prev => prev - 1);
   };
 
   if (loading || !t.home) {
@@ -105,7 +132,7 @@ export default function RegisterDriverPage() {
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || phone.replace(/\D/g, '').length !== 12 || !carModel || !carNumber || !carPhotoUrl) {
+    if (!name || !idCardNumber || phone.replace(/\D/g, '').length !== 12 || !carModel || !carNumber || !carPhotoUrl) {
       toast({
         title: "Validation Error",
         description: "Please fill all fields. Phone number must be complete.",
@@ -115,7 +142,7 @@ export default function RegisterDriverPage() {
     }
     
     if (user) {
-        await addDriverApplication({ name, phone, carModel, carNumber, carPhotoUrl });
+        await addDriverApplication({ name, idCardNumber, phone, carModel, carNumber, carPhotoUrl });
 
         toast({
             title: t.applicationSubmitted,
@@ -134,28 +161,52 @@ export default function RegisterDriverPage() {
           <CardDescription>{driverProfile?.status ? `${t.currentStatus}: ${t[driverProfile.status] || driverProfile.status}` : t.fillTheForm}</CardDescription>
         </CardHeader>
         <CardContent>
+          <Progress value={progress} className="w-full mb-6" />
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="name">{t.fullName}</Label>
-              <Input id="name" value={name} onChange={e => setName(e.target.value)} required />
+            {step === 1 && (
+                <div className="space-y-6">
+                    <div className="space-y-2">
+                        <Label htmlFor="name">{t.fullName}</Label>
+                        <Input id="name" value={name} onChange={e => setName(e.target.value)} required />
+                    </div>
+                     <div className="space-y-2">
+                        <Label htmlFor="idCardNumber">ID Card Number</Label>
+                        <Input id="idCardNumber" value={idCardNumber} onChange={e => setIdCardNumber(e.target.value)} required />
+                    </div>
+                </div>
+            )}
+            {step === 2 && (
+                <div className="space-y-6">
+                    <div className="space-y-2">
+                        <Label htmlFor="phone">{t.yourPhone}</Label>
+                        <Input id="phone" type="tel" value={phone} onChange={handlePhoneChange} placeholder="+998 (XX) XXX-XX-XX" required />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="carModel">{t.carModel}</Label>
+                        <Input id="carModel" value={carModel} onChange={e => setCarModel(e.target.value)} placeholder={t.carModelPlaceholder} required />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="carNumber">{t.carNumber}</Label>
+                        <Input id="carNumber" value={carNumber} onChange={e => setCarNumber(e.target.value)} placeholder={t.carNumberPlaceholder} required />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="carPhotoUrl">{t.carPhotoUrl}</Label>
+                        <Input id="carPhotoUrl" type="url" value={carPhotoUrl} onChange={e => setCarPhotoUrl(e.target.value)} placeholder="https://placehold.co/600x400.png" required />
+                    </div>
+                </div>
+            )}
+            
+            <div className="flex justify-between w-full">
+                {step > 1 && (
+                    <Button type="button" variant="outline" onClick={handlePrevStep}><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
+                )}
+                {step < TOTAL_STEPS && (
+                    <Button type="button" className="ml-auto" onClick={handleNextStep}>Next Step</Button>
+                )}
+                {step === TOTAL_STEPS && (
+                     <Button type="submit" className="w-full">{driverProfile && driverProfile.status !== 'unsubmitted' ? t.updateApplication : t.submitApplication}</Button>
+                )}
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="phone">{t.yourPhone}</Label>
-              <Input id="phone" type="tel" value={phone} onChange={handlePhoneChange} placeholder="+998 (XX) XXX-XX-XX" required />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="carModel">{t.carModel}</Label>
-              <Input id="carModel" value={carModel} onChange={e => setCarModel(e.target.value)} placeholder={t.carModelPlaceholder} required />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="carNumber">{t.carNumber}</Label>
-              <Input id="carNumber" value={carNumber} onChange={e => setCarNumber(e.target.value)} placeholder={t.carNumberPlaceholder} required />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="carPhotoUrl">{t.carPhotoUrl}</Label>
-              <Input id="carPhotoUrl" type="url" value={carPhotoUrl} onChange={e => setCarPhotoUrl(e.target.value)} placeholder="https://placehold.co/600x400.png" required />
-            </div>
-            <Button type="submit" className="w-full">{driverProfile && driverProfile.status !== 'unsubmitted' ? t.updateApplication : t.submitApplication}</Button>
           </form>
         </CardContent>
       </Card>

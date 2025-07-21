@@ -21,7 +21,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // Get saved language from local storage
-    const savedLang = localStorage.getItem('roadpilot-lang') as Language;
+    const savedLang = localStorage.getItem('vodiygo-lang') as Language;
     if (savedLang && ['en', 'ru', 'uz'].includes(savedLang)) {
       setLanguage(savedLang);
     }
@@ -31,7 +31,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const loadTranslations = async () => {
         const i18n = await import(`@/lib/locales/${language}.json`);
         setTranslations(i18n.default);
-        localStorage.setItem('roadpilot-lang', language);
+        localStorage.setItem('vodiygo-lang', language);
     };
     loadTranslations();
   }, [language]);
@@ -144,6 +144,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const driverDocRef = doc(db, "drivers", firebaseUser.uid);
     const newDriverProfile: Partial<Driver> = {
         name: '',
+        idCardNumber: '',
         phone: '',
         carModel: '',
         carNumber: '',

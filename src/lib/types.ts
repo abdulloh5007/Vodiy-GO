@@ -7,6 +7,7 @@ export type User = {
 export type Driver = {
   id: string; 
   name: string;
+  idCardNumber: string;
   phone: string;
   carModel: string;
   carNumber: string;

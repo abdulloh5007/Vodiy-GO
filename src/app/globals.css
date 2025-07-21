@@ -20,8 +20,8 @@ body {
     --secondary-foreground: 0 0% 93.3%; /* #EEEEEE */
     --muted: 0 0% 90%;
     --muted-foreground: 212 17.9% 30%;
-    --accent: 183 100% 40.9%; /* a slightly lighter teal */
-    --accent-foreground: 0 0% 100%;
+    --accent: 52 100% 58%; /* a slightly lighter teal */
+    --accent-foreground: 0 0% 0%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
     --border: 0 0% 85%;
@@ -47,7 +47,7 @@ body {
     --secondary-foreground: 0 0% 93.3%; /* #EEEEEE */
     --muted: 218 10.1% 30.5%;
     --muted-foreground: 0 0% 80%;
-    --accent: 183 100% 40.9%;
+    --accent: 52 100% 58%;
     --accent-foreground: 212 17.9% 16.3%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
