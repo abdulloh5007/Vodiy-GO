@@ -30,14 +30,36 @@ export function formatPhoneNumber(value: string) {
   return formatted.slice(0, 19); // Ensure max length: +998 (XX) XXX-XX-XX
 }
 
+
+export function formatPassportNumber(value: string): string {
+    const cleaned = value.replace(/\s/g, '').toUpperCase();
+    const letters = cleaned.slice(0, 2).replace(/[^A-Z]/g, '');
+    const numbers = cleaned.slice(2, 9).replace(/[^0-9]/g, '');
+    
+    if (numbers.length > 0) {
+        return `${letters} ${numbers}`;
+    }
+    return letters;
+}
+
 export function formatCarNumber(value: string): string {
     const cleaned = value.replace(/[\s\-]/g, '').toUpperCase();
-    let formatted = cleaned;
-
-    if (/^\d{2}[A-Z]\d{3}[A-Z]{2}$/.test(cleaned)) { // 01A123BC
-        formatted = `${cleaned.slice(0, 2)} ${cleaned.slice(2, 3)} ${cleaned.slice(3, 6)} ${cleaned.slice(6, 8)}`;
-    } else if (/^\d{3}[A-Z]{3}$/.test(cleaned)) { // 123ABC
-        formatted = `${cleaned.slice(0, 3)} ${cleaned.slice(3, 6)}`;
+    
+    // Format: 01 B 123 BB
+    if (cleaned.length > 3) {
+        const region = cleaned.slice(0, 2);
+        const letter = cleaned.slice(2, 3);
+        const numbers = cleaned.slice(3, 6);
+        const letters = cleaned.slice(6, 8);
+        return `${region} ${letter} ${numbers} ${letters}`.trim();
     }
-    return formatted;
+     // Format: 01 123 BBB
+    else if (cleaned.length > 2) {
+        const region = cleaned.slice(0, 2);
+        const numbers = cleaned.slice(2, 5);
+        const letters = cleaned.slice(5, 8);
+        return `${region} ${numbers} ${letters}`.trim();
+    }
+
+    return cleaned;
 }

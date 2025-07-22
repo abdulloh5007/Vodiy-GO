@@ -102,25 +102,47 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       return downloadURL;
   }
 
-  const addDriverApplication = async (driverData: Omit<Driver, 'id' | 'status' | 'carPhotoUrl'> & { carPhotoFile: File | null }) => {
-    if (!user) throw new Error("User not logged in");
-    try {
-      let carPhotoUrl = drivers.find(d => d.id === user.uid)?.carPhotoUrl || ''; // Keep old photo if new one not provided
-      
-      if (driverData.carPhotoFile) {
-          carPhotoUrl = await uploadCarPhoto(user.uid, driverData.carPhotoFile);
-      }
-      
-      const { carPhotoFile, ...driverInfo } = driverData;
+  const addDriverApplication = async (driverData: Omit<Driver, 'id' | 'status' | 'carPhotoUrl'> & { carPhotoFile: File | null, email: string, password?: string }) => {
+    if (!driverData.email || !driverData.password) {
+        throw new Error("Email and password are required for registration.");
+    }
 
-      const driverDocRef = doc(db, "drivers", user.uid);
-      await setDoc(driverDocRef, {
-        ...driverInfo,
-        carPhotoUrl,
-        status: 'pending',
-      }, { merge: true });
+    try {
+        // 1. Create user in Firebase Auth
+        const userCredential = await createUserWithEmailAndPassword(auth, driverData.email, driverData.password);
+        const firebaseUser = userCredential.user;
+        
+        // 2. Upload car photo if it exists
+        let carPhotoUrl = '';
+        if (driverData.carPhotoFile) {
+            carPhotoUrl = await uploadCarPhoto(firebaseUser.uid, driverData.carPhotoFile);
+        }
+
+        // 3. Prepare data for Firestore batch write
+        const { carPhotoFile, email, password, ...driverInfo } = driverData;
+        
+        const batch = writeBatch(db);
+
+        // User document
+        const userDocRef = doc(db, "users", firebaseUser.uid);
+        const newUser: User = { uid: firebaseUser.uid, email: firebaseUser.email, role: 'driver' };
+        batch.set(userDocRef, newUser);
+
+        // Driver document
+        const driverDocRef = doc(db, "drivers", firebaseUser.uid);
+        batch.set(driverDocRef, {
+            ...driverInfo,
+            carPhotoUrl,
+            status: 'pending',
+        });
+        
+        // 4. Commit the batch
+        await batch.commit();
+
     } catch (error) {
-      console.error("Error adding driver application: ", error);
+      console.error("Error during driver registration: ", error);
+      // Re-throw the error to be handled by the calling component
+      throw error;
     }
   };
 
@@ -181,30 +203,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       }
   };
   
-  const register = async (email: string, password: string, role: 'driver' | 'passenger'): Promise<void> => {
+  const register = async (email: string, password: string, role: 'passenger'): Promise<void> => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const firebaseUser = userCredential.user;
     
-    const batch = writeBatch(db);
-
     const userDocRef = doc(db, "users", firebaseUser.uid);
     const newUser: User = { uid: firebaseUser.uid, email: firebaseUser.email, role };
-    batch.set(userDocRef, newUser);
-    
-    if (role === 'driver') {
-        const driverDocRef = doc(db, "drivers", firebaseUser.uid);
-        const newDriverProfile: Partial<Driver> = {
-            name: '',
-            phone: '',
-            carModel: '',
-            carNumber: '',
-            carPhotoUrl: '',
-            status: 'unsubmitted'
-        }
-        batch.set(driverDocRef, newDriverProfile);
-    }
-    
-    await batch.commit();
+    await setDoc(userDocRef, newUser);
   };
   
   const logout = async () => {
@@ -228,5 +233,3 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     </AppContext.Provider>
   );
 }
-
-    

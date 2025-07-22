@@ -11,6 +11,7 @@ export type Driver = {
   id: string; 
   name: string;
   phone: string;
+  passport: string;
   carModel: string;
   carNumber: string;
   carPhotoUrl: string;
@@ -44,5 +45,3 @@ export type Language = 'en' | 'ru' | 'uz';
 export type Translations = {
   [key: string]: any;
 };
-
-    
