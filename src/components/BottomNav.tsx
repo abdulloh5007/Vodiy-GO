@@ -47,7 +47,7 @@ export function BottomNav() {
             }`}
           >
             {link.badge && link.badge > 0 && (
-              <Badge className="absolute top-1 right-1/4 scale-75">{link.badge}</Badge>
+              <Badge className="absolute top-1 right-1/4 scale-75">{link.badge}</Badge> 
             )}
             <link.icon className="w-6 h-6 mb-1" />
             <span className="text-sm">{link.label}</span>
