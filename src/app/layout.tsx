@@ -8,7 +8,7 @@ import { BottomNav } from '@/components/BottomNav';
 
 export const metadata: Metadata = {
   title: 'Vodiy GO',
-  description: 'Reliable rides, anytime.',
+  description: 'Reliable rides, anytime.', 
 };
 
 export default function RootLayout({
