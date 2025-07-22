@@ -1,6 +1,7 @@
+
 'use client';
 
-import { useContext, useState } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -47,10 +48,18 @@ export function RideCard({ ride, onImageClick }: RideCardProps) {
   
   const handleAuthAndBook = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password || !clientName || clientPhone.replace(/\D/g, '').length !== 12) {
-        toast({
+    if (authAction === 'register' && (!clientName || clientPhone.replace(/\D/g, '').length !== 12)) {
+         toast({
             title: t.validationErrorTitle,
             description: t.validationErrorDescBooking,
+            variant: "destructive",
+        });
+        return;
+    }
+    if (!email || !password) {
+        toast({
+            title: t.validationErrorTitle,
+            description: t.validationErrorDesc,
             variant: "destructive",
         });
         return;
@@ -60,7 +69,8 @@ export function RideCard({ ride, onImageClick }: RideCardProps) {
         if (authAction === 'login') {
             await login(email, password, 'passenger');
         } else {
-            await register(email, password, 'passenger');
+            // Pass the clientName to the register function
+            await register(email, password, clientName, 'passenger');
         }
         // User is now logged in. The booking will be handled by the useEffect in the component.
         toast({ title: authAction === 'login' ? t.loginSuccessTitle : t.registrationSuccessTitle });
@@ -121,18 +131,18 @@ export function RideCard({ ride, onImageClick }: RideCardProps) {
     });
   };
   
-  if (!t.home) {
-      return null;
-  }
-  
-    // Effect to complete booking after successful login/registration
-  useState(() => {
+   useEffect(() => {
     if (user && isBooking && user.role === 'passenger') {
         addOrder({
             rideId: ride.id,
             passengerId: user.uid,
-            clientName: clientName, // Use the name they entered
-            clientPhone: clientPhone, // Use the phone they entered
+            // Use user's name which was set during registration, or from their profile
+            clientName: user.name || clientName, 
+            clientPhone: user.phone || clientPhone, // Use phone from profile or what they entered
+        });
+         toast({
+            title: t.bookingSuccessful,
+            description: t.yourRideIsBooked,
         });
         setIsBooking(false);
         setClientName('');
@@ -140,8 +150,12 @@ export function RideCard({ ride, onImageClick }: RideCardProps) {
         setEmail('');
         setPassword('');
     }
-  });
+  }, [user, isBooking]);
 
+
+  if (!t.home) {
+      return null;
+  }
 
   const formattedPrice = new Intl.NumberFormat('fr-FR').format(ride.price);
 

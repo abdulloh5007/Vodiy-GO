@@ -7,9 +7,23 @@ import { Driver, Ride, Order, Language, Translations, User, DriverApplicationDat
 import { initialTranslations } from '@/lib/i18n';
 import { db, auth } from '@/lib/firebase';
 import { collection, doc, getDoc, setDoc, onSnapshot, query, orderBy, serverTimestamp, writeBatch, where, getDocs, deleteDoc, updateDoc } from "firebase/firestore";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { signInWithEmailAndPassword, onAuthStateChanged, signOut, createUserWithEmailAndPassword, User as FirebaseAuthUser } from "firebase/auth";
 import { ImageViewer } from './ImageViewer';
+
+const imageToDataUrl = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            if (typeof reader.result === 'string') {
+                resolve(reader.result);
+            } else {
+                reject(new Error('Failed to convert file to Data URL.'));
+            }
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+}
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguage] = useState<Language>('en');
@@ -94,13 +108,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
   
-  const uploadCarPhoto = async (userId: string, file: File): Promise<string> => {
-      const storage = getStorage();
-      const storageRef = ref(storage, `car-photos/${userId}/${file.name}`);
-      await uploadBytes(storageRef, file);
-      const downloadURL = await getDownloadURL(storageRef);
-      return downloadURL;
-  }
 
   const addDriverApplication = async (driverData: DriverApplicationData) => {
     if (!user) {
@@ -117,8 +124,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       throw new Error("Application already exists for this user.");
     }
 
-    // 1. Upload car photo
-    const carPhotoUrl = await uploadCarPhoto(user.uid, driverData.carPhotoFile);
+    // 1. Convert image to Data URL
+    const carPhotoUrl = await imageToDataUrl(driverData.carPhotoFile);
 
     // 2. Prepare data for Firestore
     const { carPhotoFile, ...driverInfo } = driverData;
@@ -150,16 +157,20 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const addRide = async (rideData: Omit<Ride, 'id' | 'createdAt' | 'status'>) => {
     if (!user) throw new Error("User not logged in");
     
-    await setDoc(doc(collection(db, "rides")), {
+    const newRideRef = doc(collection(db, "rides"))
+    await setDoc(newRideRef, {
       ...rideData,
+      id: newRideRef.id,
       createdAt: serverTimestamp(),
       status: 'pending', // All new rides are pending
     });
   };
 
   const addOrder = async (orderData: Omit<Order, 'id' | 'status' | 'passengerId'> & { passengerId: string }) => {
-    await setDoc(doc(collection(db, "orders")), {
+    const newOrderRef = doc(collection(db, "orders"))
+    await setDoc(newOrderRef, {
       ...orderData,
+      id: newOrderRef.id,
       status: 'new',
     });
   };

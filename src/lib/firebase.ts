@@ -8,7 +8,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyBdz-2bJjg8zyUY30MRvQI-ZQ9UwKvizPM",
   authDomain: "gameroom-booking.firebaseapp.com",
   projectId: "gameroom-booking",
-  storageBucket: "gameroom-booking.firebasestorage.app",
+  storageBucket: "gameroom-booking.appspot.com",
   messagingSenderId: "505009384076",
   appId: "1:505009384076:web:f285d98d0f6dbd6a23a9a9"
 };
