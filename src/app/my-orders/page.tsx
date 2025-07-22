@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useContext, useMemo, useState } from 'react';
@@ -160,7 +161,7 @@ export default function MyOrdersPage() {
 
     return (
         <div className="container mx-auto py-8 px-4">
-            <Card>
+            <Card className="mb-4">
                 <CardHeader className="flex flex-row items-center justify-between">
                     <div>
                         <CardTitle className="font-headline text-2xl">{t.myOrders || 'My Bookings'}</CardTitle>
@@ -175,98 +176,105 @@ export default function MyOrdersPage() {
                         </Button>
                     </div>
                 </CardHeader>
-                <CardContent>
-                    <div className={cn("hidden", viewMode === 'table' && 'md:block')}>
-                        <div className="w-full overflow-x-auto">
-                            <Table className="min-w-[800px]">
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>{t.ride || 'Ride'}</TableHead>
-                                        <TableHead>{t.clientName || 'Client Name'}</TableHead>
-                                        <TableHead>{t.clientPhone || 'Client Phone'}</TableHead>
-                                        <TableHead>{t.status || 'Status'}</TableHead>
-                                        <TableHead className="text-right">{t.actions || 'Actions'}</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {myRideOrders.length > 0 ? (
-                                        myRideOrders.map(order => {
-                                            const ride = myRides.find(r => r.id === order.rideId);
-                                            return (
-                                                <TableRow key={order.id}>
-                                                    <TableCell>
-                                                        {ride ? (
-                                                            <div className="flex flex-col">
-                                                                <span className="font-medium flex items-center gap-1"><MapPin className="h-4 w-4" /> {ride.from} &rarr; {ride.to}</span>
-                                                                {ride.time && <span className="text-sm text-muted-foreground flex items-center gap-1"><Clock className="h-4 w-4" />{ride.time}</span>}
-                                                            </div>
-                                                        ) : 'N/A'}
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        <div className="flex items-center gap-2">
-                                                            <User className="h-4 w-4" />
-                                                            {order.clientName}
+                <CardContent className={cn("hidden p-0", viewMode === 'table' && 'md:block')}>
+                    <div className="w-full overflow-x-auto">
+                        <Table className="min-w-[800px]">
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>{t.ride || 'Ride'}</TableHead>
+                                    <TableHead>{t.clientName || 'Client Name'}</TableHead>
+                                    <TableHead>{t.clientPhone || 'Client Phone'}</TableHead>
+                                    <TableHead>{t.status || 'Status'}</TableHead>
+                                    <TableHead className="text-right">{t.actions || 'Actions'}</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {myRideOrders.length > 0 ? (
+                                    myRideOrders.map(order => {
+                                        const ride = myRides.find(r => r.id === order.rideId);
+                                        return (
+                                            <TableRow key={order.id}>
+                                                <TableCell>
+                                                    {ride ? (
+                                                        <div className="flex flex-col">
+                                                            <span className="font-medium flex items-center gap-1"><MapPin className="h-4 w-4" /> {ride.from} &rarr; {ride.to}</span>
+                                                            {ride.time && <span className="text-sm text-muted-foreground flex items-center gap-1"><Clock className="h-4 w-4" />{ride.time}</span>}
                                                         </div>
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        <a href={`tel:${order.clientPhone}`} className="flex items-center gap-2 hover:text-primary">
-                                                            <Phone className="h-4 w-4" />
-                                                            {order.clientPhone}
-                                                        </a>
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        <OrderStatusBadge status={order.status} t={t} />
-                                                    </TableCell>
-                                                    <TableCell className="text-right">
-                                                    {order.status === 'new' ? (
-                                                        <>
-                                                            <Button variant="ghost" size="icon" className="text-green-600 hover:text-green-700 hover:bg-green-50" onClick={() => updateOrderStatus(order.id, 'accepted')}>
-                                                                <Check className="h-4 w-4" />
-                                                            </Button>
-                                                            <Button variant="ghost" size="icon" className="text-red-600 hover:text-red-700 hover:bg-red-50" onClick={() => updateOrderStatus(order.id, 'rejected')}>
-                                                                <X className="h-4 w-4" />
-                                                            </Button>
-                                                        </>
-                                                    ) : (
-                                                        <Button variant="ghost" size="icon" disabled>
-                                                            <Ban className="h-4 w-4 text-muted-foreground" />
+                                                    ) : 'N/A'}
+                                                </TableCell>
+                                                <TableCell>
+                                                    <div className="flex items-center gap-2">
+                                                        <User className="h-4 w-4" />
+                                                        {order.clientName}
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <a href={`tel:${order.clientPhone}`} className="flex items-center gap-2 hover:text-primary">
+                                                        <Phone className="h-4 w-4" />
+                                                        {order.clientPhone}
+                                                    </a>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <OrderStatusBadge status={order.status} t={t} />
+                                                </TableCell>
+                                                <TableCell className="text-right">
+                                                {order.status === 'new' ? (
+                                                    <>
+                                                        <Button variant="ghost" size="icon" className="text-green-600 hover:text-green-700 hover:bg-green-50" onClick={() => updateOrderStatus(order.id, 'accepted')}>
+                                                            <Check className="h-4 w-4" />
                                                         </Button>
-                                                    )}
-                                                    </TableCell>
-                                                </TableRow>
-                                            );
-                                        })
-                                    ) : (
-                                        <TableRow>
-                                            <TableCell colSpan={5} className="text-center h-24">{t.noBookingsYet || 'No bookings for your rides yet.'}</TableCell>
-                                        </TableRow>
-                                    )}
-                                </TableBody>
-                            </Table>
-                        </div>
-                    </div>
-                     <div className={cn("grid grid-cols-1 md:grid-cols-2 gap-4", viewMode === 'card' ? 'block' : 'md:hidden')}>
-                        {myRideOrders.length > 0 ? (
-                           myRideOrders.map(order => {
-                                const ride = myRides.find(r => r.id === order.rideId);
-                                return (
-                                    <OrderCard 
-                                        key={order.id} 
-                                        order={order} 
-                                        ride={ride} 
-                                        onUpdateStatus={updateOrderStatus} 
-                                        t={t}
-                                    />
-                                );
-                           })
-                        ) : (
-                             <div className="text-center py-16 col-span-full">
-                                <p className="text-muted-foreground">{t.noBookingsYet || 'No bookings for your rides yet.'}</p>
-                            </div>
-                        )}
+                                                        <Button variant="ghost" size="icon" className="text-red-600 hover:text-red-700 hover:bg-red-50" onClick={() => updateOrderStatus(order.id, 'rejected')}>
+                                                            <X className="h-4 w-4" />
+                                                        </Button>
+                                                    </>
+                                                ) : (
+                                                    <Button variant="ghost" size="icon" disabled>
+                                                        <Ban className="h-4 w-4 text-muted-foreground" />
+                                                    </Button>
+                                                )}
+                                                </TableCell>
+                                            </TableRow>
+                                        );
+                                    })
+                                ) : (
+                                    <TableRow>
+                                        <TableCell colSpan={5} className="text-center h-24">{t.noBookingsYet || 'No bookings for your rides yet.'}</TableCell>
+                                    </TableRow>
+                                )}
+                            </TableBody>
+                        </Table>
                     </div>
                 </CardContent>
             </Card>
+            
+            {myRideOrders.length === 0 && viewMode === 'table' && (
+                <Card>
+                    <CardContent className="text-center h-24 flex items-center justify-center">
+                        {t.noBookingsYet || 'No bookings for your rides yet.'}
+                    </CardContent>
+                </Card>
+            )}
+
+             <div className={cn("grid grid-cols-1 md:grid-cols-2 gap-4", viewMode === 'card' ? 'block' : 'md:hidden')}>
+                {myRideOrders.length > 0 ? (
+                   myRideOrders.map(order => {
+                        const ride = myRides.find(r => r.id === order.rideId);
+                        return (
+                            <OrderCard 
+                                key={order.id} 
+                                order={order} 
+                                ride={ride} 
+                                onUpdateStatus={updateOrderStatus} 
+                                t={t}
+                            />
+                        );
+                   })
+                ) : (
+                     <div className="text-center py-16 col-span-full bg-card rounded-lg">
+                        <p className="text-muted-foreground">{t.noBookingsYet || 'No bookings for your rides yet.'}</p>
+                    </div>
+                )}
+            </div>
         </div>
     );
 }
