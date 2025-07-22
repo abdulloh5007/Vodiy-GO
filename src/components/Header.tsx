@@ -198,8 +198,7 @@ export function Header() {
               <SheetTitle>{t.menu || "Menu"}</SheetTitle>
           </SheetHeader>
           <div className="flex-grow py-4 flex flex-col gap-4">
-            <Button variant="default" asChild onClick={() => setIsSheetOpen(false)}><Link href="/driver/login">{t.loginAsDriver}</Link></Button>
-            <Button variant="outline" asChild onClick={() => setIsSheetOpen(false)}><Link href="/admin/login">{t.loginAsAdmin}</Link></Button>
+             {/* Login buttons removed */}
           </div>
           <div className="mt-auto space-y-2">
               <Separator />
