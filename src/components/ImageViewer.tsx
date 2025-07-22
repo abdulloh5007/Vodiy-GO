@@ -59,6 +59,7 @@ export function ImageViewer({ imageUrl, onOpenChange }: ImageViewerProps) {
                                         layout="fill"
                                         objectFit="contain"
                                         className="rounded-lg"
+                                        draggable={false}
                                     />
                                 )}
                             </motion.div>

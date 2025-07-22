@@ -2,7 +2,7 @@
 
 import { useContext, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { AppContext } from '@/contexts/AppContext';
 import { RoadPilotLogo } from '@/components/icons';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
@@ -22,6 +22,7 @@ import { Separator } from './ui/separator';
 export function Header() {
   const context = useContext(AppContext);
   const pathname = usePathname();
+  const router = useRouter();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   if (!context) {
@@ -47,6 +48,16 @@ export function Header() {
     const userOrders = orders.filter(order => myRideIds.includes(order.rideId) && order.status === 'new');
     return userOrders.length;
   }, [user, rides, orders]);
+  
+  const handleLogout = async () => {
+    const userRole = user?.role;
+    await logout();
+    setIsSheetOpen(false);
+    if (userRole === 'driver') {
+      router.push('/driver/login');
+    }
+  };
+
 
   if (!t.home) {
     return (
@@ -164,10 +175,7 @@ export function Header() {
             ))}
              <Button 
                 variant="destructive" 
-                onClick={() => {
-                  logout();
-                  setIsSheetOpen(false);
-                }} 
+                onClick={handleLogout} 
                 className="w-full justify-start rounded-lg bg-red-600/90 hover:bg-red-600 text-white"
              >
                 <LogOut />
