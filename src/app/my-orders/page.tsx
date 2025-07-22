@@ -2,7 +2,7 @@
 
 import { useContext, useMemo, useState } from 'react';
 import { AppContext } from '@/contexts/AppContext';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ShieldAlert, User, Phone, MapPin, Clock, Check, X, Ban, LayoutGrid, List } from 'lucide-react';
