@@ -76,6 +76,7 @@ export function Header() {
   const driverWideLink = { href: '/create-ride', label: t.publishNewRide, icon: FileText };
   
   const driverBottomLinks = [
+    { href: '/notifications', label: t.notifications || "Notifications", icon: Bell },
     { href: '/register-driver', label: t.carSettings || "Car Settings", icon: Car },
   ];
 
@@ -83,10 +84,6 @@ export function Header() {
     { href: '/admin', label: t.registrationApplications, icon: ShieldCheck },
     { href: '/admin/ride-applications', label: "Ride Applications", icon: PackageCheck }
   ];
-  
-  const allUserLinks = [
-      { href: '/notifications', label: t.notifications || "Notifications", icon: Bell },
-  ]
 
 
   const renderUserMenu = () => (
@@ -151,19 +148,6 @@ export function Header() {
                 </div>
               </div>
             )}
-            <div className="flex flex-col gap-2">
-                {allUserLinks.map(link => (
-                    <Button 
-                        key={link.href}
-                        variant={pathname === link.href ? 'secondary' : 'ghost'} 
-                        asChild
-                        className="justify-start border rounded-lg"
-                        onClick={() => setIsSheetOpen(false)}
-                    >
-                        <Link href={link.href}><link.icon/><span>{link.label}</span></Link>
-                    </Button>
-                ))}
-            </div>
         </div>
         <div className="mt-auto flex flex-col gap-2">
             {user?.role === 'driver' && driverBottomLinks.map(link => (
