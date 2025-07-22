@@ -180,7 +180,7 @@ export default function NewRegisterDriverPage() {
             description: t.weWillReviewYourApplication,
         });
         
-        router.push('/');
+        router.push('/driver/status');
     } catch(error) {
         let errorMessage = t.unknownError;
         if (error instanceof FirebaseError) {

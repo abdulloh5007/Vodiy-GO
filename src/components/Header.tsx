@@ -150,18 +150,6 @@ export function Header() {
             {user?.role === 'passenger' && (
                  <div className="text-center text-muted-foreground py-4">{t.welcomePassenger || "Welcome!"}</div>
             )}
-            <div className="md:hidden mt-4 space-y-2">
-                 <Separator />
-                <p className='pt-2 text-sm text-muted-foreground'>{t.settings || 'Settings'}</p>
-                <div className='flex justify-between items-center bg-muted p-2 rounded-lg'>
-                  <span className='text-sm font-medium'>{t.language || 'Language'}</span>
-                  <LanguageSwitcher />
-                </div>
-                <div className='flex justify-between items-center bg-muted p-2 rounded-lg'>
-                  <span className='text-sm font-medium'>{t.theme || 'Theme'}</span>
-                  <ThemeToggle />
-                </div>
-            </div>
         </div>
         <div className="mt-auto flex flex-col gap-2">
             {user?.role === 'driver' && driverBottomLinks.map(link => (
@@ -202,18 +190,6 @@ export function Header() {
           <div className="flex-grow py-4 flex flex-col gap-4">
              {/* Login buttons removed */}
           </div>
-          <div className="mt-auto space-y-2">
-              <Separator />
-              <p className='pt-2 text-sm text-muted-foreground'>{t.settings || 'Settings'}</p>
-              <div className='flex justify-between items-center bg-muted p-2 rounded-lg'>
-                <span className='text-sm font-medium'>{t.language || 'Language'}</span>
-                <LanguageSwitcher />
-              </div>
-              <div className='flex justify-between items-center bg-muted p-2 rounded-lg'>
-                <span className='text-sm font-medium'>{t.theme || 'Theme'}</span>
-                <ThemeToggle />
-              </div>
-          </div>
       </SheetContent>
     </Sheet>
   );
@@ -227,7 +203,7 @@ export function Header() {
         </Link>
         
         <div className="flex flex-1 items-center justify-end space-x-2">
-          <div className='hidden md:flex items-center space-x-2'>
+          <div className='flex items-center space-x-2'>
             <ThemeToggle />
             <LanguageSwitcher />
           </div>
@@ -245,5 +221,3 @@ export function Header() {
     </header>
   );
 }
-
-    
