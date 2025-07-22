@@ -136,7 +136,8 @@
     "ride_table_price": "Narx",
     "ride_table_status": "Holat",
     "ride_table_actions": "Harakatlar",
-    "noPendingRideApplications": "Kutilayotgan qatnov arizalari yo'q"
+    "noPendingRideApplications": "Kutilayotgan qatnov arizalari yo'q",
+    "validationErrorDescStep1": "Iltimos, haqiqiy elektron pochta manzilini va kamida 6 belgidan iborat parolni kiriting.",
+    "validationErrorDescStep2": "Iltimos, ushbu qadam uchun barcha maydonlarni to'g'ri to'ldiring.",
+    "validationErrorDescStep3": "Iltimos, barcha avtomobil ma'lumotlarini to'ldiring va rasm yuklang."
 }
-
-    

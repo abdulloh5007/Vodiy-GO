@@ -136,7 +136,8 @@
     "ride_table_price": "Price",
     "ride_table_status": "Status",
     "ride_table_actions": "Actions",
-    "noPendingRideApplications": "No pending ride applications"
+    "noPendingRideApplications": "No pending ride applications",
+    "validationErrorDescStep1": "Please enter a valid email and a password of at least 6 characters.",
+    "validationErrorDescStep2": "Please fill all fields for this step correctly.",
+    "validationErrorDescStep3": "Please fill all car details and upload a photo."
 }
-
-    

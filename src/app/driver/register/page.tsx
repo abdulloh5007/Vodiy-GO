@@ -127,7 +127,7 @@ export default function NewRegisterDriverPage() {
       if (!email || password.length < 6) {
         toast({
           title: t.validationErrorTitle,
-          description: "Please enter a valid email and a password of at least 6 characters.",
+          description: t.validationErrorDescStep1 || "Please enter a valid email and a password of at least 6 characters.",
           variant: "destructive",
         });
         return;
@@ -137,7 +137,7 @@ export default function NewRegisterDriverPage() {
       if (!name || phone.replace(/\D/g, '').length !== 12 || passport.length < 9) {
         toast({
           title: t.validationErrorTitle,
-          description: "Please fill all fields for this step correctly.",
+          description: t.validationErrorDescStep2 || "Please fill all fields for this step correctly.",
           variant: "destructive",
         });
         return;
@@ -157,7 +157,7 @@ export default function NewRegisterDriverPage() {
     if (!carModel || !carNumber || !carPhotoFile) {
       toast({
         title: t.validationErrorTitle,
-        description: "Please fill all car details and upload a photo.",
+        description: t.validationErrorDescStep3 || "Please fill all car details and upload a photo.",
         variant: "destructive",
       });
       return;
@@ -294,5 +294,3 @@ export default function NewRegisterDriverPage() {
     </div>
   );
 }
-
-    

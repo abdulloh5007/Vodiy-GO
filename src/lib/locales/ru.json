@@ -136,7 +136,8 @@
     "ride_table_price": "Цена",
     "ride_table_status": "Статус",
     "ride_table_actions": "Действия",
-    "noPendingRideApplications": "Нет ожидающих заявок на поездки"
+    "noPendingRideApplications": "Нет ожидающих заявок на поездки",
+    "validationErrorDescStep1": "Пожалуйста, введите действующий адрес электронной почты и пароль длиной не менее 6 символов.",
+    "validationErrorDescStep2": "Пожалуйста, правильно заполните все поля для этого шага.",
+    "validationErrorDescStep3": "Пожалуйста, заполните все данные об автомобиле и загрузите фотографию."
 }
-
-    
