@@ -110,6 +110,7 @@
     "availableSeats": "Available Seats",
     "selectSeats": "Select seats",
     "dontHaveAccount": "Don't have an account?",
+    "alreadyHaveAccount": "Already have an account?",
     "step1_title": "Step 1: Account Details",
     "step2_title": "Step 2: Personal Information",
     "step3_title": "Step 3: Car Information",
@@ -137,3 +138,5 @@
     "ride_table_actions": "Actions",
     "noPendingRideApplications": "No pending ride applications"
 }
+
+    

@@ -110,6 +110,7 @@
     "availableSeats": "Свободные места",
     "selectSeats": "Выберите места",
     "dontHaveAccount": "Нет аккаунта?",
+    "alreadyHaveAccount": "Уже есть аккаунт?",
     "step1_title": "Шаг 1: Данные аккаунта",
     "step2_title": "Шаг 2: Личная информация",
     "step3_title": "Шаг 3: Информация об автомобиле",
@@ -137,3 +138,5 @@
     "ride_table_actions": "Действия",
     "noPendingRideApplications": "Нет ожидающих заявок на поездки"
 }
+
+    

@@ -14,6 +14,7 @@ import { formatPhoneNumber, formatCarNumber, formatPassportNumber } from '@/lib/
 import { Progress } from '@/components/ui/progress';
 import Image from 'next/image';
 import { FirebaseError } from 'firebase/app';
+import Link from 'next/link';
 
 
 const ImageDropzone = ({ file, setFile, t }: { file: File | null, setFile: (file: File | null) => void, t: any }) => {
@@ -282,8 +283,16 @@ export default function NewRegisterDriverPage() {
                 )}
             </div>
           </form>
+          <div className="mt-6 text-center text-sm">
+            {t.alreadyHaveAccount || "Already have an account?"}{' '}
+            <Link href="/driver/login" className="underline text-primary">
+                {t.login || 'Login'}
+            </Link>
+          </div>
         </CardContent>
       </Card>
     </div>
   );
 }
+
+    

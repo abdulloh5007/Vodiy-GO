@@ -110,6 +110,7 @@
     "availableSeats": "Mavjud o'rindiqlar",
     "selectSeats": "O'rindiqlarni tanlang",
     "dontHaveAccount": "Hisobingiz yo'qmi?",
+    "alreadyHaveAccount": "Hisobingiz bormi?",
     "step1_title": "1-qadam: Hisob ma'lumotlari",
     "step2_title": "2-qadam: Shaxsiy ma'lumotlar",
     "step3_title": "3-qadam: Avtomobil ma'lumotlari",
@@ -137,3 +138,5 @@
     "ride_table_actions": "Harakatlar",
     "noPendingRideApplications": "Kutilayotgan qatnov arizalari yo'q"
 }
+
+    
