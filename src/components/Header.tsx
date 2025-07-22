@@ -44,8 +44,7 @@ export function Header() {
     if (!user || user.role !== 'driver') return 0;
     const myRideIds = rides.filter(ride => ride.driverId === user.uid).map(r => r.id);
     if (myRideIds.length === 0) return 0;
-    const userOrders = orders.filter(order => myRideIds.includes(order.rideId));
-    // Here you can add logic to count only 'new' orders if needed.
+    const userOrders = orders.filter(order => myRideIds.includes(order.rideId) && order.status === 'new');
     return userOrders.length;
   }, [user, rides, orders]);
 
@@ -187,18 +186,7 @@ export function Header() {
               <SheetTitle>{t.menu || "Menu"}</SheetTitle>
           </SheetHeader>
           <div className="flex-grow py-4 flex flex-col gap-4">
-              <Button asChild className="w-full h-20 text-base" onClick={() => setIsSheetOpen(false)}>
-                  <Link href="/driver/login">
-                    <LogIn className="mr-2 h-5 w-5" />
-                    {t.loginAsDriver}
-                  </Link>
-              </Button>
-               <Button asChild variant="outline" className="w-full h-20 text-base" onClick={() => setIsSheetOpen(false)}>
-                  <Link href="/admin/login">
-                    <ShieldCheck className="mr-2 h-5 w-5" />
-                    {t.loginAsAdmin}
-                  </Link>
-              </Button>
+             {/* Guest links can be added here if needed in the future */}
           </div>
           <div className="mt-auto space-y-2">
               <Separator />
@@ -233,18 +221,7 @@ export function Header() {
           {loading ? null : user ? renderUserMenu() : (
             <>
               <div className='hidden md:flex items-center gap-2'>
-                <Button asChild>
-                  <Link href="/driver/login">
-                    <LogIn className="mr-2 h-4 w-4" />
-                    {t.loginAsDriver}
-                  </Link>
-                </Button>
-                <Button asChild variant="outline">
-                   <Link href="/admin/login">
-                    <ShieldCheck className="mr-2 h-4 w-4" />
-                    {t.loginAsAdmin}
-                  </Link>
-                </Button>
+                {/* Login buttons removed */}
               </div>
               {renderGuestMenu()}
             </>
