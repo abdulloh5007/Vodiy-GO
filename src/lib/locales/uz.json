@@ -101,5 +101,6 @@
     "loginAndBook": "Kirish va band qilish",
     "registerAndBook": "Ro'yxatdan o'tish va band qilish",
     "error": "Xato",
-    "driversCannotBook": "Haydovchilar va administratorlar qatnovlarni band qila olmaydi."
+    "driversCannotBook": "Haydovchilar va administratorlar qatnovlarni band qila olmaydi.",
+    "welcomePassenger": "Xush kelibsiz!"
 }

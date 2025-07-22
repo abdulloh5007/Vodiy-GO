@@ -101,5 +101,6 @@
     "loginAndBook": "Login & Book",
     "registerAndBook": "Register & Book",
     "error": "Error",
-    "driversCannotBook": "Drivers and Admins cannot book rides."
+    "driversCannotBook": "Drivers and Admins cannot book rides.",
+    "welcomePassenger": "Welcome!"
 }

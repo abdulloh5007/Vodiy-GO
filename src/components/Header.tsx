@@ -76,12 +76,13 @@ export function Header() {
     <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
       <SheetTrigger asChild>
         <Button variant="ghost" size="icon">
+           {user?.role === 'driver' && newOrdersCount > 0 && <Badge className="absolute top-1 right-1 scale-75 animate-pulse">{newOrdersCount}</Badge>}
           <Menu className="h-6 w-6" />
         </Button>
       </SheetTrigger>
       <SheetContent className="flex flex-col">
         <SheetHeader>
-          <SheetTitle>{driverProfile?.name || user?.email}</SheetTitle>
+          <SheetTitle>{user?.name || driverProfile?.name || user?.email}</SheetTitle>
         </SheetHeader>
         <div className="flex-grow py-4">
             {user?.role === 'driver' && (
@@ -132,6 +133,9 @@ export function Header() {
                     ))}
                 </div>
               </div>
+            )}
+            {user?.role === 'passenger' && (
+                 <div className="text-center text-muted-foreground py-4">{t.welcomePassenger || "Welcome!"}</div>
             )}
             <div className="md:hidden mt-4 space-y-2">
                  <Separator />
@@ -186,7 +190,8 @@ export function Header() {
               <SheetTitle>{t.menu || "Menu"}</SheetTitle>
           </SheetHeader>
           <div className="flex-grow py-4 flex flex-col gap-4">
-             {/* Guest links can be added here if needed in the future */}
+            <Button variant="default" asChild onClick={() => setIsSheetOpen(false)}><Link href="/driver/login">{t.loginAsDriver}</Link></Button>
+            <Button variant="outline" asChild onClick={() => setIsSheetOpen(false)}><Link href="/admin/login">{t.loginAsAdmin}</Link></Button>
           </div>
           <div className="mt-auto space-y-2">
               <Separator />

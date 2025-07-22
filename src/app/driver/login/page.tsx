@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { AppContext } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
@@ -24,8 +24,15 @@ export default function DriverLoginPage() {
     throw new Error('LoginPage must be used within an AppProvider');
   }
 
-  const { login, register, translations } = context;
+  const { user, login, register, translations, loading } = context;
   const t = translations;
+
+  useEffect(() => {
+    if (!loading && user && user.role === 'driver') {
+      router.push('/create-ride');
+    }
+  }, [user, loading, router]);
+
 
   const handleAuth = async (action: 'login' | 'register', e: React.FormEvent) => {
     e.preventDefault();
@@ -84,7 +91,7 @@ export default function DriverLoginPage() {
     }
   };
   
-  if (!t.home) {
+  if (!t.home || loading || (user && user.role === 'driver')) {
       return <div>Loading...</div>
   }
 

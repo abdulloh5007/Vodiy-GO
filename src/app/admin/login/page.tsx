@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { AppContext } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
@@ -24,8 +24,15 @@ export default function AdminLoginPage() {
     throw new Error('AdminLoginPage must be used within an AppProvider');
   }
 
-  const { login, translations } = context;
+  const { user, login, translations, loading } = context;
   const t = translations;
+
+  useEffect(() => {
+    if (!loading && user && user.role === 'admin') {
+      router.push('/admin');
+    }
+  }, [user, loading, router]);
+
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,7 +81,7 @@ export default function AdminLoginPage() {
     }
   };
   
-  if (!t.home) {
+  if (!t.home || loading || (user && user.role === 'admin')) {
       return <div>Loading...</div>
   }
 
