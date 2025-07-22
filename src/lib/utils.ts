@@ -44,21 +44,36 @@ export function formatPassportNumber(value: string): string {
 
 export function formatCarNumber(value: string): string {
     const cleaned = value.replace(/[\s\-]/g, '').toUpperCase();
-    
-    // Format: 01 B 123 BB
-    if (cleaned.length > 3) {
-        const region = cleaned.slice(0, 2);
-        const letter = cleaned.slice(2, 3);
-        const numbers = cleaned.slice(3, 6);
-        const letters = cleaned.slice(6, 8);
-        return `${region} ${letter} ${numbers} ${letters}`.trim();
-    }
-     // Format: 01 123 BBB
-    else if (cleaned.length > 2) {
-        const region = cleaned.slice(0, 2);
-        const numbers = cleaned.slice(2, 5);
-        const letters = cleaned.slice(5, 8);
-        return `${region} ${numbers} ${letters}`.trim();
+    const region = cleaned.slice(0, 2).replace(/[^0-9]/g, '');
+    const rest = cleaned.slice(2);
+
+    if (region.length < 2) return region;
+
+    // Check if the character after region code is a letter or a number
+    if (rest.length > 0) {
+        const isLetterAfterRegion = /^[A-Z]/.test(rest);
+
+        if (isLetterAfterRegion) {
+            // Format: 01 B 123 BB
+            const letter1 = rest.slice(0, 1).replace(/[^A-Z]/g, '');
+            const numbers = rest.slice(1, 4).replace(/[^0-9]/g, '');
+            const letters2 = rest.slice(4, 6).replace(/[^A-Z]/g, '');
+            
+            let result = `${region}`;
+            if (letter1) result += ` ${letter1}`;
+            if (numbers) result += ` ${numbers}`;
+            if (letters2) result += ` ${letters2}`;
+            return result;
+        } else {
+            // Format: 01 123 BBB
+            const numbers = rest.slice(0, 3).replace(/[^0-9]/g, '');
+            const letters = rest.slice(3, 6).replace(/[^A-Z]/g, '');
+
+            let result = `${region}`;
+            if (numbers) result += ` ${numbers}`;
+            if (letters) result += ` ${letters}`;
+            return result;
+        }
     }
 
     return cleaned;
