@@ -152,8 +152,12 @@ export default function RideApplicationsPage() {
        <Card className="mb-4">
         <CardHeader className="flex flex-row items-center justify-between">
             <div>
-                <CardTitle className="font-headline text-2xl">Ride Applications</CardTitle>
-                <CardDescription>{pendingRides.length > 0 ? `You have ${pendingRides.length} pending ride applications.` : 'No pending ride applications.'}</CardDescription>
+                <CardTitle className="font-headline text-2xl">{t.rideApplications || 'Ride Applications'}</CardTitle>
+                <CardDescription>
+                    {pendingRides.length > 0 
+                        ? (t.rideApplications_desc || `You have {count} pending ride applications.`).replace('{count}', pendingRides.length) 
+                        : (t.rideApplications_desc_none || 'No pending ride applications.')}
+                </CardDescription>
             </div>
              <div className="hidden md:flex items-center gap-2">
                 <Button variant={viewMode === 'table' ? 'secondary' : 'ghost'} size="icon" onClick={() => setViewMode('table')}>
@@ -169,11 +173,11 @@ export default function RideApplicationsPage() {
               <Table className="min-w-[900px]">
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Driver</TableHead>
-                    <TableHead>Car</TableHead>
-                    <TableHead>Ride</TableHead>
-                    <TableHead>Price</TableHead>
-                    <TableHead>Status</TableHead>
+                    <TableHead>{t.ride_table_driver || 'Driver'}</TableHead>
+                    <TableHead>{t.ride_table_car || 'Car'}</TableHead>
+                    <TableHead>{t.ride_table_ride || 'Ride'}</TableHead>
+                    <TableHead>{t.ride_table_price || 'Price'}</TableHead>
+                    <TableHead>{t.ride_table_status || 'Status'}</TableHead>
                     <TableHead className="text-right">{t.actions}</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -213,7 +217,7 @@ export default function RideApplicationsPage() {
                                 <div className="font-semibold">{new Intl.NumberFormat('fr-FR').format(ride.price)} UZS</div>
                             </TableCell>
                             <TableCell>
-                            <Badge variant="secondary">{ride.status}</Badge>
+                            <Badge variant="secondary">{t[ride.status] || ride.status}</Badge>
                             </TableCell>
                             <TableCell className="text-right">
                             <Button variant="ghost" size="icon" className="text-green-600 hover:text-green-700 hover:bg-green-50" onClick={() => updateRideStatus(ride.id, 'approved')}>
@@ -228,7 +232,7 @@ export default function RideApplicationsPage() {
                     })
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center h-24">No pending ride applications</TableCell>
+                      <TableCell colSpan={6} className="text-center h-24">{t.noPendingRideApplications || 'No pending ride applications'}</TableCell>
                     </TableRow>
                   )}
                 </TableBody>
@@ -254,12 +258,10 @@ export default function RideApplicationsPage() {
             })
             ) : (
             <div className="text-center py-16 col-span-full">
-                <p className="text-muted-foreground">No pending ride applications</p>
+                <p className="text-muted-foreground">{t.noPendingRideApplications || 'No pending ride applications'}</p>
             </div>
             )}
       </div>
     </div>
   );
 }
-
-    

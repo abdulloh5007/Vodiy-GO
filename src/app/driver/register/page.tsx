@@ -16,7 +16,7 @@ import Image from 'next/image';
 import { FirebaseError } from 'firebase/app';
 
 
-const ImageDropzone = ({ file, setFile }: { file: File | null, setFile: (file: File | null) => void }) => {
+const ImageDropzone = ({ file, setFile, t }: { file: File | null, setFile: (file: File | null) => void, t: any }) => {
     const [preview, setPreview] = useState<string | null>(null);
 
     useEffect(() => {
@@ -69,7 +69,7 @@ const ImageDropzone = ({ file, setFile }: { file: File | null, setFile: (file: F
             ) : (
                 <div className="flex flex-col items-center gap-2 text-muted-foreground">
                     <UploadCloud className="h-10 w-10"/>
-                    <span>Drag & drop or click to upload car photo</span>
+                    <span>{t.carPhotoDropzone || 'Drag & drop or click to upload car photo'}</span>
                 </div>
             )}
         </div>
@@ -125,7 +125,7 @@ export default function NewRegisterDriverPage() {
     if (step === 1) {
       if (!email || password.length < 6) {
         toast({
-          title: "Validation Error",
+          title: t.validationErrorTitle,
           description: "Please enter a valid email and a password of at least 6 characters.",
           variant: "destructive",
         });
@@ -135,7 +135,7 @@ export default function NewRegisterDriverPage() {
     if (step === 2) {
       if (!name || phone.replace(/\D/g, '').length !== 12 || passport.length < 9) {
         toast({
-          title: "Validation Error",
+          title: t.validationErrorTitle,
           description: "Please fill all fields for this step correctly.",
           variant: "destructive",
         });
@@ -155,7 +155,7 @@ export default function NewRegisterDriverPage() {
     
     if (!carModel || !carNumber || !carPhotoFile) {
       toast({
-        title: "Validation Error",
+        title: t.validationErrorTitle,
         description: "Please fill all car details and upload a photo.",
         variant: "destructive",
       });
@@ -217,7 +217,7 @@ export default function NewRegisterDriverPage() {
           <form onSubmit={handleSubmit} className="space-y-6">
             {step === 1 && (
                 <div className="space-y-6 animate-in fade-in">
-                    <CardDescription>Step 1: Account Details</CardDescription>
+                    <CardDescription>{t.step1_title || "Step 1: Account Details"}</CardDescription>
                     <div className="space-y-2">
                         <Label htmlFor="email">{t.email}</Label>
                         <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} required />
@@ -230,7 +230,7 @@ export default function NewRegisterDriverPage() {
             )}
             {step === 2 && (
                 <div className="space-y-6 animate-in fade-in">
-                    <CardDescription>Step 2: Personal Information</CardDescription>
+                    <CardDescription>{t.step2_title || "Step 2: Personal Information"}</CardDescription>
                     <div className="space-y-2">
                         <Label htmlFor="name">{t.fullName}</Label>
                         <Input id="name" value={name} onChange={e => setName(e.target.value)} required />
@@ -240,14 +240,14 @@ export default function NewRegisterDriverPage() {
                         <Input id="phone" type="tel" value={phone} onChange={handlePhoneChange} placeholder="+998 (XX) XXX-XX-XX" required />
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="passport">Passport Number</Label>
-                        <Input id="passport" value={passport} onChange={handlePassportChange} placeholder="AA 1234567" required />
+                        <Label htmlFor="passport">{t.passportNumber || "Passport Number"}</Label>
+                        <Input id="passport" value={passport} onChange={handlePassportChange} placeholder={t.passportPlaceholder || "AA 1234567"} required />
                     </div>
                 </div>
             )}
             {step === 3 && (
                 <div className="space-y-6 animate-in fade-in">
-                    <CardDescription>Step 3: Car Information</CardDescription>
+                    <CardDescription>{t.step3_title || "Step 3: Car Information"}</CardDescription>
                     <div className="space-y-2">
                         <Label htmlFor="carModel">{t.carModel}</Label>
                         <Input id="carModel" value={carModel} onChange={e => setCarModel(e.target.value)} placeholder={t.carModelPlaceholder} required />
@@ -258,7 +258,7 @@ export default function NewRegisterDriverPage() {
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="carPhotoUrl">{t.carPhotoUrl}</Label>
-                        <ImageDropzone file={carPhotoFile} setFile={setCarPhotoFile} />
+                        <ImageDropzone file={carPhotoFile} setFile={setCarPhotoFile} t={t} />
                     </div>
                 </div>
             )}
@@ -266,13 +266,13 @@ export default function NewRegisterDriverPage() {
             <div className="flex justify-between w-full pt-4">
                 {step > 1 ? (
                     <Button type="button" variant="outline" onClick={handlePrevStep} disabled={isSubmitting}>
-                        <ArrowLeft className="mr-2 h-4 w-4" /> Back
+                        <ArrowLeft className="mr-2 h-4 w-4" /> {t.back_button || 'Back'}
                     </Button>
                 ) : <div />}
                 
                 {step < TOTAL_STEPS ? (
                     <Button type="button" onClick={handleNextStep}>
-                        Next Step <ArrowRight className="ml-2 h-4 w-4" />
+                        {t.next_button || 'Next Step'} <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                 ) : (
                      <Button type="submit" disabled={isSubmitting}>

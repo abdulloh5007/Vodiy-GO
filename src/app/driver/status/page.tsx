@@ -43,8 +43,8 @@ export default function DriverStatusPage() {
             case 'pending':
                 return {
                     icon: <ShieldAlert className="h-16 w-16 text-yellow-500" />,
-                    title: "Application Pending",
-                    description: "Your application is currently under review. We will notify you once it's processed. Thank you for your patience.",
+                    title: t.statusPage_pending_title || "Application Pending",
+                    description: t.statusPage_pending_desc || "Your application is currently under review. We will notify you once it's processed. Thank you for your patience.",
                     showLogout: true,
                 };
             case 'verified':
@@ -52,22 +52,23 @@ export default function DriverStatusPage() {
                 router.push('/create-ride');
                 return {
                      icon: <ShieldCheck className="h-16 w-16 text-green-500" />,
-                     title: "Application Verified!",
-                     description: "Redirecting you to the dashboard...",
+                     title: t.statusPage_verified_title || "Application Verified!",
+                     description: t.statusPage_verified_desc || "Redirecting you to the dashboard...",
                      showLogout: false,
                 };
             case 'rejected':
                 return {
                     icon: <ShieldX className="h-16 w-16 text-destructive" />,
-                    title: "Application Rejected",
-                    description: "We're sorry, but your application could not be approved at this time. Please contact support for more information.",
+                    title: t.statusPage_rejected_title || "Application Rejected",
+                    description: t.statusPage_rejected_desc || "We're sorry, but your application could not be approved at this time. Please contact support for more information.",
                     showLogout: true,
                 };
             default:
+                 // This could be the state before the driver document is created or found
                 return {
                     icon: <Loader2 className="h-16 w-16 animate-spin" />,
-                    title: "Checking Status...",
-                    description: "Please wait while we check your application status.",
+                    title: t.statusPage_checking_title || "Checking Status...",
+                    description: t.statusPage_checking_desc || "Please wait while we check your application status.",
                     showLogout: false,
                 };
         }
@@ -95,4 +96,3 @@ export default function DriverStatusPage() {
         </div>
     );
 }
-
