@@ -77,7 +77,6 @@ export function Header() {
   
   const driverBottomLinks = [
     { href: '/register-driver', label: t.carSettings || "Car Settings", icon: Car },
-    { href: '/notifications', label: t.notifications || "Notifications", icon: Bell },
   ];
 
   const adminLinks = [
@@ -85,7 +84,7 @@ export function Header() {
     { href: '/admin/ride-applications', label: "Ride Applications", icon: PackageCheck }
   ];
   
-  const passengerLinks = [
+  const allUserLinks = [
       { href: '/notifications', label: t.notifications || "Notifications", icon: Bell },
   ]
 
@@ -152,21 +151,19 @@ export function Header() {
                 </div>
               </div>
             )}
-            {user?.role === 'passenger' && (
-                 <div className="flex flex-col gap-2">
-                    {passengerLinks.map(link => (
-                         <Button 
-                            key={link.href}
-                            variant={pathname === link.href ? 'secondary' : 'ghost'} 
-                            asChild
-                            className="justify-start border rounded-lg"
-                            onClick={() => setIsSheetOpen(false)}
-                        >
-                            <Link href={link.href}><link.icon/><span>{link.label}</span></Link>
-                        </Button>
-                    ))}
-                 </div>
-            )}
+            <div className="flex flex-col gap-2">
+                {allUserLinks.map(link => (
+                    <Button 
+                        key={link.href}
+                        variant={pathname === link.href ? 'secondary' : 'ghost'} 
+                        asChild
+                        className="justify-start border rounded-lg"
+                        onClick={() => setIsSheetOpen(false)}
+                    >
+                        <Link href={link.href}><link.icon/><span>{link.label}</span></Link>
+                    </Button>
+                ))}
+            </div>
         </div>
         <div className="mt-auto flex flex-col gap-2">
             {user?.role === 'driver' && driverBottomLinks.map(link => (

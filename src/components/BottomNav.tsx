@@ -32,7 +32,7 @@ export function BottomNav() {
 
   const navLinks = [
     { href: '/', label: translations.home || 'Home', icon: Home },
-    { href: '/my-orders', label: translations.myOrders || 'Bookings', icon: ShoppingBag, badge: newOrdersCount > 0 ? newOrdersCount : 0 },
+    { href: '/my-orders', label: translations.myOrders || 'Bookings', icon: ShoppingBag, badge: newOrdersCount },
   ];
 
   return (

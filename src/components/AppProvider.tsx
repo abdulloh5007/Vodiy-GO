@@ -119,8 +119,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const driverDocRef = doc(db, "drivers", user.uid);
     await setDoc(driverDocRef, {
         ...driverInfo,
-        id: user.uid,
-        name: user.name,
         carPhotoUrl,
         status: 'pending', // Application is pending review
     }, { merge: true });
