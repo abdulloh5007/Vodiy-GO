@@ -3,7 +3,7 @@
 
 import { useContext, useMemo, useState } from 'react';
 import { AppContext } from '@/contexts/AppContext';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ShieldAlert, User, Phone, MapPin, Clock, Check, X, Ban, LayoutGrid, List } from 'lucide-react';
@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Order, Ride } from '@/lib/types';
 import { cn } from '@/lib/utils';
+import { CardFooter } from '@/components/ui/card';
 
 
 function MyOrdersSkeleton() {
@@ -246,14 +247,6 @@ export default function MyOrdersPage() {
                     </div>
                 </CardContent>
             </Card>
-            
-            {myRideOrders.length === 0 && viewMode === 'table' && (
-                <Card>
-                    <CardContent className="text-center h-24 flex items-center justify-center">
-                        {t.noBookingsYet || 'No bookings for your rides yet.'}
-                    </CardContent>
-                </Card>
-            )}
 
              <div className={cn("grid grid-cols-1 md:grid-cols-2 gap-4", viewMode === 'card' ? 'block' : 'md:hidden')}>
                 {myRideOrders.length > 0 ? (
