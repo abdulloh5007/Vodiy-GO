@@ -55,7 +55,7 @@ export function ImageViewer({ imageUrl, onOpenChange }: ImageViewerProps) {
                                 {imageUrl && (
                                     <Image
                                         src={imageUrl}
-                                        alt="Fullscreen view"
+                                        alt="Fullscreen view" 
                                         layout="fill"
                                         objectFit="contain"
                                         className="rounded-lg"
