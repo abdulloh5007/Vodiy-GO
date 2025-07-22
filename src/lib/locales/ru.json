@@ -65,7 +65,7 @@
     "carSettings": "Настройки машины",
     "validationErrorTitle": "Ошибка валидации",
     "validationErrorDesc": "Пожалуйста, введите почту и пароль.",
-    "validationErrorDescBooking": "Пожалуйста, введите ваше имя и полный номер телефона.",
+    "validationErrorDescBooking": "Пожалуйста, заполните все обязательные поля.",
     "loginSuccessTitle": "Вход выполнен успешно",
     "registrationSuccessTitle": "Регистрация прошла успешно",
     "redirecting": "Перенаправление...",
@@ -88,5 +88,18 @@
     "ride": "Поездка",
     "clientName": "Имя клиента",
     "clientPhone": "Телефон клиента",
-    "noBookingsYet": "Пока нет бронирований для ваших поездок."
+    "noBookingsYet": "Пока нет бронирований для ваших поездок.",
+    "settings": "Настройки",
+    "language": "Язык",
+    "theme": "Тема",
+    "menu": "Меню",
+    "adminLoginDescription": "Введите учетные данные администратора для доступа к панели управления.",
+    "unauthorizedAccess": "У вас нет прав для доступа.",
+    "email": "Почта",
+    "password": "Пароль",
+    "loginToBook": "Чтобы забронировать поездку, войдите или создайте аккаунт пассажира.",
+    "loginAndBook": "Войти и забронировать",
+    "registerAndBook": "Зарегистрироваться и забронировать",
+    "error": "Ошибка",
+    "driversCannotBook": "Водители и администраторы не могут бронировать поездки."
 }

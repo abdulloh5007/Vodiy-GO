@@ -65,7 +65,7 @@
     "carSettings": "Mashina sozlamalari",
     "validationErrorTitle": "Validatsiya xatosi",
     "validationErrorDesc": "Iltimos, email va parolni kiriting.",
-    "validationErrorDescBooking": "Iltimos, ismingizni va to'liq telefon raqamingizni kiriting.",
+    "validationErrorDescBooking": "Iltimos, barcha kerakli maydonlarni to'ldiring.",
     "loginSuccessTitle": "Muvaffaqiyatli kirish",
     "registrationSuccessTitle": "Muvaffaqiyatli ro'yxatdan o'tish",
     "redirecting": "Yo'naltirilmoqda...",
@@ -88,5 +88,18 @@
     "ride": "Qatnov",
     "clientName": "Mijoz ismi",
     "clientPhone": "Mijoz telefoni",
-    "noBookingsYet": "Sizning qatnovlaringiz uchun hali buyurtmalar yo'q."
+    "noBookingsYet": "Sizning qatnovlaringiz uchun hali buyurtmalar yo'q.",
+    "settings": "Sozlamalar",
+    "language": "Til",
+    "theme": "Mavzu",
+    "menu": "Menyu",
+    "adminLoginDescription": "Boshqaruv paneliga kirish uchun administrator hisob ma'lumotlarini kiriting.",
+    "unauthorizedAccess": "Bunga kirish uchun sizda ruxsat yo'q.",
+    "email": "Email",
+    "password": "Parol",
+    "loginToBook": "Qatnovni band qilish uchun tizimga kiring yoki yo'lovchi hisobini yarating.",
+    "loginAndBook": "Kirish va band qilish",
+    "registerAndBook": "Ro'yxatdan o'tish va band qilish",
+    "error": "Xato",
+    "driversCannotBook": "Haydovchilar va administratorlar qatnovlarni band qila olmaydi."
 }

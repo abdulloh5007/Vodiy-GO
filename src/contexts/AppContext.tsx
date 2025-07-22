@@ -15,8 +15,8 @@ interface AppContextType {
   updateDriverStatus: (driverId: string, status: 'verified' | 'rejected') => void;
   addRide: (ride: Omit<Ride, 'id' | 'createdAt'>) => void;
   addOrder: (order: Omit<Order, 'id' | 'status'>) => void;
-  login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string, role?: 'admin' | 'driver' | 'passenger') => Promise<void>;
+  register: (email: string, password: string, role: 'driver' | 'passenger') => Promise<void>;
   logout: () => void;
   loading: boolean;
   selectedImage: string | null;

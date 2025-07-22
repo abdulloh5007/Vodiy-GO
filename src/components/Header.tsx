@@ -1,6 +1,6 @@
 'use client';
 
-import { useContext, useMemo } from 'react';
+import { useContext, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { AppContext } from '@/contexts/AppContext';
@@ -22,6 +22,7 @@ import { Separator } from './ui/separator';
 export function Header() {
   const context = useContext(AppContext);
   const pathname = usePathname();
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   if (!context) {
     return (
@@ -40,10 +41,12 @@ export function Header() {
   }, [user, drivers]);
 
   const newOrdersCount = useMemo(() => {
-    if (!user) return 0;
+    if (!user || user.role !== 'driver') return 0;
     const myRideIds = rides.filter(ride => ride.driverId === user.uid).map(r => r.id);
     if (myRideIds.length === 0) return 0;
-    return orders.filter(order => myRideIds.includes(order.rideId) && order.status === 'new').length;
+    const userOrders = orders.filter(order => myRideIds.includes(order.rideId));
+    // Here you can add logic to count only 'new' orders if needed.
+    return userOrders.length;
   }, [user, rides, orders]);
 
   if (!t.home) {
@@ -71,7 +74,7 @@ export function Header() {
 
 
   const renderUserMenu = () => (
-    <Sheet>
+    <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
       <SheetTrigger asChild>
         <Button variant="ghost" size="icon">
           <Menu className="h-6 w-6" />
@@ -91,6 +94,7 @@ export function Header() {
                             variant={pathname === link.href ? 'secondary' : 'outline'} 
                             asChild 
                             className="h-28 flex-col gap-2 text-sm rounded-lg relative"
+                            onClick={() => setIsSheetOpen(false)}
                         >
                             <Link href={link.href}>
                               {link.badge && link.badge > 0 && (
@@ -107,6 +111,7 @@ export function Header() {
                     variant={pathname === driverWideLink.href ? 'secondary' : 'outline'} 
                     asChild
                     className="w-full h-20 rounded-lg"
+                    onClick={() => setIsSheetOpen(false)}
                 >
                     <Link href={driverWideLink.href}><driverWideLink.icon className="h-6 w-6"/><span>{driverWideLink.label}</span></Link>
                 </Button>
@@ -121,6 +126,7 @@ export function Header() {
                             variant={pathname === link.href ? 'secondary' : 'outline'} 
                             asChild 
                             className="h-28 flex-col gap-2 text-sm rounded-lg"
+                            onClick={() => setIsSheetOpen(false)}
                         >
                             <Link href={link.href}><link.icon className="mb-1 h-8 w-8"/><span>{link.label}</span></Link>
                         </Button>
@@ -130,13 +136,13 @@ export function Header() {
             )}
             <div className="md:hidden mt-4 space-y-2">
                  <Separator />
-                <p className='pt-2 text-sm text-muted-foreground'>Settings</p>
+                <p className='pt-2 text-sm text-muted-foreground'>{t.settings || 'Settings'}</p>
                 <div className='flex justify-between items-center bg-muted p-2 rounded-lg'>
-                  <span className='text-sm font-medium'>Language</span>
+                  <span className='text-sm font-medium'>{t.language || 'Language'}</span>
                   <LanguageSwitcher />
                 </div>
                 <div className='flex justify-between items-center bg-muted p-2 rounded-lg'>
-                  <span className='text-sm font-medium'>Theme</span>
+                  <span className='text-sm font-medium'>{t.theme || 'Theme'}</span>
                   <ThemeToggle />
                 </div>
             </div>
@@ -148,13 +154,17 @@ export function Header() {
                     variant={pathname === link.href ? 'secondary' : 'ghost'} 
                     asChild
                     className="justify-start border rounded-lg"
+                    onClick={() => setIsSheetOpen(false)}
                 >
                     <Link href={link.href}><link.icon/><span>{link.label}</span></Link>
                 </Button>
             ))}
              <Button 
                 variant="destructive" 
-                onClick={logout} 
+                onClick={() => {
+                  logout();
+                  setIsSheetOpen(false);
+                }} 
                 className="w-full justify-start rounded-lg bg-red-600/90 hover:bg-red-600 text-white"
              >
                 <LogOut />
@@ -166,7 +176,7 @@ export function Header() {
   );
 
   const renderGuestMenu = () => (
-    <Sheet>
+    <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
        <SheetTrigger asChild>
         <Button variant="ghost" size="icon" className='md:hidden'>
           <Menu className="h-6 w-6" />
@@ -177,22 +187,28 @@ export function Header() {
               <SheetTitle>{t.menu || "Menu"}</SheetTitle>
           </SheetHeader>
           <div className="flex-grow py-4 flex flex-col gap-4">
-              <Button asChild className="w-full h-20 text-base">
-                  <Link href="/admin/login">
+              <Button asChild className="w-full h-20 text-base" onClick={() => setIsSheetOpen(false)}>
+                  <Link href="/driver/login">
                     <LogIn className="mr-2 h-5 w-5" />
                     {t.loginAsDriver}
+                  </Link>
+              </Button>
+               <Button asChild variant="outline" className="w-full h-20 text-base" onClick={() => setIsSheetOpen(false)}>
+                  <Link href="/admin/login">
+                    <ShieldCheck className="mr-2 h-5 w-5" />
+                    {t.loginAsAdmin}
                   </Link>
               </Button>
           </div>
           <div className="mt-auto space-y-2">
               <Separator />
-              <p className='pt-2 text-sm text-muted-foreground'>Settings</p>
+              <p className='pt-2 text-sm text-muted-foreground'>{t.settings || 'Settings'}</p>
               <div className='flex justify-between items-center bg-muted p-2 rounded-lg'>
-                <span className='text-sm font-medium'>Language</span>
+                <span className='text-sm font-medium'>{t.language || 'Language'}</span>
                 <LanguageSwitcher />
               </div>
               <div className='flex justify-between items-center bg-muted p-2 rounded-lg'>
-                <span className='text-sm font-medium'>Theme</span>
+                <span className='text-sm font-medium'>{t.theme || 'Theme'}</span>
                 <ThemeToggle />
               </div>
           </div>
@@ -216,12 +232,20 @@ export function Header() {
 
           {loading ? null : user ? renderUserMenu() : (
             <>
-              <Button asChild className='hidden md:inline-flex'>
-                <Link href="/admin/login">
-                  <LogIn className="mr-2 h-4 w-4" />
-                  {t.loginAsDriver}
-                </Link>
-              </Button>
+              <div className='hidden md:flex items-center gap-2'>
+                <Button asChild>
+                  <Link href="/driver/login">
+                    <LogIn className="mr-2 h-4 w-4" />
+                    {t.loginAsDriver}
+                  </Link>
+                </Button>
+                <Button asChild variant="outline">
+                   <Link href="/admin/login">
+                    <ShieldCheck className="mr-2 h-4 w-4" />
+                    {t.loginAsAdmin}
+                  </Link>
+                </Button>
+              </div>
               {renderGuestMenu()}
             </>
           )}

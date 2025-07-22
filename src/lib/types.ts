@@ -1,7 +1,9 @@
 export type User = {
   uid: string;
   email: string | null;
-  role: 'driver' | 'admin';
+  role: 'passenger' | 'driver' | 'admin';
+  name?: string;
+  phone?: string;
 };
 
 export type Driver = {
@@ -29,6 +31,7 @@ export type Ride = {
 export type Order = {
   id: string; 
   rideId: string;
+  passengerId: string;
   clientName: string;
   clientPhone: string;
   status: 'new' | 'accepted' | 'rejected';

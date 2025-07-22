@@ -62,8 +62,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         if (userDocSnap.exists()) {
             setUser({ uid: firebaseUser.uid, ...userDocSnap.data() } as User);
         } else {
-            // This case might happen for users created before the users collection was standard
-            const newUser: User = { uid: firebaseUser.uid, email: firebaseUser.email, role: 'driver' };
+            // This case is for users that might not have a user doc yet.
+            // Let's create a passenger one by default.
+            const newUser: User = { uid: firebaseUser.uid, email: firebaseUser.email, role: 'passenger' };
             await setDoc(userDocRef, newUser);
             setUser(newUser);
         }
@@ -118,40 +119,56 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
-  const addOrder = async (orderData: Omit<Order, 'id' | 'status'>) => {
+  const addOrder = async (orderData: Omit<Order, 'id' | 'status' | 'passengerId'> & { passengerId: string }) => {
     await setDoc(doc(collection(db, "orders")), {
       ...orderData,
       status: 'new',
     });
   };
 
-  const login = async (email: string, password: string):Promise<void> => {
-    await signInWithEmailAndPassword(auth, email, password);
+  const login = async (email: string, password: string, role?: 'admin' | 'driver' | 'passenger'):Promise<void> => {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const firebaseUser = userCredential.user;
+  
+      if (role) {
+          const userDocRef = doc(db, 'users', firebaseUser.uid);
+          const userDocSnap = await getDoc(userDocRef);
+          if (userDocSnap.exists()) {
+              const userData = userDocSnap.data() as User;
+              if (userData.role !== role) {
+                  await signOut(auth);
+                  throw new Error('auth/unauthorized-role');
+              }
+          } else {
+              await signOut(auth);
+              throw new Error('auth/no-user-record');
+          }
+      }
   };
   
-  const register = async (email: string, password: string): Promise<void> => {
+  const register = async (email: string, password: string, role: 'driver' | 'passenger'): Promise<void> => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const firebaseUser = userCredential.user;
     
     const batch = writeBatch(db);
 
-    // Create user document in 'users' collection
     const userDocRef = doc(db, "users", firebaseUser.uid);
-    const newUser: User = { uid: firebaseUser.uid, email: firebaseUser.email, role: 'driver' };
+    const newUser: User = { uid: firebaseUser.uid, email: firebaseUser.email, role };
     batch.set(userDocRef, newUser);
     
-    // Create an initial empty driver profile
-    const driverDocRef = doc(db, "drivers", firebaseUser.uid);
-    const newDriverProfile: Partial<Driver> = {
-        name: '',
-        idCardNumber: '',
-        phone: '',
-        carModel: '',
-        carNumber: '',
-        carPhotoUrl: '',
-        status: 'unsubmitted'
+    if (role === 'driver') {
+        const driverDocRef = doc(db, "drivers", firebaseUser.uid);
+        const newDriverProfile: Partial<Driver> = {
+            name: '',
+            idCardNumber: '',
+            phone: '',
+            carModel: '',
+            carNumber: '',
+            carPhotoUrl: '',
+            status: 'unsubmitted'
+        }
+        batch.set(driverDocRef, newDriverProfile);
     }
-    batch.set(driverDocRef, newDriverProfile);
     
     await batch.commit();
   };
