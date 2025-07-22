@@ -110,7 +110,7 @@ export function Header() {
                             className="h-28 flex-col gap-2 text-sm rounded-lg relative"
                             onClick={() => setIsSheetOpen(false)}
                         >
-                            <Link href={link.href}>
+                            <Link href={link.href} className='relative'>
                               {link.badge && link.badge > 0 && (
                                 <Badge className="absolute top-2 right-2">{link.badge}</Badge>
                               )}
