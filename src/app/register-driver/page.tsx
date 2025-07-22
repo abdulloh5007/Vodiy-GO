@@ -1,14 +1,21 @@
 'use client';
 
-// This page is currently a placeholder after the registration flow was moved to /driver/register.
-// It can be repurposed for editing driver details in the future.
-export default function RegisterDriverPage() {
+// This page is a redirect placeholder.
+// The main registration is at /driver/register
+// The application form is at /driver/application
+// This page can be repurposed for editing driver details in the future.
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+
+export default function RegisterDriverRedirectPage() {
+    const router = useRouter();
+    useEffect(() => {
+        router.push('/driver/register');
+    }, [router]);
+    
   return (
     <div className="container mx-auto py-8 px-4">
-      <h1 className="text-2xl font-bold">Driver Profile Settings</h1>
-      <p className="text-muted-foreground">
-        This page will be used for updating your driver and car information.
-      </p>
+      <p>Redirecting to registration...</p>
     </div>
   );
 }

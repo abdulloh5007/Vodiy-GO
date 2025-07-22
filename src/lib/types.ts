@@ -45,3 +45,5 @@ export type Language = 'en' | 'ru' | 'uz';
 export type Translations = {
   [key: string]: any;
 };
+
+export type DriverApplicationData = Omit<Driver, 'id' | 'status' | 'carPhotoUrl' | 'name'> & { carPhotoFile: File | null };

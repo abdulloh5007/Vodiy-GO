@@ -2,7 +2,7 @@
 'use client';
 
 import React from 'react';
-import { Driver, Ride, Order, Language, Translations, User } from '@/lib/types';
+import { Driver, Ride, Order, Language, Translations, User, DriverApplicationData } from '@/lib/types';
 
 interface AppContextType {
   language: Language;
@@ -12,14 +12,14 @@ interface AppContextType {
   drivers: Driver[];
   rides: Ride[];
   orders: Order[];
-  addDriverApplication: (driver: Omit<Driver, 'id' | 'status' | 'carPhotoUrl'> & { carPhotoFile: File | null; email: string; password?: string; }) => Promise<void>;
+  addDriverApplication: (driver: DriverApplicationData) => Promise<void>;
   updateDriverStatus: (driverId: string, status: 'verified' | 'rejected') => void;
   updateRideStatus: (rideId: string, status: 'approved' | 'rejected') => void;
   updateOrderStatus: (orderId: string, status: 'accepted' | 'rejected') => void;
   addRide: (ride: Omit<Ride, 'id' | 'createdAt' | 'status'>) => void;
   addOrder: (order: Omit<Order, 'id' | 'status'>) => void;
   login: (email: string, password: string, role?: 'admin' | 'driver' | 'passenger') => Promise<void>;
-  register: (email: string, password: string, role: 'passenger') => Promise<void>;
+  register: (email: string, password: string, name: string, role: 'passenger' | 'driver') => Promise<void>;
   logout: () => void;
   loading: boolean;
   selectedImage: string | null;

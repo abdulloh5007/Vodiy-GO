@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useContext, useMemo } from 'react';
+import { useState, useContext, useMemo, useEffect } from 'react';
 import { AppContext } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,6 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { ShieldAlert, Loader2, Clock } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useRouter } from 'next/navigation';
 
 const locations = ["Sirdaryo", "Navoiy", "Jizzax", "Xorazm", "Buxoro", "Surxondaryo", "Namangan", "Andijon", "Qashqadaryo", "Samarqand", "Fargʻona", "Toshkent"];
 
@@ -57,6 +58,7 @@ function CreateRideSkeleton() {
 export default function CreateRidePage() {
   const context = useContext(AppContext);
   const { toast } = useToast();
+  const router = useRouter();
 
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
@@ -72,8 +74,22 @@ export default function CreateRidePage() {
   const { user, addRide, translations, drivers, loading } = context;
   const t = translations;
 
-  const isVerifiedDriver = user && drivers.some(d => d.id === user.uid && d.status === 'verified');
+  const driverProfile = useMemo(() => {
+    if (!user) return null;
+    return drivers.find(d => d.id === user.uid);
+  }, [user, drivers]);
+
+  const isVerifiedDriver = user && driverProfile && driverProfile.status === 'verified';
   
+  useEffect(() => {
+    if (!loading && (!user || user.role !== 'driver')) {
+      router.push('/driver/login');
+    } else if (!loading && user && driverProfile?.status !== 'verified') {
+      router.push('/driver/status');
+    }
+  }, [loading, user, driverProfile, router]);
+
+
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const rawValue = e.target.value.replace(/\s/g, '');
     if (!isNaN(Number(rawValue)) && Number(rawValue) <= 1000000) {
@@ -91,23 +107,8 @@ export default function CreateRidePage() {
   const fromLocations = useMemo(() => locations.filter(loc => loc !== to), [to]);
   const toLocations = useMemo(() => locations.filter(loc => loc !== from), [from]);
 
-  if (loading || !t.home) {
+  if (loading || !t.home || !isVerifiedDriver) {
       return <CreateRideSkeleton />;
-  }
-
-  if (!isVerifiedDriver) {
-    return (
-        <div className="container mx-auto py-8 px-4 flex justify-center items-center h-[calc(100vh-8rem)]">
-            <Card className="w-full max-w-md text-center">
-                <CardHeader>
-                    <CardTitle className="flex items-center justify-center gap-2"><ShieldAlert className="text-destructive h-8 w-8"/>{t.accessDenied}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <p>{t.youMustBeVerified}</p>
-                </CardContent>
-            </Card>
-        </div>
-    );
   }
 
   const handleSubmit = async (e: React.FormEvent) => {

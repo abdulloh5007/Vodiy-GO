@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { AppContext } from '@/contexts/AppContext';
-import { Driver, Ride, Order, Language, Translations, User } from '@/lib/types';
+import { Driver, Ride, Order, Language, Translations, User, DriverApplicationData } from '@/lib/types';
 import { initialTranslations } from '@/lib/i18n';
 import { db, auth } from '@/lib/firebase';
 import { collection, doc, getDoc, setDoc, onSnapshot, query, orderBy, serverTimestamp, writeBatch, where, getDocs, deleteDoc, updateDoc } from "firebase/firestore";
@@ -102,41 +102,28 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       return downloadURL;
   }
 
-  const addDriverApplication = async (driverData: Omit<Driver, 'id' | 'status' | 'carPhotoUrl'> & { carPhotoFile: File | null, email: string, password?: string }) => {
-    if (!driverData.email || !driverData.password) {
-        throw new Error("Email and password are required for registration.");
+  const addDriverApplication = async (driverData: DriverApplicationData) => {
+    if (!user) {
+        throw new Error("User must be logged in to submit an application.");
+    }
+    if (!driverData.carPhotoFile) {
+        throw new Error("Car photo is required.");
     }
 
-    // 1. Create user in Firebase Auth first
-    const userCredential = await createUserWithEmailAndPassword(auth, driverData.email, driverData.password);
-    const firebaseUser = userCredential.user;
+    // 1. Upload car photo
+    const carPhotoUrl = await uploadCarPhoto(user.uid, driverData.carPhotoFile);
+
+    // 2. Prepare data for Firestore
+    const { carPhotoFile, ...driverInfo } = driverData;
     
-    // 2. Upload car photo if it exists
-    let carPhotoUrl = '';
-    if (driverData.carPhotoFile) {
-        carPhotoUrl = await uploadCarPhoto(firebaseUser.uid, driverData.carPhotoFile);
-    }
-
-    // 3. Prepare data for Firestore batch write
-    const { carPhotoFile, email, password, ...driverInfo } = driverData;
-    
-    const batch = writeBatch(db);
-
-    // User document with 'driver' role
-    const userDocRef = doc(db, "users", firebaseUser.uid);
-    const newUser: User = { uid: firebaseUser.uid, email: firebaseUser.email, role: 'driver' };
-    batch.set(userDocRef, newUser);
-
-    // Driver document with 'pending' status
-    const driverDocRef = doc(db, "drivers", firebaseUser.uid);
-    batch.set(driverDocRef, {
+    const driverDocRef = doc(db, "drivers", user.uid);
+    await setDoc(driverDocRef, {
         ...driverInfo,
+        id: user.uid,
+        name: user.name,
         carPhotoUrl,
-        status: 'pending',
-    });
-    
-    // 4. Commit the batch
-    await batch.commit();
+        status: 'pending', // Application is pending review
+    }, { merge: true });
   };
 
   const updateDriverStatus = async (driverId: string, status: 'verified' | 'rejected') => {
@@ -191,13 +178,27 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       }
   };
   
-  const register = async (email: string, password: string, role: 'passenger'): Promise<void> => {
+  const register = async (email: string, password: string, name: string, role: 'passenger' | 'driver'): Promise<void> => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const firebaseUser = userCredential.user;
     
+    const batch = writeBatch(db);
+
     const userDocRef = doc(db, "users", firebaseUser.uid);
-    const newUser: User = { uid: firebaseUser.uid, email: firebaseUser.email, role };
-    await setDoc(userDocRef, newUser);
+    const newUser: User = { uid: firebaseUser.uid, email: firebaseUser.email, name, role };
+    batch.set(userDocRef, newUser);
+
+    if (role === 'driver') {
+        const driverDocRef = doc(db, "drivers", firebaseUser.uid);
+        const newDriver: Omit<Driver, 'phone' | 'passport' | 'carModel' | 'carNumber' | 'carPhotoUrl'> = {
+            id: firebaseUser.uid,
+            name,
+            status: 'unsubmitted' // Initial status, they need to complete the application
+        };
+        batch.set(driverDocRef, newDriver);
+    }
+    
+    await batch.commit();
   };
   
   const logout = async () => {
