@@ -102,5 +102,10 @@
     "registerAndBook": "Register & Book",
     "error": "Error",
     "driversCannotBook": "Drivers and Admins cannot book rides.",
-    "welcomePassenger": "Welcome!"
+    "welcomePassenger": "Welcome!",
+    "statusNew": "New",
+    "statusAccepted": "Accepted",
+    "statusRejected": "Rejected",
+    "availableSeats": "Available Seats",
+    "selectSeats": "Select seats"
 }

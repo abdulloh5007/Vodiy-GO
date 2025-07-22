@@ -102,5 +102,10 @@
     "registerAndBook": "Зарегистрироваться и забронировать",
     "error": "Ошибка",
     "driversCannotBook": "Водители и администраторы не могут бронировать поездки.",
-    "welcomePassenger": "Добро пожаловать!"
+    "welcomePassenger": "Добро пожаловать!",
+    "statusNew": "Новый",
+    "statusAccepted": "Принят",
+    "statusRejected": "Отклонен",
+    "availableSeats": "Свободные места",
+    "selectSeats": "Выберите места"
 }
