@@ -110,18 +110,26 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         throw new Error("Car photo is required.");
     }
 
+    const driverDocRef = doc(db, "drivers", user.uid);
+    const driverDocSnap = await getDoc(driverDocRef);
+
+    if (driverDocSnap.exists()) {
+      throw new Error("Application already exists for this user.");
+    }
+
     // 1. Upload car photo
     const carPhotoUrl = await uploadCarPhoto(user.uid, driverData.carPhotoFile);
 
     // 2. Prepare data for Firestore
     const { carPhotoFile, ...driverInfo } = driverData;
     
-    const driverDocRef = doc(db, "drivers", user.uid);
     await setDoc(driverDocRef, {
+        id: user.uid,
+        name: user.name, // Name is taken from the user object now
         ...driverInfo,
         carPhotoUrl,
         status: 'pending', // Application is pending review
-    }, { merge: true });
+    });
   };
 
   const updateDriverStatus = async (driverId: string, status: 'verified' | 'rejected') => {
@@ -180,23 +188,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const firebaseUser = userCredential.user;
     
-    const batch = writeBatch(db);
-
     const userDocRef = doc(db, "users", firebaseUser.uid);
     const newUser: User = { uid: firebaseUser.uid, email: firebaseUser.email, name, role };
-    batch.set(userDocRef, newUser);
+    await setDoc(userDocRef, newUser);
 
-    if (role === 'driver') {
-        const driverDocRef = doc(db, "drivers", firebaseUser.uid);
-        const newDriver: Omit<Driver, 'phone' | 'passport' | 'carModel' | 'carNumber' | 'carPhotoUrl'> = {
-            id: firebaseUser.uid,
-            name,
-            status: 'unsubmitted' // Initial status, they need to complete the application
-        };
-        batch.set(driverDocRef, newDriver);
-    }
-    
-    await batch.commit();
+    // DO NOT create a driver document here. It will be created upon application submission.
   };
   
   const logout = async () => {

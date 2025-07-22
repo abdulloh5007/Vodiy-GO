@@ -113,8 +113,7 @@ export default function DriverApplicationPage() {
     if (!loading) {
       if (!user || user.role !== 'driver') {
         router.push('/driver/login');
-      } else if (driverProfile && driverProfile.status !== 'unsubmitted') {
-        // If they already submitted, redirect them to status page
+      } else if (driverProfile) { // If a driver document exists, they have submitted.
         router.push('/driver/status');
       }
     }
@@ -169,6 +168,9 @@ export default function DriverApplicationPage() {
     
     setIsSubmitting(true);
     try {
+        if (!user || !user.name) {
+             throw new Error("User name not found")
+        }
         await addDriverApplication({ 
             phone,
             passport, 
@@ -184,6 +186,7 @@ export default function DriverApplicationPage() {
         
         router.push('/driver/status');
     } catch(error) {
+        console.error("Application submission failed:", error);
         toast({
             title: t.registrationFailedTitle,
             description: t.unknownError,
@@ -194,7 +197,7 @@ export default function DriverApplicationPage() {
     }
   };
 
-  if (loading || !user || !t.home || (driverProfile && driverProfile.status !== 'unsubmitted')) {
+  if (loading || !user || !t.home || driverProfile) {
     return (
         <div className="container mx-auto py-8 px-4 flex justify-center items-center h-[calc(100vh-8rem)]">
             <Loader2 className="h-12 w-12 animate-spin text-primary" />

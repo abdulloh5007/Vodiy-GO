@@ -1,9 +1,9 @@
+
 'use client';
 
 // This page is a redirect placeholder.
 // The main registration is at /driver/register
 // The application form is at /driver/application
-// This page can be repurposed for editing driver details in the future.
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 

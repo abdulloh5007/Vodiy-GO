@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useContext, useMemo, useEffect } from 'react';
@@ -79,13 +80,13 @@ export default function CreateRidePage() {
     return drivers.find(d => d.id === user.uid);
   }, [user, drivers]);
 
-  const isVerifiedDriver = user && driverProfile && driverProfile.status === 'verified';
-  
   useEffect(() => {
-    if (!loading && (!user || user.role !== 'driver')) {
-      router.push('/driver/login');
-    } else if (!loading && user && driverProfile?.status !== 'verified') {
-      router.push('/driver/status');
+    if (!loading) {
+        if (!user || user.role !== 'driver') {
+            router.push('/driver/login');
+        } else if (driverProfile?.status !== 'verified') {
+            router.push('/driver/status');
+        }
     }
   }, [loading, user, driverProfile, router]);
 
@@ -107,6 +108,8 @@ export default function CreateRidePage() {
   const fromLocations = useMemo(() => locations.filter(loc => loc !== to), [to]);
   const toLocations = useMemo(() => locations.filter(loc => loc !== from), [from]);
 
+  const isVerifiedDriver = user && driverProfile && driverProfile.status === 'verified';
+  
   if (loading || !t.home || !isVerifiedDriver) {
       return <CreateRideSkeleton />;
   }

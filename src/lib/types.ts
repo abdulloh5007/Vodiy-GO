@@ -15,7 +15,7 @@ export type Driver = {
   carModel: string;
   carNumber: string;
   carPhotoUrl: string;
-  status: 'pending' | 'verified' | 'rejected' | 'unsubmitted';
+  status: 'pending' | 'verified' | 'rejected';
 };
 
 export type Ride = {

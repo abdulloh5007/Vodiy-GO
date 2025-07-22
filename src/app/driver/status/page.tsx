@@ -22,13 +22,17 @@ export default function DriverStatusPage() {
     const status = driverProfile?.status;
 
     useEffect(() => {
-        if (!loading && !user) {
-            router.push('/driver/login');
+        if (!loading) {
+            if (!user) {
+                router.push('/driver/login');
+            } else if (user.role !== 'driver') {
+                 router.push('/');
+            } else if (!driverProfile) {
+                // Not submitted application yet
+                router.push('/driver/application');
+            }
         }
-        if (!loading && user && user.role !== 'driver') {
-             router.push('/');
-        }
-    }, [user, loading, router]);
+    }, [user, loading, router, driverProfile]);
     
     if (loading || !t.home || !user) {
         return (
@@ -64,7 +68,7 @@ export default function DriverStatusPage() {
                     showLogout: true,
                 };
             default:
-                 // This could be the state before the driver document is created or found
+                 // This covers the case where the driver document might not be found yet while loading
                 return {
                     icon: <Loader2 className="h-16 w-16 animate-spin" />,
                     title: t.statusPage_checking_title || "Checking Status...",
