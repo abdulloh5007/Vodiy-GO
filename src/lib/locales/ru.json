@@ -139,5 +139,18 @@
     "noPendingRideApplications": "Нет ожидающих заявок на поездки",
     "validationErrorDescStep1": "Пожалуйста, введите действующий адрес электронной почты и пароль длиной не менее 6 символов.",
     "validationErrorDescStep2": "Пожалуйста, правильно заполните все поля для этого шага.",
-    "validationErrorDescStep3": "Пожалуйста, заполните все данные об автомобиле и загрузите фотографию."
+    "validationErrorDescStep3": "Пожалуйста, заполните все данные об автомобиле и загрузите фотографию.",
+    "notifications": "Уведомления",
+    "notifications_desc": "Здесь вы можете найти свои последние уведомления.",
+    "no_notifications": "У вас нет уведомлений.",
+    "notification_ride_approved_title": "Поездка одобрена",
+    "notification_ride_approved_desc": "Ваша поездка из Навои в Бухару была одобрена и теперь видна пассажирам.",
+    "notification_new_booking_title": "Новое бронирование",
+    "notification_new_booking_desc": "У вас новый запрос на бронирование для вашей поездки из Навои в Бухару.",
+    "notification_app_approved_title": "Регистрация одобрена",
+    "notification_app_approved_desc": "Поздравляем! Ваша заявка водителя была одобрена.",
+    "notification_booking_accepted_title": "Бронирование принято",
+    "notification_booking_accepted_desc": "Ваше бронирование на поездку из Сырдарьи в Ташкент было принято водителем.",
+    "notification_booking_rejected_title": "Бронирование отклонено",
+    "notification_booking_rejected_desc": "К сожалению, ваше бронирование на поездку из Сырдарьи в Ташкент было отклонено водителем."
 }

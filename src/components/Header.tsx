@@ -16,7 +16,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import { LogIn, Menu, Car, FileText, LogOut, Home, User, ShoppingBag, ShieldCheck, Settings, Globe, PackageCheck } from 'lucide-react';
+import { LogIn, Menu, Car, FileText, LogOut, Home, User, ShoppingBag, ShieldCheck, Settings, Globe, PackageCheck, Bell } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from './ui/separator';
 
@@ -70,19 +70,24 @@ export function Header() {
 
   const driverLinks = [
     { href: '/', label: t.home, icon: Home },
-    { href: '/my-orders', label: t.myOrders, icon: ShoppingBag, badge: newOrdersCount > 0 ? newOrdersCount : 0 },
+    { href: '/my-orders', label: t.myOrders, icon: ShoppingBag, badge: newOrdersCount },
   ];
   
   const driverWideLink = { href: '/create-ride', label: t.publishNewRide, icon: FileText };
   
   const driverBottomLinks = [
     { href: '/register-driver', label: t.carSettings || "Car Settings", icon: Car },
+    { href: '/notifications', label: t.notifications || "Notifications", icon: Bell },
   ];
 
   const adminLinks = [
     { href: '/admin', label: t.registrationApplications, icon: ShieldCheck },
     { href: '/admin/ride-applications', label: "Ride Applications", icon: PackageCheck }
   ];
+  
+  const passengerLinks = [
+      { href: '/notifications', label: t.notifications || "Notifications", icon: Bell },
+  ]
 
 
   const renderUserMenu = () => (
@@ -148,7 +153,19 @@ export function Header() {
               </div>
             )}
             {user?.role === 'passenger' && (
-                 <div className="text-center text-muted-foreground py-4">{t.welcomePassenger || "Welcome!"}</div>
+                 <div className="flex flex-col gap-2">
+                    {passengerLinks.map(link => (
+                         <Button 
+                            key={link.href}
+                            variant={pathname === link.href ? 'secondary' : 'ghost'} 
+                            asChild
+                            className="justify-start border rounded-lg"
+                            onClick={() => setIsSheetOpen(false)}
+                        >
+                            <Link href={link.href}><link.icon/><span>{link.label}</span></Link>
+                        </Button>
+                    ))}
+                 </div>
             )}
         </div>
         <div className="mt-auto flex flex-col gap-2">

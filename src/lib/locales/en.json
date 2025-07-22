@@ -139,5 +139,18 @@
     "noPendingRideApplications": "No pending ride applications",
     "validationErrorDescStep1": "Please enter a valid email and a password of at least 6 characters.",
     "validationErrorDescStep2": "Please fill all fields for this step correctly.",
-    "validationErrorDescStep3": "Please fill all car details and upload a photo."
+    "validationErrorDescStep3": "Please fill all car details and upload a photo.",
+    "notifications": "Notifications",
+    "notifications_desc": "Here you can find your recent notifications.",
+    "no_notifications": "You have no notifications.",
+    "notification_ride_approved_title": "Ride Approved",
+    "notification_ride_approved_desc": "Your ride from Navoiy to Buxoro has been approved and is now visible to passengers.",
+    "notification_new_booking_title": "New Booking",
+    "notification_new_booking_desc": "You have a new booking request for your ride from Navoiy to Buxoro.",
+    "notification_app_approved_title": "Registration Approved",
+    "notification_app_approved_desc": "Congratulations! Your driver application has been approved.",
+    "notification_booking_accepted_title": "Booking Accepted",
+    "notification_booking_accepted_desc": "Your booking for the ride from Sirdaryo to Toshkent has been accepted by the driver.",
+    "notification_booking_rejected_title": "Booking Rejected",
+    "notification_booking_rejected_desc": "Unfortunately, your booking for the ride from Sirdaryo to Toshkent was rejected by the driver."
 }

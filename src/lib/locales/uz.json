@@ -139,5 +139,18 @@
     "noPendingRideApplications": "Kutilayotgan qatnov arizalari yo'q",
     "validationErrorDescStep1": "Iltimos, haqiqiy elektron pochta manzilini va kamida 6 belgidan iborat parolni kiriting.",
     "validationErrorDescStep2": "Iltimos, ushbu qadam uchun barcha maydonlarni to'g'ri to'ldiring.",
-    "validationErrorDescStep3": "Iltimos, barcha avtomobil ma'lumotlarini to'ldiring va rasm yuklang."
+    "validationErrorDescStep3": "Iltimos, barcha avtomobil ma'lumotlarini to'ldiring va rasm yuklang.",
+    "notifications": "Bildirishnomalar",
+    "notifications_desc": "Bu yerda siz so'nggi bildirishnomalaringizni topishingiz mumkin.",
+    "no_notifications": "Sizda bildirishnomalar yo'q.",
+    "notification_ride_approved_title": "Qatnov tasdiqlandi",
+    "notification_ride_approved_desc": "Sizning Navoiy-Buxoro yo'nalishidagi qatnovingiz tasdiqlandi va endi yo'lovchilarga ko'rinadi.",
+    "notification_new_booking_title": "Yangi buyurtma",
+    "notification_new_booking_desc": "Sizning Navoiy-Buxoro yo'nalishidagi qatnovingizga yangi buyurtma kelib tushdi.",
+    "notification_app_approved_title": "Ro'yxatdan o'tish tasdiqlandi",
+    "notification_app_approved_desc": "Tabriklaymiz! Sizning haydovchilik arizangiz tasdiqlandi.",
+    "notification_booking_accepted_title": "Buyurtma qabul qilindi",
+    "notification_booking_accepted_desc": "Sizning Sirdaryo-Toshkent yo'nalishidagi qatnov uchun buyurtmangiz haydovchi tomonidan qabul qilindi.",
+    "notification_booking_rejected_title": "Buyurtma rad etildi",
+    "notification_booking_rejected_desc": "Afsuski, sizning Sirdaryo-Toshkent yo'nalishidagi qatnov uchun buyurtmangiz haydovchi tomonidan rad etildi."
 }

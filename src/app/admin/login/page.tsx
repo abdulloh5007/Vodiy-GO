@@ -10,6 +10,32 @@ import { Label } from '@/components/ui/label';
 import { useToast } from "@/hooks/use-toast";
 import { FirebaseError } from 'firebase/app';
 import { ShieldCheck } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+
+
+function AdminLoginSkeleton() {
+    return (
+        <div className="container mx-auto py-8 px-4 flex justify-center">
+            <Card className="w-full max-w-md">
+                <CardHeader>
+                    <Skeleton className="h-8 w-3/4 mb-2" />
+                    <Skeleton className="h-5 w-1/2" />
+                </CardHeader>
+                <CardContent className="space-y-6">
+                    <div className="space-y-2">
+                        <Skeleton className="h-5 w-16" />
+                        <Skeleton className="h-10 w-full" />
+                    </div>
+                    <div className="space-y-2">
+                        <Skeleton className="h-5 w-16" />
+                        <Skeleton className="h-10 w-full" />
+                    </div>
+                     <Skeleton className="h-10 w-full" />
+                </CardContent>
+            </Card>
+        </div>
+    )
+}
 
 export default function AdminLoginPage() {
   const context = useContext(AppContext);
@@ -82,7 +108,7 @@ export default function AdminLoginPage() {
   };
   
   if (!t.home || loading || (user && user.role === 'admin')) {
-      return <div>Loading...</div>
+      return <AdminLoginSkeleton />
   }
 
   return (

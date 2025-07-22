@@ -10,6 +10,35 @@ import { Label } from '@/components/ui/label';
 import { useToast } from "@/hooks/use-toast";
 import { FirebaseError } from 'firebase/app';
 import Link from 'next/link';
+import { Skeleton } from '@/components/ui/skeleton';
+
+
+function DriverLoginSkeleton() {
+    return (
+        <div className="container mx-auto py-8 px-4 flex justify-center">
+            <Card className="w-full max-w-md">
+                <CardHeader>
+                    <Skeleton className="h-8 w-3/4 mb-2" />
+                    <Skeleton className="h-5 w-1/2" />
+                </CardHeader>
+                <CardContent className="space-y-6">
+                    <div className="space-y-2">
+                        <Skeleton className="h-5 w-16" />
+                        <Skeleton className="h-10 w-full" />
+                    </div>
+                    <div className="space-y-2">
+                        <Skeleton className="h-5 w-16" />
+                        <Skeleton className="h-10 w-full" />
+                    </div>
+                     <Skeleton className="h-10 w-full" />
+                     <div className="mt-4 text-center text-sm">
+                        <Skeleton className="h-5 w-full" />
+                    </div>
+                </CardContent>
+            </Card>
+        </div>
+    )
+}
 
 export default function DriverLoginPage() {
   const context = useContext(AppContext);
@@ -84,7 +113,7 @@ export default function DriverLoginPage() {
   };
   
   if (!t.home || loading || (user && user.role === 'driver')) {
-      return <div>Loading...</div>
+      return <DriverLoginSkeleton />
   }
 
   return (
