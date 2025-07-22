@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useContext, useMemo } from 'react';
+import { useState, useContext, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { AppContext } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
@@ -19,7 +19,7 @@ import { FirebaseError } from 'firebase/app';
 const ImageDropzone = ({ file, setFile }: { file: File | null, setFile: (file: File | null) => void }) => {
     const [preview, setPreview] = useState<string | null>(null);
 
-    useState(() => {
+    useEffect(() => {
         if (file) {
             const reader = new FileReader();
             reader.onloadend = () => {
