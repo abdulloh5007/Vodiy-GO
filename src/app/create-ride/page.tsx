@@ -12,7 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 import { ShieldAlert, Loader2, Clock } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
-const locations = ["Tashkent", "Andijan", "Fergana", "Samarkand", "Bukhara"];
+const locations = ["Sirdaryo", "Navoiy", "Jizzax", "Xorazm", "Buxoro", "Surxondaryo", "Namangan", "Andijon", "Qashqadaryo", "Samarqand", "Fargʻona", "Toshkent"];
 
 function CreateRideSkeleton() {
     return (
