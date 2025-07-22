@@ -11,8 +11,9 @@ interface AppContextType {
   drivers: Driver[];
   rides: Ride[];
   orders: Order[];
-  addDriverApplication: (driver: Omit<Driver, 'id' | 'status'>) => Promise<void>;
+  addDriverApplication: (driver: Omit<Driver, 'id' | 'status' | 'carPhotoUrl'> & { carPhotoFile: File | null }) => Promise<void>;
   updateDriverStatus: (driverId: string, status: 'verified' | 'rejected') => void;
+  updateOrderStatus: (orderId: string, status: 'accepted' | 'rejected') => void;
   addRide: (ride: Omit<Ride, 'id' | 'createdAt'>) => void;
   addOrder: (order: Omit<Order, 'id' | 'status'>) => void;
   login: (email: string, password: string, role?: 'admin' | 'driver' | 'passenger') => Promise<void>;

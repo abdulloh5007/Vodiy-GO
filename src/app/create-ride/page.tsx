@@ -63,6 +63,7 @@ export default function CreateRidePage() {
   const [price, setPrice] = useState('');
   const [info, setInfo] = useState('');
   const [time, setTime] = useState('');
+  const [seats, setSeats] = useState<'4' | '8'>('4');
   
   if (!context) {
     throw new Error('CreateRidePage must be used within an AppProvider');
@@ -75,9 +76,15 @@ export default function CreateRidePage() {
   
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const rawValue = e.target.value.replace(/\s/g, '');
-    if (!isNaN(Number(rawValue))) {
+    if (!isNaN(Number(rawValue)) && Number(rawValue) <= 1000000) {
       const formattedValue = new Intl.NumberFormat('fr-FR').format(Number(rawValue));
       setPrice(formattedValue);
+    } else if (Number(rawValue) > 1000000) {
+        toast({
+            title: "Error",
+            description: "Maximum price is 1,000,000 UZS",
+            variant: "destructive",
+        })
     }
   };
 
@@ -124,6 +131,7 @@ export default function CreateRidePage() {
           price: priceValue,
           info,
           time,
+          seats: parseInt(seats)
         });
         
         toast({
@@ -136,6 +144,7 @@ export default function CreateRidePage() {
         setPrice('');
         setInfo('');
         setTime('');
+        setSeats('4');
     }
   };
 
@@ -181,6 +190,18 @@ export default function CreateRidePage() {
                   <Label htmlFor="time">{t.departureTimeOptional}</Label>
                   <Input id="time" type="time" value={time} onChange={e => setTime(e.target.value)} />
                 </div>
+            </div>
+            <div className="space-y-2">
+                <Label htmlFor="seats">{t.availableSeats || 'Available Seats'}</Label>
+                <Select value={seats} onValueChange={(value) => setSeats(value as '4' | '8')}>
+                    <SelectTrigger id="seats">
+                        <SelectValue placeholder={t.selectSeats || 'Select seats'} />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="4">4</SelectItem>
+                        <SelectItem value="8">8</SelectItem>
+                    </SelectContent>
+                </Select>
             </div>
             <div className="space-y-2">
               <Label htmlFor="info">{t.additionalInfo}</Label>

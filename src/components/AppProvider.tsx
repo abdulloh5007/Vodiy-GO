@@ -5,7 +5,8 @@ import { AppContext } from '@/contexts/AppContext';
 import { Driver, Ride, Order, Language, Translations, User } from '@/lib/types';
 import { initialTranslations } from '@/lib/i18n';
 import { db, auth } from '@/lib/firebase';
-import { collection, doc, getDoc, setDoc, onSnapshot, query, orderBy, serverTimestamp, writeBatch, where, getDocs, deleteDoc } from "firebase/firestore";
+import { collection, doc, getDoc, setDoc, onSnapshot, query, orderBy, serverTimestamp, writeBatch, where, getDocs, deleteDoc, updateDoc } from "firebase/firestore";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { signInWithEmailAndPassword, onAuthStateChanged, signOut, createUserWithEmailAndPassword, User as FirebaseAuthUser } from "firebase/auth";
 import { ImageViewer } from './ImageViewer';
 
@@ -46,7 +47,17 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
     const ridesQuery = query(collection(db, "rides"), orderBy("createdAt", "desc"));
     const unsubscribeRides = onSnapshot(ridesQuery, (snapshot) => {
-      const ridesData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Ride));
+      const now = Date.now();
+      const oneDay = 24 * 60 * 60 * 1000;
+      const ridesData = snapshot.docs
+        .map(doc => ({ id: doc.id, ...doc.data() } as Ride))
+        .filter(ride => {
+            if (ride.createdAt) {
+                const rideDate = ride.createdAt.toDate().getTime();
+                return (now - rideDate) < oneDay;
+            }
+            return true; // keep rides without timestamp for now
+        });
       setRides(ridesData);
     });
     
@@ -81,13 +92,30 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       unsubscribeAuth();
     };
   }, []);
+  
+  const uploadCarPhoto = async (userId: string, file: File): Promise<string> => {
+      const storage = getStorage();
+      const storageRef = ref(storage, `car-photos/${userId}/${file.name}`);
+      await uploadBytes(storageRef, file);
+      const downloadURL = await getDownloadURL(storageRef);
+      return downloadURL;
+  }
 
-  const addDriverApplication = async (driverData: Omit<Driver, 'id' | 'status'>) => {
+  const addDriverApplication = async (driverData: Omit<Driver, 'id' | 'status' | 'carPhotoUrl'> & { carPhotoFile: File | null }) => {
     if (!user) throw new Error("User not logged in");
     try {
+      let carPhotoUrl = drivers.find(d => d.id === user.uid)?.carPhotoUrl || ''; // Keep old photo if new one not provided
+      
+      if (driverData.carPhotoFile) {
+          carPhotoUrl = await uploadCarPhoto(user.uid, driverData.carPhotoFile);
+      }
+      
+      const { carPhotoFile, ...driverInfo } = driverData;
+
       const driverDocRef = doc(db, "drivers", user.uid);
       await setDoc(driverDocRef, {
-        ...driverData,
+        ...driverInfo,
+        carPhotoUrl,
         status: 'pending',
       }, { merge: true });
     } catch (error) {
@@ -99,6 +127,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const driverDoc = doc(db, "drivers", driverId);
     await setDoc(driverDoc, { status }, { merge: true });
   };
+  
+  const updateOrderStatus = async (orderId: string, status: 'accepted' | 'rejected') => {
+      const orderDoc = doc(db, "orders", orderId);
+      await updateDoc(orderDoc, { status });
+  }
 
   const addRide = async (rideData: Omit<Ride, 'id' | 'createdAt'>) => {
     if (!user) throw new Error("User not logged in");
@@ -183,7 +216,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       language, setLanguage, translations,
       user,
       drivers, rides, orders, 
-      addDriverApplication, updateDriverStatus,
+      addDriverApplication, updateDriverStatus, updateOrderStatus,
       addRide, addOrder,
       login, register, logout,
       loading,

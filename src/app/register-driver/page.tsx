@@ -8,10 +8,71 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, ShieldAlert, ArrowLeft } from 'lucide-react';
+import { Loader2, ShieldAlert, ArrowLeft, UploadCloud, X } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatPhoneNumber } from '@/lib/utils';
 import { Progress } from '@/components/ui/progress';
+import Image from 'next/image';
+
+const ImageDropzone = ({ file, setFile }: { file: File | null, setFile: (file: File | null) => void }) => {
+    const [preview, setPreview] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setPreview(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        } else {
+            setPreview(null);
+        }
+    }, [file]);
+
+    const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        const droppedFile = e.dataTransfer.files[0];
+        if (droppedFile && droppedFile.type.startsWith('image/')) {
+            setFile(droppedFile);
+        }
+    };
+    
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const selectedFile = e.target.files?.[0];
+        if (selectedFile) {
+            setFile(selectedFile);
+        }
+    };
+
+    return (
+        <div 
+            className="relative border-2 border-dashed border-muted-foreground/50 rounded-lg p-4 text-center cursor-pointer hover:border-primary transition-colors"
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={handleDrop}
+            onClick={() => document.getElementById('file-upload')?.click()}
+        >
+            <input id="file-upload" type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
+            {preview ? (
+                <>
+                    <Image src={preview} alt="Car preview" width={200} height={120} className="mx-auto rounded-md object-cover" />
+                    <Button 
+                        variant="destructive" 
+                        size="icon"
+                        className="absolute top-2 right-2 h-6 w-6"
+                        onClick={(e) => { e.stopPropagation(); setFile(null); }}
+                    >
+                        <X className="h-4 w-4" />
+                    </Button>
+                </>
+            ) : (
+                <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                    <UploadCloud className="h-10 w-10"/>
+                    <span>Drag & drop or click to upload car photo</span>
+                </div>
+            )}
+        </div>
+    )
+}
 
 
 function RegisterDriverSkeleton() {
@@ -64,7 +125,7 @@ export default function RegisterDriverPage() {
   const [phone, setPhone] = useState('+998');
   const [carModel, setCarModel] = useState('');
   const [carNumber, setCarNumber] = useState('');
-  const [carPhotoUrl, setCarPhotoUrl] = useState('');
+  const [carPhotoFile, setCarPhotoFile] = useState<File | null>(null);
 
   if (!context) {
     throw new Error('RegisterDriverPage must be used within an AppProvider');
@@ -82,7 +143,7 @@ export default function RegisterDriverPage() {
           setPhone(driverProfile.phone || '+998');
           setCarModel(driverProfile.carModel || '');
           setCarNumber(driverProfile.carNumber || '');
-          setCarPhotoUrl(driverProfile.carPhotoUrl || '');
+          // Note: we don't pre-fill the photo file
       }
   }, [driverProfile]);
 
@@ -132,17 +193,17 @@ export default function RegisterDriverPage() {
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !idCardNumber || phone.replace(/\D/g, '').length !== 12 || !carModel || !carNumber || !carPhotoUrl) {
+    if (!name || !idCardNumber || phone.replace(/\D/g, '').length !== 12 || !carModel || !carNumber || (!carPhotoFile && !driverProfile?.carPhotoUrl)) {
       toast({
         title: "Validation Error",
-        description: "Please fill all fields. Phone number must be complete.",
+        description: "Please fill all fields and upload a car photo. Phone number must be complete.",
         variant: "destructive",
       });
       return;
     }
     
     if (user) {
-        await addDriverApplication({ name, idCardNumber, phone, carModel, carNumber, carPhotoUrl });
+        await addDriverApplication({ name, idCardNumber, phone, carModel, carNumber, carPhotoFile });
 
         toast({
             title: t.applicationSubmitted,
@@ -191,7 +252,12 @@ export default function RegisterDriverPage() {
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="carPhotoUrl">{t.carPhotoUrl}</Label>
-                        <Input id="carPhotoUrl" type="url" value={carPhotoUrl} onChange={e => setCarPhotoUrl(e.target.value)} placeholder="https://placehold.co/600x400.png" required />
+                        <ImageDropzone file={carPhotoFile} setFile={setCarPhotoFile} />
+                         {driverProfile?.carPhotoUrl && !carPhotoFile && (
+                            <div className="mt-2 text-sm text-muted-foreground">
+                                Current photo: <a href={driverProfile.carPhotoUrl} target="_blank" rel="noopener noreferrer" className='text-primary underline'>View</a>. Upload a new photo to replace it.
+                            </div>
+                        )}
                     </div>
                 </div>
             )}

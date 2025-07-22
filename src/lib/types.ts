@@ -23,6 +23,7 @@ export type Ride = {
   from: string;
   to: string;
   price: number;
+  seats: number;
   info: string;
   time?: string; // Optional departure time
   createdAt: any; // Allow server timestamp

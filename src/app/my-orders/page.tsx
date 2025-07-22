@@ -5,7 +5,11 @@ import { AppContext } from '@/contexts/AppContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ShieldAlert, User, Phone, MapPin, Clock } from 'lucide-react';
+import { ShieldAlert, User, Phone, MapPin, Clock, Check, X, Ban } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Order } from '@/lib/types';
+
 
 function MyOrdersSkeleton() {
     return (
@@ -22,6 +26,8 @@ function MyOrdersSkeleton() {
                                 <TableHead><Skeleton className="h-5 w-24" /></TableHead>
                                 <TableHead><Skeleton className="h-5 w-32" /></TableHead>
                                 <TableHead><Skeleton className="h-5 w-28" /></TableHead>
+                                <TableHead><Skeleton className="h-5 w-28" /></TableHead>
+                                <TableHead className="text-right"><Skeleton className="h-5 w-20" /></TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -36,6 +42,15 @@ function MyOrdersSkeleton() {
                                     <TableCell>
                                         <Skeleton className="h-5 w-full" />
                                     </TableCell>
+                                     <TableCell>
+                                        <Skeleton className="h-6 w-16 rounded-full" />
+                                    </TableCell>
+                                    <TableCell className="text-right">
+                                        <div className="flex justify-end gap-2">
+                                            <Skeleton className="h-8 w-8 rounded-md" />
+                                            <Skeleton className="h-8 w-8 rounded-md" />
+                                        </div>
+                                    </TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>
@@ -46,6 +61,16 @@ function MyOrdersSkeleton() {
     );
 }
 
+const OrderStatusBadge = ({ status }: { status: Order['status']}) => {
+    const variant = {
+        new: 'default',
+        accepted: 'secondary',
+        rejected: 'destructive'
+    }[status]  as "default" | "secondary" | "destructive" | null | undefined;
+    
+    return <Badge variant={variant}>{status}</Badge>
+}
+
 export default function MyOrdersPage() {
     const context = useContext(AppContext);
 
@@ -53,7 +78,7 @@ export default function MyOrdersPage() {
         throw new Error('MyOrdersPage must be used within an AppProvider');
     }
 
-    const { user, rides, orders, drivers, loading, translations } = context;
+    const { user, rides, orders, drivers, loading, translations, updateOrderStatus } = context;
     const t = translations;
 
     const driverProfile = user ? drivers.find(d => d.id === user.uid) : undefined;
@@ -68,7 +93,7 @@ export default function MyOrdersPage() {
         const myRideIds = myRides.map(r => r.id);
         return orders.filter(order => myRideIds.includes(order.rideId));
     }, [orders, myRides]);
-
+    
     if (loading || !t.home) {
         return <MyOrdersSkeleton />;
     }
@@ -102,6 +127,8 @@ export default function MyOrdersPage() {
                                 <TableHead>{t.ride || 'Ride'}</TableHead>
                                 <TableHead>{t.clientName || 'Client Name'}</TableHead>
                                 <TableHead>{t.clientPhone || 'Client Phone'}</TableHead>
+                                <TableHead>{t.status || 'Status'}</TableHead>
+                                <TableHead className="text-right">{t.actions || 'Actions'}</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -128,12 +155,31 @@ export default function MyOrdersPage() {
                                                     {order.clientPhone}
                                                 </a>
                                             </TableCell>
+                                            <TableCell>
+                                                <OrderStatusBadge status={order.status} />
+                                            </TableCell>
+                                            <TableCell className="text-right">
+                                              {order.status === 'new' ? (
+                                                  <>
+                                                      <Button variant="ghost" size="icon" className="text-green-600 hover:text-green-700 hover:bg-green-50" onClick={() => updateOrderStatus(order.id, 'accepted')}>
+                                                        <Check className="h-4 w-4" />
+                                                      </Button>
+                                                      <Button variant="ghost" size="icon" className="text-red-600 hover:text-red-700 hover:bg-red-50" onClick={() => updateOrderStatus(order.id, 'rejected')}>
+                                                        <X className="h-4 w-4" />
+                                                      </Button>
+                                                  </>
+                                              ) : (
+                                                  <Button variant="ghost" size="icon" disabled>
+                                                    <Ban className="h-4 w-4 text-muted-foreground" />
+                                                  </Button>
+                                              )}
+                                            </TableCell>
                                         </TableRow>
                                     );
                                 })
                             ) : (
                                 <TableRow>
-                                    <TableCell colSpan={3} className="text-center h-24">{t.noBookingsYet || 'No bookings for your rides yet.'}</TableCell>
+                                    <TableCell colSpan={5} className="text-center h-24">{t.noBookingsYet || 'No bookings for your rides yet.'}</TableCell>
                                 </TableRow>
                             )}
                         </TableBody>
