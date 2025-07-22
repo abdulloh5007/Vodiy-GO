@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useContext, useEffect, useMemo } from 'react';
@@ -10,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, ShieldAlert, ArrowLeft, UploadCloud, X } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
-import { formatPhoneNumber } from '@/lib/utils';
+import { formatPhoneNumber, formatCarNumber } from '@/lib/utils';
 import { Progress } from '@/components/ui/progress';
 import Image from 'next/image';
 
@@ -121,7 +122,6 @@ export default function RegisterDriverPage() {
   const [step, setStep] = useState(1);
 
   const [name, setName] = useState('');
-  const [idCardNumber, setIdCardNumber] = useState('');
   const [phone, setPhone] = useState('+998');
   const [carModel, setCarModel] = useState('');
   const [carNumber, setCarNumber] = useState('');
@@ -139,7 +139,6 @@ export default function RegisterDriverPage() {
   useEffect(() => {
       if (driverProfile) {
           setName(driverProfile.name || '');
-          setIdCardNumber(driverProfile.idCardNumber || '');
           setPhone(driverProfile.phone || '+998');
           setCarModel(driverProfile.carModel || '');
           setCarNumber(driverProfile.carNumber || '');
@@ -151,12 +150,16 @@ export default function RegisterDriverPage() {
     const formatted = formatPhoneNumber(e.target.value);
     setPhone(formatted);
   };
+   const handleCarNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatCarNumber(e.target.value);
+    setCarNumber(formatted);
+  };
   
   const progress = useMemo(() => (step / TOTAL_STEPS) * 100, [step]);
 
   const handleNextStep = () => {
     if (step === 1) {
-      if (!name || !idCardNumber) {
+      if (!name || phone.replace(/\D/g, '').length !== 12) {
         toast({
           title: "Validation Error",
           description: "Please fill all fields for this step.",
@@ -193,7 +196,7 @@ export default function RegisterDriverPage() {
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !idCardNumber || phone.replace(/\D/g, '').length !== 12 || !carModel || !carNumber || (!carPhotoFile && !driverProfile?.carPhotoUrl)) {
+    if (!name || phone.replace(/\D/g, '').length !== 12 || !carModel || !carNumber || (!carPhotoFile && !driverProfile?.carPhotoUrl)) {
       toast({
         title: "Validation Error",
         description: "Please fill all fields and upload a car photo. Phone number must be complete.",
@@ -203,7 +206,7 @@ export default function RegisterDriverPage() {
     }
     
     if (user) {
-        await addDriverApplication({ name, idCardNumber, phone, carModel, carNumber, carPhotoFile });
+        await addDriverApplication({ name, phone, carModel, carNumber, carPhotoFile });
 
         toast({
             title: t.applicationSubmitted,
@@ -231,24 +234,20 @@ export default function RegisterDriverPage() {
                         <Input id="name" value={name} onChange={e => setName(e.target.value)} required />
                     </div>
                      <div className="space-y-2">
-                        <Label htmlFor="idCardNumber">ID Card Number</Label>
-                        <Input id="idCardNumber" value={idCardNumber} onChange={e => setIdCardNumber(e.target.value)} required />
+                        <Label htmlFor="phone">{t.yourPhone}</Label>
+                        <Input id="phone" type="tel" value={phone} onChange={handlePhoneChange} placeholder="+998 (XX) XXX-XX-XX" required />
                     </div>
                 </div>
             )}
             {step === 2 && (
                 <div className="space-y-6">
                     <div className="space-y-2">
-                        <Label htmlFor="phone">{t.yourPhone}</Label>
-                        <Input id="phone" type="tel" value={phone} onChange={handlePhoneChange} placeholder="+998 (XX) XXX-XX-XX" required />
-                    </div>
-                    <div className="space-y-2">
                         <Label htmlFor="carModel">{t.carModel}</Label>
                         <Input id="carModel" value={carModel} onChange={e => setCarModel(e.target.value)} placeholder={t.carModelPlaceholder} required />
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="carNumber">{t.carNumber}</Label>
-                        <Input id="carNumber" value={carNumber} onChange={e => setCarNumber(e.target.value)} placeholder={t.carNumberPlaceholder} required />
+                        <Input id="carNumber" value={carNumber} onChange={handleCarNumberChange} placeholder={t.carNumberPlaceholder} required />
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="carPhotoUrl">{t.carPhotoUrl}</Label>
@@ -266,8 +265,9 @@ export default function RegisterDriverPage() {
                 {step > 1 && (
                     <Button type="button" variant="outline" onClick={handlePrevStep}><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
                 )}
+                 {step === 1 && <div />} 
                 {step < TOTAL_STEPS && (
-                    <Button type="button" className="ml-auto" onClick={handleNextStep}>Next Step</Button>
+                    <Button type="button" onClick={handleNextStep}>Next Step</Button>
                 )}
                 {step === TOTAL_STEPS && (
                      <Button type="submit" className="w-full">{driverProfile && driverProfile.status !== 'unsubmitted' ? t.updateApplication : t.submitApplication}</Button>

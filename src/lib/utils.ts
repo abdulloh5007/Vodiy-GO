@@ -29,3 +29,15 @@ export function formatPhoneNumber(value: string) {
   
   return formatted.slice(0, 19); // Ensure max length: +998 (XX) XXX-XX-XX
 }
+
+export function formatCarNumber(value: string): string {
+    const cleaned = value.replace(/[\s\-]/g, '').toUpperCase();
+    let formatted = cleaned;
+
+    if (/^\d{2}[A-Z]\d{3}[A-Z]{2}$/.test(cleaned)) { // 01A123BC
+        formatted = `${cleaned.slice(0, 2)} ${cleaned.slice(2, 3)} ${cleaned.slice(3, 6)} ${cleaned.slice(6, 8)}`;
+    } else if (/^\d{3}[A-Z]{3}$/.test(cleaned)) { // 123ABC
+        formatted = `${cleaned.slice(0, 3)} ${cleaned.slice(3, 6)}`;
+    }
+    return formatted;
+}

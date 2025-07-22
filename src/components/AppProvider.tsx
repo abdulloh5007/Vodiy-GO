@@ -195,7 +195,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         const driverDocRef = doc(db, "drivers", firebaseUser.uid);
         const newDriverProfile: Partial<Driver> = {
             name: '',
-            idCardNumber: '',
             phone: '',
             carModel: '',
             carNumber: '',
