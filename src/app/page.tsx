@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo, useContext } from 'react';
@@ -67,24 +68,26 @@ export default function Home() {
 
   const t = translations;
 
+  const approvedRides = useMemo(() => rides.filter(ride => ride.status === 'approved'), [rides]);
+
   const availableLocations = useMemo(() => {
     const locations = new Set<string>();
-    rides.forEach(ride => {
+    approvedRides.forEach(ride => {
       locations.add(ride.from);
       locations.add(ride.to);
     });
     return Array.from(locations);
-  }, [rides]);
+  }, [approvedRides]);
 
   const filteredRides = useMemo(() => {
-    return rides.filter(ride => {
+    return approvedRides.filter(ride => {
       const driver = drivers.find(d => d.id === ride.driverId && d.status === 'verified');
       if (!driver) return false;
       const fromMatch = from === 'all' || ride.from === from;
       const toMatch = to === 'all' || ride.to === to;
       return fromMatch && toMatch;
     });
-  }, [rides, drivers, from, to]);
+  }, [approvedRides, drivers, from, to]);
 
   const handleSearch = () => {
     // This function is kept for semantic purposes,
@@ -155,3 +158,5 @@ export default function Home() {
     </div>
   );
 }
+
+    

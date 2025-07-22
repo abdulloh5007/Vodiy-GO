@@ -1,3 +1,4 @@
+
 export type User = {
   uid: string;
   email: string | null;
@@ -27,6 +28,7 @@ export type Ride = {
   info: string;
   time?: string; // Optional departure time
   createdAt: any; // Allow server timestamp
+  status: 'pending' | 'approved' | 'rejected';
 };
 
 export type Order = {
@@ -43,3 +45,5 @@ export type Language = 'en' | 'ru' | 'uz';
 export type Translations = {
   [key: string]: any;
 };
+
+    

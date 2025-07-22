@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useContext, useMemo, useState } from 'react';
@@ -15,7 +16,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import { LogIn, Menu, Car, FileText, LogOut, Home, User, ShoppingBag, ShieldCheck, Settings, Globe } from 'lucide-react';
+import { LogIn, Menu, Car, FileText, LogOut, Home, User, ShoppingBag, ShieldCheck, Settings, Globe, PackageCheck } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from './ui/separator';
 
@@ -79,7 +80,8 @@ export function Header() {
   ];
 
   const adminLinks = [
-    { href: '/admin', label: t.registrationApplications, icon: ShieldCheck }
+    { href: '/admin', label: t.registrationApplications, icon: ShieldCheck },
+    { href: '/admin/ride-applications', label: "Ride Applications", icon: PackageCheck }
   ];
 
 
@@ -243,3 +245,5 @@ export function Header() {
     </header>
   );
 }
+
+    

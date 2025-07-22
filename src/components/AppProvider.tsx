@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
@@ -128,27 +129,28 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     await setDoc(driverDoc, { status }, { merge: true });
   };
   
+  const updateRideStatus = async (rideId: string, status: 'approved' | 'rejected') => {
+    const rideDoc = doc(db, "rides", rideId);
+    await updateDoc(rideDoc, { status });
+  }
+
   const updateOrderStatus = async (orderId: string, status: 'accepted' | 'rejected') => {
       const orderDoc = doc(db, "orders", orderId);
       await updateDoc(orderDoc, { status });
   }
 
-  const addRide = async (rideData: Omit<Ride, 'id' | 'createdAt'>) => {
+  const addRide = async (rideData: Omit<Ride, 'id' | 'createdAt' | 'status'>) => {
     if (!user) throw new Error("User not logged in");
 
-    // Delete previous rides by the same driver
-    const q = query(collection(db, "rides"), where("driverId", "==", user.uid));
-    const querySnapshot = await getDocs(q);
-    const batch = writeBatch(db);
-    querySnapshot.forEach((doc) => {
-      batch.delete(doc.ref);
-    });
-    await batch.commit();
-
+    // We no longer delete previous rides, a driver can have multiple pending rides.
+    // However, only one approved ride will be shown at a time (or handle this logic on display).
+    // Let's stick to creating a new one as pending.
+    
     // Add the new ride
     await setDoc(doc(collection(db, "rides")), {
       ...rideData,
       createdAt: serverTimestamp(),
+      status: 'pending', // All new rides are pending
     });
   };
 
@@ -216,7 +218,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       language, setLanguage, translations,
       user,
       drivers, rides, orders, 
-      addDriverApplication, updateDriverStatus, updateOrderStatus,
+      addDriverApplication, updateDriverStatus, updateOrderStatus, updateRideStatus,
       addRide, addOrder,
       login, register, logout,
       loading,
@@ -227,3 +229,5 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     </AppContext.Provider>
   );
 }
+
+    
