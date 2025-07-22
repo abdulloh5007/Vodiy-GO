@@ -17,7 +17,7 @@ import { FirebaseError } from 'firebase/app';
 import Link from 'next/link';
 
 
-const ImageDropzone = ({ file, setFile, t }: { file: File | null, setFile: (file: File | null) => void, t: any }) => {
+const ImageDropzone = ({ file, setFile, t, disabled }: { file: File | null, setFile: (file: File | null) => void, t: any, disabled: boolean }) => {
     const [preview, setPreview] = useState<string | null>(null);
 
     useEffect(() => {
@@ -34,6 +34,7 @@ const ImageDropzone = ({ file, setFile, t }: { file: File | null, setFile: (file
 
     const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
+        if (disabled) return;
         const droppedFile = e.dataTransfer.files[0];
         if (droppedFile && droppedFile.type.startsWith('image/')) {
             setFile(droppedFile);
@@ -41,6 +42,7 @@ const ImageDropzone = ({ file, setFile, t }: { file: File | null, setFile: (file
     };
     
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (disabled) return;
         const selectedFile = e.target.files?.[0];
         if (selectedFile) {
             setFile(selectedFile);
@@ -49,12 +51,13 @@ const ImageDropzone = ({ file, setFile, t }: { file: File | null, setFile: (file
 
     return (
         <div 
-            className="relative border-2 border-dashed border-muted-foreground/50 rounded-lg p-4 text-center cursor-pointer hover:border-primary transition-colors"
+            className="relative border-2 border-dashed border-muted-foreground/50 rounded-lg p-4 text-center cursor-pointer hover:border-primary transition-colors data-[disabled=true]:cursor-not-allowed data-[disabled=true]:opacity-50"
             onDragOver={(e) => e.preventDefault()}
             onDrop={handleDrop}
-            onClick={() => document.getElementById('file-upload')?.click()}
+            onClick={() => !disabled && document.getElementById('file-upload')?.click()}
+            data-disabled={disabled}
         >
-            <input id="file-upload" type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
+            <input id="file-upload" type="file" accept="image/*" className="hidden" onChange={handleFileChange} disabled={disabled} />
             {preview ? (
                 <>
                     <Image src={preview} alt="Car preview" width={200} height={120} className="mx-auto rounded-md object-cover" />
@@ -63,6 +66,7 @@ const ImageDropzone = ({ file, setFile, t }: { file: File | null, setFile: (file
                         size="icon"
                         className="absolute top-2 right-2 h-6 w-6"
                         onClick={(e) => { e.stopPropagation(); setFile(null); }}
+                        disabled={disabled}
                     >
                         <X className="h-4 w-4" />
                     </Button>
@@ -221,11 +225,11 @@ export default function NewRegisterDriverPage() {
                     <CardDescription>{t.step1_title || "Step 1: Account Details"}</CardDescription>
                     <div className="space-y-2">
                         <Label htmlFor="email">{t.email}</Label>
-                        <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} required />
+                        <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} required disabled={isSubmitting} />
                     </div>
                      <div className="space-y-2">
                         <Label htmlFor="password">{t.password}</Label>
-                        <Input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} required />
+                        <Input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} required disabled={isSubmitting} />
                     </div>
                 </div>
             )}
@@ -234,15 +238,15 @@ export default function NewRegisterDriverPage() {
                     <CardDescription>{t.step2_title || "Step 2: Personal Information"}</CardDescription>
                     <div className="space-y-2">
                         <Label htmlFor="name">{t.fullName}</Label>
-                        <Input id="name" value={name} onChange={e => setName(e.target.value)} required />
+                        <Input id="name" value={name} onChange={e => setName(e.target.value)} required disabled={isSubmitting} />
                     </div>
                      <div className="space-y-2">
                         <Label htmlFor="phone">{t.yourPhone}</Label>
-                        <Input id="phone" type="tel" value={phone} onChange={handlePhoneChange} placeholder="+998 (XX) XXX-XX-XX" required />
+                        <Input id="phone" type="tel" value={phone} onChange={handlePhoneChange} placeholder="+998 (XX) XXX-XX-XX" required disabled={isSubmitting} />
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="passport">{t.passportNumber || "Passport Number"}</Label>
-                        <Input id="passport" value={passport} onChange={handlePassportChange} placeholder={t.passportPlaceholder || "AA 1234567"} required />
+                        <Input id="passport" value={passport} onChange={handlePassportChange} placeholder={t.passportPlaceholder || "AA 1234567"} required disabled={isSubmitting} />
                     </div>
                 </div>
             )}
@@ -251,15 +255,15 @@ export default function NewRegisterDriverPage() {
                     <CardDescription>{t.step3_title || "Step 3: Car Information"}</CardDescription>
                     <div className="space-y-2">
                         <Label htmlFor="carModel">{t.carModel}</Label>
-                        <Input id="carModel" value={carModel} onChange={e => setCarModel(e.target.value)} placeholder={t.carModelPlaceholder} required />
+                        <Input id="carModel" value={carModel} onChange={e => setCarModel(e.target.value)} placeholder={t.carModelPlaceholder} required disabled={isSubmitting} />
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="carNumber">{t.carNumber}</Label>
-                        <Input id="carNumber" value={carNumber} onChange={handleCarNumberChange} placeholder="e.g., 01 B 123 BB" required />
+                        <Input id="carNumber" value={carNumber} onChange={handleCarNumberChange} placeholder="e.g., 01 B 123 BB" required disabled={isSubmitting} />
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="carPhotoUrl">{t.carPhotoUrl}</Label>
-                        <ImageDropzone file={carPhotoFile} setFile={setCarPhotoFile} t={t} />
+                        <ImageDropzone file={carPhotoFile} setFile={setCarPhotoFile} t={t} disabled={isSubmitting} />
                     </div>
                 </div>
             )}
