@@ -192,9 +192,13 @@ export default function NewRegisterDriverPage() {
             switch (error.code) {
                 case 'auth/email-already-in-use':
                     errorMessage = t.errorEmailInUse;
+                    // Go back to step 1 to fix email
+                    setStep(1); 
                     break;
                 case 'auth/weak-password':
                     errorMessage = t.errorWeakPassword;
+                     // Go back to step 1 to fix password
+                    setStep(1);
                     break;
                 default:
                     errorMessage = t.unknownAuthError;

@@ -107,43 +107,36 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         throw new Error("Email and password are required for registration.");
     }
 
-    try {
-        // 1. Create user in Firebase Auth
-        const userCredential = await createUserWithEmailAndPassword(auth, driverData.email, driverData.password);
-        const firebaseUser = userCredential.user;
-        
-        // 2. Upload car photo if it exists
-        let carPhotoUrl = '';
-        if (driverData.carPhotoFile) {
-            carPhotoUrl = await uploadCarPhoto(firebaseUser.uid, driverData.carPhotoFile);
-        }
-
-        // 3. Prepare data for Firestore batch write
-        const { carPhotoFile, email, password, ...driverInfo } = driverData;
-        
-        const batch = writeBatch(db);
-
-        // User document
-        const userDocRef = doc(db, "users", firebaseUser.uid);
-        const newUser: User = { uid: firebaseUser.uid, email: firebaseUser.email, role: 'driver' };
-        batch.set(userDocRef, newUser);
-
-        // Driver document
-        const driverDocRef = doc(db, "drivers", firebaseUser.uid);
-        batch.set(driverDocRef, {
-            ...driverInfo,
-            carPhotoUrl,
-            status: 'pending',
-        });
-        
-        // 4. Commit the batch
-        await batch.commit();
-
-    } catch (error) {
-      console.error("Error during driver registration: ", error);
-      // Re-throw the error to be handled by the calling component
-      throw error;
+    // 1. Create user in Firebase Auth first
+    const userCredential = await createUserWithEmailAndPassword(auth, driverData.email, driverData.password);
+    const firebaseUser = userCredential.user;
+    
+    // 2. Upload car photo if it exists
+    let carPhotoUrl = '';
+    if (driverData.carPhotoFile) {
+        carPhotoUrl = await uploadCarPhoto(firebaseUser.uid, driverData.carPhotoFile);
     }
+
+    // 3. Prepare data for Firestore batch write
+    const { carPhotoFile, email, password, ...driverInfo } = driverData;
+    
+    const batch = writeBatch(db);
+
+    // User document with 'driver' role
+    const userDocRef = doc(db, "users", firebaseUser.uid);
+    const newUser: User = { uid: firebaseUser.uid, email: firebaseUser.email, role: 'driver' };
+    batch.set(userDocRef, newUser);
+
+    // Driver document with 'pending' status
+    const driverDocRef = doc(db, "drivers", firebaseUser.uid);
+    batch.set(driverDocRef, {
+        ...driverInfo,
+        carPhotoUrl,
+        status: 'pending',
+    });
+    
+    // 4. Commit the batch
+    await batch.commit();
   };
 
   const updateDriverStatus = async (driverId: string, status: 'verified' | 'rejected') => {
@@ -163,12 +156,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const addRide = async (rideData: Omit<Ride, 'id' | 'createdAt' | 'status'>) => {
     if (!user) throw new Error("User not logged in");
-
-    // We no longer delete previous rides, a driver can have multiple pending rides.
-    // However, only one approved ride will be shown at a time (or handle this logic on display).
-    // Let's stick to creating a new one as pending.
     
-    // Add the new ride
     await setDoc(doc(collection(db, "rides")), {
       ...rideData,
       createdAt: serverTimestamp(),
@@ -215,7 +203,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const logout = async () => {
     await signOut(auth);
   };
-
 
   return (
     <AppContext.Provider value={{ 
