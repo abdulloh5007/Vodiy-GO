@@ -75,6 +75,7 @@ export function Header() {
   ];
 
   const passengerLinks = [
+    { href: '/', label: t.home, icon: Home },
     { href: '/my-orders', label: t.myOrders, icon: ShoppingBag },
   ];
 
