@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useContext, useEffect } from 'react';
@@ -58,7 +59,7 @@ export default function DriverLoginPage() {
 
   useEffect(() => {
     if (!loading && user && user.role === 'driver') {
-      router.push('/create-ride');
+      router.push('/driver/create-ride');
     }
   }, [user, loading, router]);
 
@@ -81,7 +82,7 @@ export default function DriverLoginPage() {
         title: t.loginSuccessTitle,
         description: t.redirecting,
       });
-      router.push('/create-ride');
+      router.push('/driver/create-ride');
     } catch (error) {
         let errorMessage = t.unknownError;
         if (error instanceof FirebaseError) {

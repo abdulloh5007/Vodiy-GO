@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useContext, useMemo, useEffect } from 'react';
@@ -106,13 +107,6 @@ export default function PassengerOrdersPage() {
 
     const { user, rides, orders, drivers, loading, translations: t } = context;
 
-    useEffect(() => {
-        if (!loading && (!user || user.role !== 'passenger')) {
-            router.push('/');
-        }
-    }, [user, loading, router]);
-
-
     const myOrders = useMemo(() => {
         if (!user) return [];
         return orders
@@ -120,7 +114,7 @@ export default function PassengerOrdersPage() {
             .sort((a, b) => b.createdAt.seconds - a.createdAt.seconds);
     }, [orders, user]);
 
-    if (loading || !user || !t.home || user.role !== 'passenger') {
+    if (loading || !user || !t.home) {
         return <MyOrdersSkeleton />;
     }
     
