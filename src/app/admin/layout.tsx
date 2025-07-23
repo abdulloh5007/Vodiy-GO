@@ -29,7 +29,7 @@ export default function AdminLayout({
 
   // useEffect(() => {
   //   if (!loading) {
-  //     const isAuthPage = pathname === '/admin/login';
+  //     const isAuthPage = pathname === '/admin/login'; 
   //     if (!user && !isAuthPage) {
   //       router.push('/admin/login');
   //     } else if (user && user.role !== 'admin') {
