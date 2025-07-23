@@ -1,8 +1,9 @@
+
 'use client';
 
 import { useContext, useEffect } from 'react';
 import { AppContext } from '@/contexts/AppContext';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 
 export default function DriverLayout({
@@ -12,6 +13,7 @@ export default function DriverLayout({
 }) {
   const context = useContext(AppContext);
   const router = useRouter();
+  const pathname = usePathname();
 
   if (!context) {
     // This case should ideally not happen if the provider is at the root
@@ -26,13 +28,18 @@ export default function DriverLayout({
 
   useEffect(() => {
     if (!loading) {
-      if (!user || user.role !== 'driver') {
+      const isAuthPage = pathname === '/driver/login' || pathname === '/driver/register';
+      if (!user && !isAuthPage) {
         router.push('/driver/login');
+      } else if (user && user.role !== 'driver' && !isAuthPage) {
+        router.push('/');
       }
     }
-  }, [user, loading, router]);
+  }, [user, loading, router, pathname]);
   
-  if (loading || !user) {
+  const isAuthPage = pathname === '/driver/login' || pathname === '/driver/register';
+
+  if (loading || (!user && !isAuthPage)) {
     return (
         <div className="flex h-screen w-full items-center justify-center">
             <Loader2 className="h-12 w-12 animate-spin text-primary" />
