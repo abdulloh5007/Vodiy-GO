@@ -29,6 +29,7 @@ export type Ride = {
   time?: string; // Optional departure time
   createdAt: any; // Allow server timestamp
   status: 'pending' | 'approved' | 'rejected';
+  approvedAt?: any; // Timestamp for when the ride was approved
 };
 
 export type Order = {

@@ -145,7 +145,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   
   const updateRideStatus = async (rideId: string, status: 'approved' | 'rejected') => {
     const rideDoc = doc(db, "rides", rideId);
-    await updateDoc(rideDoc, { status });
+    await updateDoc(rideDoc, { 
+        status,
+        ...(status === 'approved' && { approvedAt: serverTimestamp() })
+    });
   }
 
   const updateOrderStatus = async (orderId: string, status: 'accepted' | 'rejected') => {
@@ -153,7 +156,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       await updateDoc(orderDoc, { status });
   }
 
-  const addRide = async (rideData: Omit<Ride, 'id' | 'createdAt' | 'status'>) => {
+  const addRide = async (rideData: Omit<Ride, 'id' | 'createdAt' | 'status' | 'approvedAt'>) => {
     if (!user) throw new Error("User not logged in");
     
     const newRideRef = doc(collection(db, "rides"))
@@ -162,6 +165,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       id: newRideRef.id,
       createdAt: serverTimestamp(),
       status: 'pending', // All new rides are pending
+      approvedAt: null
     });
   };
 
@@ -195,12 +199,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       }
   };
   
-  const register = async (email: string, password: string, name: string, role: 'passenger' | 'driver'): Promise<void> => {
+  const register = async (email: string, password: string, name: string, role: 'passenger' | 'driver', phone?: string): Promise<void> => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const firebaseUser = userCredential.user;
     
     const userDocRef = doc(db, "users", firebaseUser.uid);
-    const newUser: User = { uid: firebaseUser.uid, email: firebaseUser.email, name, role };
+    const newUser: User = { uid: firebaseUser.uid, email: firebaseUser.email, name, role, ...(phone && { phone }) };
     await setDoc(userDocRef, newUser);
 
     // DO NOT create a driver document here. It will be created upon application submission.

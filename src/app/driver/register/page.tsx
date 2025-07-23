@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from 'lucide-react';
 import { FirebaseError } from 'firebase/app';
 import Link from 'next/link';
+import { formatPhoneNumber } from '@/lib/utils';
 
 
 export default function DriverRegisterPage() {
@@ -21,6 +22,7 @@ export default function DriverRegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+  const [phone, setPhone] = useState('+998');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!context) {
@@ -29,13 +31,18 @@ export default function DriverRegisterPage() {
 
   const { register, translations: t } = context;
 
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatPhoneNumber(e.target.value);
+    setPhone(formatted);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!name || !email || password.length < 6) {
+    if (!name || !email || password.length < 6 || phone.replace(/\D/g, '').length !== 12) {
       toast({
         title: t.validationErrorTitle,
-        description: t.validationErrorDescStep1 || "Please enter a valid name, email, and a password of at least 6 characters.",
+        description: t.validationErrorDescStep1 || "Please enter a valid name, email, phone and a password of at least 6 characters.",
         variant: "destructive",
       });
       return;
@@ -43,7 +50,7 @@ export default function DriverRegisterPage() {
     
     setIsSubmitting(true);
     try {
-        await register(email, password, name, 'driver');
+        await register(email, password, name, 'driver', phone);
         toast({
             title: t.registrationSuccessTitle,
             description: t.redirectingToApplication,
@@ -85,6 +92,10 @@ export default function DriverRegisterPage() {
              <div className="space-y-2">
                 <Label htmlFor="name">{t.fullName}</Label>
                 <Input id="name" value={name} onChange={e => setName(e.target.value)} required disabled={isSubmitting} />
+            </div>
+             <div className="space-y-2">
+                <Label htmlFor="register-phone">{t.yourPhone}</Label>
+                <Input id="register-phone" type="tel" value={phone} onChange={handlePhoneChange} placeholder="+998 (XX) XXX-XX-XX" required disabled={isSubmitting}/>
             </div>
             <div className="space-y-2">
                 <Label htmlFor="email">{t.email}</Label>

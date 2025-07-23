@@ -179,5 +179,7 @@
     "rating_based_on": "{count} ta baho asosida",
     "diagnostics_profile_button_desc": "Tekshiruv holatini yuborish yoki tekshirish",
     "activeRideTitle": "Sizda faol qatnov mavjud",
-    "activeRideDesc": "Siz bir vaqtning o'zida faqat bitta faol qatnovga ega bo'lishingiz mumkin. Iltimos, uning tugashini kuting yoki qo'llab-quvvatlash xizmatiga murojaat qiling."
+    "activeRideDesc": "Siz bir vaqtning o'zida faqat bitta faol qatnovga ega bo'lishingiz mumkin. Iltimos, uning tugashini kuting yoki qo'llab-quvvatlash xizmatiga murojaat qiling.",
+    "published_ago": "E'lon qilindi",
+    "one_booking_limit_alert": "Siz bir vaqtning o'zida faqat bitta faol buyurtmaga ega bo'lishingiz mumkin."
 }

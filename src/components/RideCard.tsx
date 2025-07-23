@@ -16,6 +16,8 @@ import { formatPhoneNumber } from '@/lib/utils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { FirebaseError } from 'firebase/app';
 import { useRouter } from 'next/navigation';
+import { formatDistanceToNow } from 'date-fns';
+import { ru, uz } from 'date-fns/locale';
 
 interface RideCardProps {
   ride: Ride;
@@ -26,7 +28,7 @@ export function RideCard({ ride, onImageClick }: RideCardProps) {
   const context = useContext(AppContext);
   const router = useRouter();
   const [isBooking, setIsBooking] = useState(false);
-  const [authAction, setAuthAction] = useState<'login' | 'register'>('login');
+  const [authAction, setAuthAction] = useState<'login'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [clientName, setClientName] = useState('');
@@ -36,7 +38,7 @@ export function RideCard({ ride, onImageClick }: RideCardProps) {
   const { toast } = useToast();
 
   if (!context) return null;
-  const { drivers, translations, addOrder, user, login, register, orders } = context;
+  const { drivers, translations, language, addOrder, user, login, register, orders } = context;
   const t = translations;
 
   const driver = drivers.find(d => d.id === ride.driverId);
@@ -49,6 +51,12 @@ export function RideCard({ ride, onImageClick }: RideCardProps) {
     return orders.find(o => o.rideId === ride.id && o.passengerId === user.uid);
   }, [user, orders, ride.id]);
 
+  const hasActiveOrder = useMemo(() => {
+    if (!user) return false;
+    return orders.some(o => o.passengerId === user.uid && (o.status === 'new' || o.status === 'accepted'));
+  }, [user, orders]);
+
+
   if (!driver || availableSeats <= 0) return null;
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -58,14 +66,6 @@ export function RideCard({ ride, onImageClick }: RideCardProps) {
   
   const handleAuthAndBook = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (authAction === 'register' && (!clientName || clientPhone.replace(/\D/g, '').length !== 12)) {
-         toast({
-            title: t.validationErrorTitle,
-            description: t.validationErrorDescBooking,
-            variant: "destructive",
-        });
-        return;
-    }
     if (!email || !password) {
         toast({
             title: t.validationErrorTitle,
@@ -76,14 +76,8 @@ export function RideCard({ ride, onImageClick }: RideCardProps) {
     }
     setIsSubmitting(true);
     try {
-        if (authAction === 'login') {
-            await login(email, password, 'passenger');
-        } else {
-            // Pass the clientName to the register function
-            await register(email, password, clientName, 'passenger');
-        }
-        // User is now logged in. The booking will be handled by the useEffect in the component.
-        toast({ title: authAction === 'login' ? t.loginSuccessTitle : t.registrationSuccessTitle });
+        await login(email, password, 'passenger');
+        toast({ title: t.loginSuccessTitle });
     } catch (error) {
         let errorMessage = t.unknownError;
         if (error instanceof FirebaseError) {
@@ -104,7 +98,7 @@ export function RideCard({ ride, onImageClick }: RideCardProps) {
             }
         }
         toast({
-            title: authAction === 'login' ? t.loginFailedTitle : t.registrationFailedTitle,
+            title: t.loginFailedTitle,
             description: errorMessage,
             variant: "destructive",
         });
@@ -168,6 +162,13 @@ export function RideCard({ ride, onImageClick }: RideCardProps) {
   }
 
   const formattedPrice = new Intl.NumberFormat('fr-FR').format(ride.price);
+  
+  const getRideApprovedTime = () => {
+      if (!ride.approvedAt) return null;
+      const locale = language === 'ru' ? ru : language === 'uz' ? uz : undefined;
+      const date = ride.approvedAt.toDate();
+      return formatDistanceToNow(date, { addSuffix: true, locale });
+  }
 
   return (
     <>
@@ -182,6 +183,11 @@ export function RideCard({ ride, onImageClick }: RideCardProps) {
               data-ai-hint="car side"
               onClick={() => onImageClick(driver.carPhotoUrl)}
             />
+             {ride.approvedAt && (
+                <Badge variant="secondary" className="absolute bottom-2 right-2">
+                    {t.published_ago || 'Published'} {getRideApprovedTime()}
+                </Badge>
+            )}
           </div>
           <div className="p-4">
             <CardTitle className="font-headline text-xl flex items-center justify-between">
@@ -224,9 +230,10 @@ export function RideCard({ ride, onImageClick }: RideCardProps) {
           <Button 
             className="w-full bg-accent hover:bg-accent/80 text-accent-foreground" 
             onClick={handleBooking}
-            disabled={!!existingOrderForThisRide}
+            disabled={!!existingOrderForThisRide || hasActiveOrder}
+            title={hasActiveOrder && !existingOrderForThisRide ? t.one_booking_limit_alert : ""}
           >
-            {existingOrderForThisRide ? (t.bookingRequestSent || 'Request Sent') : t.bookNow}
+            {existingOrderForThisRide ? t.bookingRequestSent : t.bookNow}
           </Button>
         </CardFooter>
       </Card>
@@ -239,45 +246,21 @@ export function RideCard({ ride, onImageClick }: RideCardProps) {
               {t.loginToBook}
             </DialogDescription>
           </DialogHeader>
-          <Tabs value={authAction} onValueChange={(value) => setAuthAction(value as 'login' | 'register')}>
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="login">{t.login}</TabsTrigger>
-              <TabsTrigger value="register">{t.register}</TabsTrigger>
-            </TabsList>
             <form onSubmit={handleAuthAndBook}>
-              <TabsContent value="login" className="space-y-4 py-4">
-                <div className="space-y-2">
-                  <Label htmlFor="login-email">{t.email}</Label>
-                  <Input id="login-email" type="email" value={email} onChange={e => setEmail(e.target.value)} required />
+                <div className="space-y-4 py-4">
+                    <div className="space-y-2">
+                    <Label htmlFor="login-email">{t.email}</Label>
+                    <Input id="login-email" type="email" value={email} onChange={e => setEmail(e.target.value)} required />
+                    </div>
+                    <div className="space-y-2">
+                    <Label htmlFor="login-password">{t.password}</Label>
+                    <Input id="login-password" type="password" value={password} onChange={e => setPassword(e.target.value)} required />
+                    </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="login-password">{t.password}</Label>
-                  <Input id="login-password" type="password" value={password} onChange={e => setPassword(e.target.value)} required />
-                </div>
-              </TabsContent>
-              <TabsContent value="register" className="space-y-4 py-4">
-                 <div className="space-y-2">
-                    <Label htmlFor="register-name">{t.yourName}</Label>
-                    <Input id="register-name" value={clientName} onChange={(e) => setClientName(e.target.value)} required />
-                </div>
-                 <div className="space-y-2">
-                    <Label htmlFor="register-phone">{t.yourPhone}</Label>
-                    <Input id="register-phone" type="tel" value={clientPhone} onChange={handlePhoneChange} placeholder="+998 (XX) XXX-XX-XX" required/>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="register-email">{t.email}</Label>
-                  <Input id="register-email" type="email" value={email} onChange={e => setEmail(e.target.value)} required />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="register-password">{t.password}</Label>
-                  <Input id="register-password" type="password" value={password} onChange={e => setPassword(e.target.value)} required />
-                </div>
-              </TabsContent>
               <DialogFooter>
-                <Button type="submit" disabled={isSubmitting}>{authAction === 'login' ? t.loginAndBook : t.registerAndBook}</Button>
+                <Button type="submit" disabled={isSubmitting}>{t.loginAndBook}</Button>
               </DialogFooter>
             </form>
-          </Tabs>
         </DialogContent>
       </Dialog>
     </>
