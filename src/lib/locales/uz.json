@@ -79,6 +79,7 @@
     "unknownAuthError": "Kutilmagan autentifikatsiya xatosi yuz berdi.",
     "unknownError": "Noma'lum xato yuz berdi.",
     "departureTimeOptional": "Jo'nash vaqti (ixtiyoriy)",
+    "departureTimePlaceholder": "masalan, 09:00 yoki Ertalab",
     "currentStatus": "Sizning joriy holatingiz",
     "pending": "Kutilmoqda",
     "verified": "Tasdiqlangan",

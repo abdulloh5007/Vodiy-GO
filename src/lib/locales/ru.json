@@ -79,6 +79,7 @@
     "unknownAuthError": "Произошла непредвиденная ошибка аутентификации.",
     "unknownError": "Произошла неизвестная ошибка.",
     "departureTimeOptional": "Время отправления (необязательно)",
+    "departureTimePlaceholder": "напр., 09:00 или Утром",
     "currentStatus": "Ваш текущий статус",
     "pending": "В ожидании",
     "verified": "Проверен",

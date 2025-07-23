@@ -79,6 +79,7 @@
     "unknownAuthError": "An unexpected authentication error occurred.",
     "unknownError": "An unknown error occurred.",
     "departureTimeOptional": "Departure Time (Optional)",
+    "departureTimePlaceholder": "e.g., 09:00 or Morning",
     "currentStatus": "Your current status",
     "pending": "Pending",
     "verified": "Verified",

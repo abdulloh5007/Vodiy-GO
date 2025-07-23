@@ -82,10 +82,8 @@ export default function CreateRidePage() {
 
   useEffect(() => {
     if (!loading) {
-        if (!user || user.role !== 'driver') {
-            router.push('/driver/login');
-        } else if (driverProfile?.status !== 'verified') {
-            router.push('/driver/profile');
+        if (driverProfile?.status !== 'verified') {
+            router.push('/driver/profile/diagnostics');
         }
     }
   }, [loading, user, driverProfile, router]);
@@ -192,7 +190,7 @@ export default function CreateRidePage() {
                 </div>
                  <div className="space-y-2">
                   <Label htmlFor="time">{t.departureTimeOptional}</Label>
-                  <Input id="time" type="time" value={time} onChange={e => setTime(e.target.value)} />
+                  <Input id="time" type="text" value={time} onChange={e => setTime(e.target.value)} placeholder={t.departureTimePlaceholder || 'e.g., 09:00 or Morning'} />
                 </div>
             </div>
             <div className="space-y-2">

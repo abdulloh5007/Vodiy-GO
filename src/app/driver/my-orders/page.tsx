@@ -127,16 +127,20 @@ export default function MyOrdersPage() {
         throw new Error('MyOrdersPage must be used within an AppProvider');
     }
 
-    const { user, rides, orders, drivers, loading, translations, updateOrderStatus } = context;
+    const { user, rides, orders, loading, translations, updateOrderStatus } = context;
     const t = translations;
 
-    const driverProfile = user ? drivers.find(d => d.id === user.uid) : undefined;
-
     useEffect(() => {
-        if (!loading && (!user || user.role !== 'driver')) {
-            router.push('/driver/login');
+        const savedViewMode = localStorage.getItem('my-orders-view-mode');
+        if (savedViewMode === 'table' || savedViewMode === 'card') {
+            setViewMode(savedViewMode);
         }
-    }, [user, loading, router]);
+    }, []);
+
+    const handleSetViewMode = (mode: 'table' | 'card') => {
+        setViewMode(mode);
+        localStorage.setItem('my-orders-view-mode', mode);
+    }
 
     const myRides = useMemo(() => {
         if (!user) return [];
@@ -149,7 +153,7 @@ export default function MyOrdersPage() {
         return orders.filter(order => myRideIds.includes(order.rideId)).sort((a,b) => (a.status === 'new' ? -1 : 1));
     }, [orders, myRides]);
     
-    if (loading || !t.home || !user || !driverProfile) {
+    if (loading || !t.home || !user) {
         return <MyOrdersSkeleton />;
     }
     
@@ -161,16 +165,16 @@ export default function MyOrdersPage() {
                         <CardTitle className="font-headline text-2xl">{t.myOrders || 'My Bookings'}</CardTitle>
                         <CardDescription>{t.ordersForYourRides || 'Bookings for your active rides.'}</CardDescription>
                     </div>
-                     <div className="hidden md:flex items-center gap-2">
-                        <Button variant={viewMode === 'table' ? 'secondary' : 'ghost'} size="icon" onClick={() => setViewMode('table')}>
+                     <div className="flex items-center gap-2">
+                        <Button variant={viewMode === 'table' ? 'secondary' : 'ghost'} size="icon" onClick={() => handleSetViewMode('table')}>
                             <List className="h-5 w-5" />
                         </Button>
-                        <Button variant={viewMode === 'card' ? 'secondary' : 'ghost'} size="icon" onClick={() => setViewMode('card')}>
+                        <Button variant={viewMode === 'card' ? 'secondary' : 'ghost'} size="icon" onClick={() => handleSetViewMode('card')}>
                             <LayoutGrid className="h-5 w-5" />
                         </Button>
                     </div>
                 </CardHeader>
-                <CardContent className={cn("hidden p-0", viewMode === 'table' && 'md:block')}>
+                <CardContent className={cn("p-0", viewMode !== 'table' && 'hidden')}>
                     <div className="w-full overflow-x-auto">
                         <Table className="min-w-[800px]">
                             <TableHeader>
@@ -241,7 +245,7 @@ export default function MyOrdersPage() {
                 </CardContent>
             </Card>
 
-             <div className={cn("grid grid-cols-1 md:grid-cols-2 gap-4", viewMode === 'card' ? 'block' : 'md:hidden')}>
+             <div className={cn("grid grid-cols-1 md:grid-cols-2 gap-4", viewMode !== 'card' && 'hidden')}>
                 {myRideOrders.length > 0 ? (
                    myRideOrders.map(order => {
                         const ride = myRides.find(r => r.id === order.rideId);

@@ -115,15 +115,6 @@ export default function DriverDiagnosticsPage() {
     return drivers.find(d => d.id === user.uid);
   }, [user, drivers]);
 
-  useEffect(() => {
-    if (!loading) {
-      if (!user || user.role !== 'driver') {
-        router.push('/driver/login');
-      }
-    }
-  }, [loading, user, router]);
-
-
   const handleCarNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formatted = formatCarNumber(e.target.value);
     setCarNumber(formatted);
@@ -229,7 +220,7 @@ export default function DriverDiagnosticsPage() {
   
   // If a driver profile exists, show their status instead of the application form
   if (driverProfile) {
-    return <DriverStatusPage driverProfile={driverProfile} t={t} />
+    return <DriverStatusPage driverProfile={driverProfile} t={t} router={router} />
   }
 
   // If no driver profile, show the application form
@@ -237,8 +228,15 @@ export default function DriverDiagnosticsPage() {
     <div className="container mx-auto py-8 px-4 flex justify-center">
       <Card className="w-full max-w-2xl">
         <CardHeader>
-          <CardTitle className="font-headline text-2xl">{t.diagnostics_title || "Diagnostics"}</CardTitle>
-          <CardDescription>{t.diagnostics_desc || "Fill the form to complete your profile."}</CardDescription>
+          <div className="flex items-center gap-4">
+             <Button variant="ghost" size="icon" onClick={() => router.back()}>
+                <ArrowLeft className="h-5 w-5" />
+             </Button>
+            <div>
+              <CardTitle className="font-headline text-2xl">{t.diagnostics_title || "Diagnostics"}</CardTitle>
+              <CardDescription>{t.diagnostics_desc || "Fill the form to complete your profile."}</CardDescription>
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           <Progress value={progress} className="w-full mb-6" />
@@ -315,7 +313,7 @@ export default function DriverDiagnosticsPage() {
 }
 
 
-const DriverStatusPage = ({ driverProfile, t }: { driverProfile: Driver, t: any}) => {
+const DriverStatusPage = ({ driverProfile, t, router }: { driverProfile: Driver, t: any, router: any}) => {
     
     const getStatusContent = () => {
         switch (driverProfile.status) {
@@ -352,6 +350,11 @@ const DriverStatusPage = ({ driverProfile, t }: { driverProfile: Driver, t: any}
         <div className="container mx-auto py-8 px-4 flex justify-center">
              <Card className="w-full max-w-md text-center">
                 <CardHeader className="items-center">
+                    <div className="absolute top-4 left-4">
+                        <Button variant="ghost" size="icon" onClick={() => router.back()}>
+                            <ArrowLeft className="h-5 w-5" />
+                        </Button>
+                    </div>
                     {icon}
                     <CardTitle className="mt-4">{title}</CardTitle>
                 </CardHeader>

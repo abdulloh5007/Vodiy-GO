@@ -66,38 +66,37 @@ function AdminPageSkeleton() {
     )
 }
 
-const ApplicationCard = ({ driver, onUpdateStatus, onImageClick, t }: { driver: Driver, onUpdateStatus: (id: string, status: 'verified' | 'rejected') => void, onImageClick: (url: string) => void, t: any }) => {
+const ApplicationCard = ({ driver, onUpdateStatus, onImageClick, t }: { driver: Driver, onUpdateStatus: (id: string, status: 'verified' | 'rejected') => void, onImageClick: (url:string) => void, t: any }) => {
     return (
         <Card>
-            <CardHeader>
-                <CardTitle>{driver.name}</CardTitle>
-                <CardDescription>{driver.phone}</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                <div className="flex items-center gap-4">
+            <CardHeader className="p-4">
+                 <div className="flex items-start gap-4">
                     <Image 
                         src={driver.carPhotoUrl} 
                         alt={driver.carModel} 
-                        width={128} 
-                        height={80} 
+                        width={100} 
+                        height={64} 
                         className="rounded-md object-cover cursor-pointer aspect-video" 
                         data-ai-hint="car side"
                         onClick={() => onImageClick(driver.carPhotoUrl)}
                     />
-                    <div className='space-y-1'>
-                        <p className="font-semibold">{driver.carModel}</p>
-                        <p className="text-sm text-muted-foreground">{driver.carNumber}</p>
-                        <Badge variant="secondary">{driver.status}</Badge>
+                    <div className='space-y-1 flex-grow'>
+                        <CardTitle className="text-lg">{driver.name}</CardTitle>
+                        <CardDescription>{driver.phone}</CardDescription>
+                         <p className="text-sm font-medium pt-1">{driver.carModel} <span className="text-muted-foreground font-mono">({driver.carNumber})</span></p>
                     </div>
+                     <Badge variant="secondary">{driver.status}</Badge>
                 </div>
-            </CardContent>
-            <CardFooter className="flex justify-end gap-2">
-                 <Button variant="outline" size="icon" className="text-green-600 hover:text-green-700 hover:bg-green-50" onClick={() => onUpdateStatus(driver.id, 'verified')}>
-                    <Check className="h-4 w-4" />
-                </Button>
-                <Button variant="outline" size="icon" className="text-red-600 hover:text-red-700 hover:bg-red-50" onClick={() => onUpdateStatus(driver.id, 'rejected')}>
-                    <X className="h-4 w-4" />
-                </Button>
+            </CardHeader>
+            <CardFooter className="p-0">
+                 <div className="flex w-full">
+                    <Button variant="ghost" size="lg" className="flex-1 rounded-t-none rounded-br-none text-green-600 hover:text-green-700 hover:bg-green-50" onClick={() => onUpdateStatus(driver.id, 'verified')}>
+                        <Check className="h-5 w-5" />
+                    </Button>
+                    <Button variant="ghost" size="lg" className="flex-1 rounded-t-none rounded-bl-none text-red-600 hover:text-red-700 hover:bg-red-50" onClick={() => onUpdateStatus(driver.id, 'rejected')}>
+                        <X className="h-5 w-5" />
+                    </Button>
+                </div>
             </CardFooter>
         </Card>
     );
@@ -119,22 +118,6 @@ export default function AdminPage() {
     return <AdminPageSkeleton />;
   }
   
-
-  if (!user || user.role !== 'admin') {
-    return (
-        <div className="container mx-auto py-8 px-4 flex justify-center items-center h-[calc(100vh-8rem)]">
-            <Card className="w-full max-w-md text-center">
-                <CardHeader>
-                    <CardTitle className="flex items-center justify-center gap-2"><ShieldAlert className="text-destructive h-8 w-8"/>{t.accessDenied}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <p>{t.onlyAdminsCanAccess}</p>
-                </CardContent>
-            </Card>
-        </div>
-    );
-  }
-
   const pendingDrivers = drivers.filter(d => d.status === 'pending');
 
   return (
@@ -145,7 +128,7 @@ export default function AdminPage() {
                 <CardTitle className="font-headline text-2xl">{t.registrationApplications}</CardTitle>
                 <CardDescription>{pendingDrivers.length > 0 ? `You have ${pendingDrivers.length} pending applications.` : t.noPendingApplications}</CardDescription>
             </div>
-             <div className="hidden md:flex items-center gap-2">
+             <div className="flex items-center gap-2">
                 <Button variant={viewMode === 'table' ? 'secondary' : 'ghost'} size="icon" onClick={() => setViewMode('table')}>
                     <List className="h-5 w-5" />
                 </Button>
@@ -155,7 +138,7 @@ export default function AdminPage() {
             </div>
         </CardHeader>
         <CardContent>
-           <div className={cn("hidden", viewMode === 'table' && 'md:block')}>
+           <div className={cn(viewMode !== 'table' && 'hidden')}>
              <div className="w-full overflow-x-auto">
               <Table className="min-w-[800px]">
                 <TableHeader>
@@ -213,7 +196,7 @@ export default function AdminPage() {
               </Table>
               </div>
             </div>
-            <div className={cn("grid grid-cols-1 md:grid-cols-2 gap-4", viewMode === 'card' ? 'block' : 'md:hidden')}>
+            <div className={cn("grid grid-cols-1 md:grid-cols-2 gap-4", viewMode !== 'card' && 'hidden')}>
                  {pendingDrivers.length > 0 ? (
                     pendingDrivers.map(driver => (
                         <ApplicationCard 

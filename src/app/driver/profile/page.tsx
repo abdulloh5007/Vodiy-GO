@@ -33,7 +33,7 @@ function ProfileSkeleton() {
 
 const ProfileCard = ({ driver, t }: { driver: Driver, t: any }) => {
     return (
-        <Card className="overflow-hidden">
+        <Card className="overflow-hidden mb-5">
             <CardContent className="p-4 flex items-center gap-4">
                 <Image
                     src={driver.carPhotoUrl || 'https://placehold.co/100x100.png'}
@@ -53,7 +53,7 @@ const ProfileCard = ({ driver, t }: { driver: Driver, t: any }) => {
                             <Star className="w-5 h-5 fill-current" />
                             <Star className="w-5 h-5 fill-current" />
                             <Star className="w-5 h-5 fill-current" />
-                             <span className="text-sm text-muted-foreground ml-1">(5.0)</span>
+                            <span className="text-sm text-muted-foreground ml-1">(5.0)</span>
                         </div>
                     </Link>
                 </div>

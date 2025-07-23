@@ -32,18 +32,15 @@ export function BottomNav() {
   }
 
   const navLinks = [
-    { href: '/driver/create-ride', label: translations.home || 'Home', icon: Home },
+    { href: '/driver/create-ride', label: translations.createRide || 'Create Ride', icon: Car },
     { href: '/driver/messages', label: translations.messages_title || "Messages", icon: MessageSquare },
     { href: '/driver/my-orders', label: translations.myOrders || 'Bookings', icon: ShoppingBag, badge: newOrdersCount },
     { href: '/driver/profile', label: translations.profile_title || "Profile", icon: UserIcon },
   ];
 
   return (
-    <div className="md:hidden fixed bottom-2 left-1/2 -translate-x-1/2 z-50 w-[95%] h-16
-      bg-white/5 backdrop-blur-2xl rounded-full border border-white/20 shadow-[0_4px_30px_rgba(0,0,0,0.1)] 
-      ring-1 ring-white/10 px-3 sm:px-5 flex items-center justify-around transition-all duration-300">
-      
-      <div className="grid h-full max-w-lg grid-cols-4 mx-auto font-medium w-full">
+    <div className="md:hidden fixed bottom-0 left-0 z-50 w-full h-16 bg-background/80 border-t border-border backdrop-blur-lg">
+      <div className="grid h-full max-w-lg grid-cols-4 mx-auto font-medium">
         {navLinks.map((link) => {
           const isActive = pathname === link.href;
           return (
@@ -51,19 +48,17 @@ export function BottomNav() {
               key={link.href}
               href={link.href}
               className={cn(
-                `relative inline-flex flex-col items-center justify-center px-4 py-2 rounded-full 
-                transition-all duration-200 ease-out group overflow-hidden`,
-                isActive
-                  ? 'bg-white/20 text-white ring-1 ring-primary/50 shadow-[inset_0_1px_2px_rgba(255,255,255,0.2)]'
-                  : 'text-white/70 hover:bg-white/10 hover:text-white'
+                'inline-flex flex-col items-center justify-center px-5 relative group',
+                isActive ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
               )}
             >
-              {!!link.badge && Number(link.badge) > 0 && (
-                <Badge className="absolute -top-1 -right-1 h-4 w-4 p-0 text-[10px] flex items-center justify-center rounded-full bg-red-500 text-white shadow-md">
+              {link.badge && link.badge > 0 && (
+                <Badge className="absolute top-1.5 right-1.5 h-4 w-4 p-0 text-[10px] flex items-center justify-center rounded-full bg-red-500 text-white shadow-md">
                   {link.badge}
                 </Badge>
               )}
-              <link.icon className="w-5 h-5 mb-0.5" />
+              <link.icon className="w-5 h-5 mb-1" />
+              <span className="text-xs">{link.label}</span>
             </Link>
           );
         })}
