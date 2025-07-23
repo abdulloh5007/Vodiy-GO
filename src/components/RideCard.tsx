@@ -15,6 +15,7 @@ import { useToast } from '@/hooks/use-toast';
 import { formatPhoneNumber } from '@/lib/utils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { FirebaseError } from 'firebase/app';
+import { useRouter } from 'next/navigation';
 
 interface RideCardProps {
   ride: Ride;
@@ -23,6 +24,7 @@ interface RideCardProps {
 
 export function RideCard({ ride, onImageClick }: RideCardProps) {
   const context = useContext(AppContext);
+  const router = useRouter();
   const [isBooking, setIsBooking] = useState(false);
   const [authAction, setAuthAction] = useState<'login' | 'register'>('login');
   const [email, setEmail] = useState('');
@@ -120,7 +122,6 @@ export function RideCard({ ride, onImageClick }: RideCardProps) {
          return;
     }
     
-    // If user is already logged in as a passenger, just show a simple confirmation
     addOrder({
         rideId: ride.id,
         passengerId: user.uid,
@@ -129,9 +130,10 @@ export function RideCard({ ride, onImageClick }: RideCardProps) {
     });
     
     toast({
-        title: t.bookingSuccessful,
-        description: t.yourRideIsBooked,
+        title: t.bookingRequestSent,
+        description: t.bookingRequestSent_desc,
     });
+    router.push('/my-orders');
   };
   
    useEffect(() => {
@@ -139,21 +141,21 @@ export function RideCard({ ride, onImageClick }: RideCardProps) {
         addOrder({
             rideId: ride.id,
             passengerId: user.uid,
-            // Use user's name which was set during registration, or from their profile
             clientName: user.name || clientName, 
-            clientPhone: user.phone || clientPhone, // Use phone from profile or what they entered
+            clientPhone: user.phone || clientPhone,
         });
          toast({
-            title: t.bookingSuccessful,
-            description: t.yourRideIsBooked,
+            title: t.bookingRequestSent,
+            description: t.bookingRequestSent_desc,
         });
         setIsBooking(false);
         setClientName('');
         setClientPhone('+998');
         setEmail('');
         setPassword('');
+        router.push('/my-orders');
     }
-  }, [user, isBooking]);
+  }, [user, isBooking, addOrder, clientName, clientPhone, ride.id, router, t]);
 
 
   if (!t.home) {

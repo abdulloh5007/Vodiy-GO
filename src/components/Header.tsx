@@ -56,12 +56,8 @@ export function Header() {
     const userRole = user?.role;
     await logout();
     setIsSheetOpen(false);
-    if (userRole === 'driver') {
-      router.push('/driver/login');
-    }
-     if (userRole === 'admin') {
-      router.push('/admin/login');
-    }
+    // Redirect to home page after logout for all roles
+    router.push('/');
   };
 
 
@@ -76,6 +72,10 @@ export function Header() {
   const adminLinks = [
     { href: '/admin', label: t.registrationApplications, icon: UserCog, badge: newDriverApplicationsCount },
     { href: '/admin/ride-applications', label: t.rideApplications, icon: PackageCheck, badge: newRideApplicationsCount }
+  ];
+
+  const passengerLinks = [
+    { href: '/my-orders', label: t.myOrders, icon: ShoppingBag },
   ];
 
   const renderAdminMenu = () => (
@@ -125,6 +125,49 @@ export function Header() {
     </Sheet>
   )
 
+  const renderPassengerMenu = () => (
+     <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+      <SheetTrigger asChild>
+        <Button variant="ghost" size="icon">
+          <Menu className="h-6 w-6" />
+        </Button>
+      </SheetTrigger>
+      <SheetContent className="flex flex-col">
+        <SheetHeader>
+          <SheetTitle>{user?.name || user?.email}</SheetTitle>
+        </SheetHeader>
+        <div className="flex-grow py-4">
+          <nav className="flex flex-col gap-2">
+            {passengerLinks.map(link => (
+              <Button 
+                key={link.href}
+                variant={pathname === link.href ? 'secondary' : 'ghost'} 
+                asChild
+                className="justify-start"
+                onClick={() => setIsSheetOpen(false)}
+              >
+                <Link href={link.href} className="flex items-center gap-2">
+                  <link.icon className="h-5 w-5"/>
+                  <span>{link.label}</span>
+                </Link>
+              </Button>
+            ))}
+          </nav>
+        </div>
+        <div className="mt-auto flex flex-col gap-2">
+             <Button 
+                variant="destructive" 
+                onClick={handleLogout} 
+                className="w-full justify-start rounded-lg bg-red-600/90 hover:bg-red-600 text-white"
+             >
+                <LogOut className="mr-2 h-5 w-5"/>
+                <span>{t.logout}</span>
+            </Button>
+        </div>
+      </SheetContent>
+    </Sheet>
+  );
+
   const renderGuestMenu = () => (
      <div className='hidden md:flex items-center gap-2'>
         <Button asChild variant="outline">
@@ -149,11 +192,10 @@ export function Header() {
 
           {loading ? null : (
             <>
-                {user?.role === 'passenger' && <Button variant="outline" onClick={logout}>{t.logout}</Button>}
+                {user?.role === 'passenger' && renderPassengerMenu()}
                 {user?.role === 'admin' && renderAdminMenu()}
                 {!user && renderGuestMenu()}
-                {/* Driver menu is handled by BottomNav on mobile, and header is simplified on desktop */}
-                 {user?.role === 'driver' && (
+                {user?.role === 'driver' && (
                     <Button variant="ghost" className="hidden md:flex" onClick={logout}><LogOut className='mr-2'/> {t.logout}</Button>
                  )}
             </>
