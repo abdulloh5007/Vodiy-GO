@@ -6,8 +6,9 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { AppContext } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
-import { Home, ShoppingBag } from 'lucide-react';
+import { Bell, Car, Home, ShoppingBag, User as UserIcon, MessageSquare } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 
 export function BottomNav() {
   const context = useContext(AppContext);
@@ -31,29 +32,39 @@ export function BottomNav() {
   }
 
   const navLinks = [
-    { href: '/', label: translations.home || 'Home', icon: Home },
-    { href: '/my-orders', label: translations.myOrders || 'Bookings', icon: ShoppingBag, badge: newOrdersCount },
+    { href: '/driver/create-ride', label: translations.home || 'Home', icon: Home },
+    { href: '/driver/messages', label: translations.messages_title || "Messages", icon: MessageSquare },
+    { href: '/driver/my-orders', label: translations.myOrders || 'Bookings', icon: ShoppingBag, badge: newOrdersCount },
+    { href: '/driver/profile', label: translations.profile_title || "Profile", icon: UserIcon },
   ];
 
   return (
-    <div className="md:hidden fixed bottom-0 left-0 z-50 w-full h-16 bg-background border-t">
-      <div className="grid h-full max-w-lg grid-cols-2 mx-auto font-medium">
-        {navLinks.map((link) => (
-          <Link
-            key={link.href}
-            href={link.href}
-            className={`inline-flex flex-col items-center justify-center px-5 relative group ${
-              pathname === link.href ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            {link.badge && link.badge > 0 && (
-              <Badge className="absolute top-1 right-1/4 scale-75">{link.badge}</Badge> 
-            )}
-            <link.icon className="w-6 h-6 mb-1" />
-            <span className="text-sm">{link.label}</span>
-          </Link>
-        ))}
+    <div className="md:hidden fixed bottom-2 left-1/2 -translate-x-1/2 z-50 w-[95%] h-16 
+    border bg-card/80 backdrop-blur-xl rounded-full shadow-lg
+    flex items-center justify-around px-2">
+      <div className="grid h-full max-w-lg grid-cols-4 mx-auto font-medium w-full">
+        {navLinks.map((link) => {
+          const isActive = pathname === link.href;
+          return (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={cn(
+                `relative inline-flex flex-col items-center justify-center gap-0.5 px-3 sm:px-5 py-2 rounded-full transition-all duration-200 ease-out group`,
+                isActive
+                  ? 'bg-primary/90 text-primary-foreground'
+                  : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
+              )}
+            >
+              {!!link.badge && Number(link.badge) > 0 && (
+                <Badge className="absolute top-1 right-1 h-4 w-4 p-0 flex items-center justify-center text-xs">{link.badge}</Badge>
+              )}
+              <link.icon className="w-5 h-5 mb-0.5" />
+              <span className="text-[10px] sm:text-xs font-medium">{link.label}</span>
+            </Link>
+          );
+        })}
       </div>
-    </div>
+    </div>  
   );
 }

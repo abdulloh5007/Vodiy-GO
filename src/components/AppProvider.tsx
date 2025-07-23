@@ -132,7 +132,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     
     await setDoc(driverDocRef, {
         id: user.uid,
-        name: user.name, // Name is taken from the user object now
         ...driverInfo,
         carPhotoUrl,
         status: 'pending', // Application is pending review

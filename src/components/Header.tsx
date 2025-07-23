@@ -16,7 +16,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import { LogIn, Menu, Car, FileText, LogOut, Home, User, ShoppingBag, ShieldCheck, Settings, Globe, PackageCheck, Bell } from 'lucide-react';
+import { LogIn, Menu, Car, FileText, LogOut, Home, User, ShoppingBag, ShieldCheck, Settings, Globe, PackageCheck, Bell, UserCog } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from './ui/separator';
 
@@ -42,13 +42,15 @@ export function Header() {
     return drivers.find(d => d.id === user.uid)
   }, [user, drivers]);
 
-  const newOrdersCount = useMemo(() => {
-    if (!user || user.role !== 'driver') return 0;
-    const myRideIds = rides.filter(ride => ride.driverId === user.uid).map(r => r.id);
-    if (myRideIds.length === 0) return 0;
-    const userOrders = orders.filter(order => myRideIds.includes(order.rideId) && order.status === 'new');
-    return userOrders.length;
-  }, [user, rides, orders]);
+  const newRideApplicationsCount = useMemo(() => {
+    if (user?.role !== 'admin') return 0;
+    return rides.filter(r => r.status === 'pending').length;
+  }, [user, rides]);
+
+  const newDriverApplicationsCount = useMemo(() => {
+     if (user?.role !== 'admin') return 0;
+    return drivers.filter(d => d.status === 'pending').length;
+  }, [user, drivers]);
   
   const handleLogout = async () => {
     const userRole = user?.role;
@@ -56,6 +58,9 @@ export function Header() {
     setIsSheetOpen(false);
     if (userRole === 'driver') {
       router.push('/driver/login');
+    }
+     if (userRole === 'admin') {
+      router.push('/admin/login');
     }
   };
 
@@ -68,99 +73,45 @@ export function Header() {
     )
   }
 
-  const driverLinks = [
-    { href: '/', label: t.home, icon: Home },
-    { href: '/my-orders', label: t.myOrders, icon: ShoppingBag, badge: newOrdersCount },
-  ];
-  
-  const driverWideLink = { href: '/create-ride', label: t.publishNewRide, icon: FileText };
-  
-  const driverBottomLinks = [
-    { href: '/notifications', label: t.notifications || "Notifications", icon: Bell },
-    { href: '/register-driver', label: t.carSettings || "Car Settings", icon: Car },
-  ];
-
   const adminLinks = [
-    { href: '/admin', label: t.registrationApplications, icon: ShieldCheck },
-    { href: '/admin/ride-applications', label: "Ride Applications", icon: PackageCheck }
+    { href: '/admin', label: t.registrationApplications, icon: UserCog, badge: newDriverApplicationsCount },
+    { href: '/admin/ride-applications', label: t.rideApplications, icon: PackageCheck, badge: newRideApplicationsCount }
   ];
 
-
-  const renderUserMenu = () => (
-    <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+  const renderAdminMenu = () => (
+     <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
       <SheetTrigger asChild>
-        <Button variant="ghost" size="icon">
-           {user?.role === 'driver' && newOrdersCount > 0 && <Badge className="absolute top-1 right-1 scale-75 animate-pulse">{newOrdersCount}</Badge>}
+        <Button variant="ghost" size="icon" className="relative">
+           {(newDriverApplicationsCount + newRideApplicationsCount > 0) && <Badge variant="destructive" className="absolute top-1 right-1 scale-75 animate-pulse">{newDriverApplicationsCount + newRideApplicationsCount}</Badge>}
           <Menu className="h-6 w-6" />
         </Button>
       </SheetTrigger>
       <SheetContent className="flex flex-col">
         <SheetHeader>
-          <SheetTitle>{user?.name || driverProfile?.name || user?.email}</SheetTitle>
+          <SheetTitle>{user?.name || user?.email}</SheetTitle>
         </SheetHeader>
         <div className="flex-grow py-4">
-            {user?.role === 'driver' && (
-              <div className='flex flex-col gap-4'>
-                <div className="hidden md:grid grid-cols-2 gap-4">
-                    {driverLinks.map(link => (
-                        <Button 
-                            key={link.href}
-                            variant={pathname === link.href ? 'secondary' : 'outline'} 
-                            asChild 
-                            className="h-28 flex-col gap-2 text-sm rounded-lg relative"
-                            onClick={() => setIsSheetOpen(false)}
-                        >
-                            <Link href={link.href} className='relative'>
-                              {link.badge && link.badge > 0 && (
-                                <Badge className="absolute top-2 right-2">{link.badge}</Badge>
-                              )}
-                              <link.icon className="mb-1 h-8 w-8"/>
-                              <span>{link.label}</span>
-                            </Link>
-                        </Button>
-                    ))}
-                </div>
-                <Button 
-                    key={driverWideLink.href}
-                    variant={pathname === driverWideLink.href ? 'secondary' : 'outline'} 
-                    asChild
-                    className="w-full h-20 rounded-lg"
-                    onClick={() => setIsSheetOpen(false)}
-                >
-                    <Link href={driverWideLink.href}><driverWideLink.icon className="h-6 w-6"/><span>{driverWideLink.label}</span></Link>
-                </Button>
+            <div className='flex flex-col gap-4'>
+              <div className="grid grid-cols-1 gap-4">
+                  {adminLinks.map(link => (
+                      <Button 
+                          key={link.href}
+                          variant={pathname === link.href ? 'secondary' : 'outline'} 
+                          asChild 
+                          className="h-28 flex-col gap-2 text-sm rounded-lg relative"
+                          onClick={() => setIsSheetOpen(false)}
+                      >
+                          <Link href={link.href}>
+                            {link.badge && link.badge > 0 ? <Badge variant="destructive" className="absolute top-2 right-2">{link.badge}</Badge> : ''}
+                            <link.icon className="mb-1 h-8 w-8"/>
+                            <span>{link.label}</span>
+                          </Link>
+                      </Button>
+                  ))}
               </div>
-            )}
-             {user?.role === 'admin' && (
-              <div className='flex flex-col gap-4'>
-                <div className="grid grid-cols-1 gap-4">
-                    {adminLinks.map(link => (
-                        <Button 
-                            key={link.href}
-                            variant={pathname === link.href ? 'secondary' : 'outline'} 
-                            asChild 
-                            className="h-28 flex-col gap-2 text-sm rounded-lg"
-                            onClick={() => setIsSheetOpen(false)}
-                        >
-                            <Link href={link.href}><link.icon className="mb-1 h-8 w-8"/><span>{link.label}</span></Link>
-                        </Button>
-                    ))}
-                </div>
-              </div>
-            )}
+            </div>
         </div>
         <div className="mt-auto flex flex-col gap-2">
-            {user?.role === 'driver' && driverBottomLinks.map(link => (
-               <Button 
-                    key={link.href}
-                    variant={pathname === link.href ? 'secondary' : 'ghost'} 
-                    asChild
-                    className="justify-start border rounded-lg"
-                    onClick={() => setIsSheetOpen(false)}
-                >
-                    <Link href={link.href}><link.icon/><span>{link.label}</span></Link>
-                </Button>
-            ))}
              <Button 
                 variant="destructive" 
                 onClick={handleLogout} 
@@ -172,24 +123,14 @@ export function Header() {
         </div>
       </SheetContent>
     </Sheet>
-  );
+  )
 
   const renderGuestMenu = () => (
-    <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-       <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" className='md:hidden'>
-          <Menu className="h-6 w-6" />
+     <div className='hidden md:flex items-center gap-2'>
+        <Button asChild variant="outline">
+            <Link href="/driver/login">{t.loginAsDriver}</Link>
         </Button>
-      </SheetTrigger>
-      <SheetContent className="flex flex-col">
-          <SheetHeader>
-              <SheetTitle>{t.menu || "Menu"}</SheetTitle>
-          </SheetHeader>
-          <div className="flex-grow py-4 flex flex-col gap-4">
-             {/* Login buttons removed */}
-          </div>
-      </SheetContent>
-    </Sheet>
+     </div>
   );
   
   return (
@@ -206,12 +147,15 @@ export function Header() {
             <LanguageSwitcher />
           </div>
 
-          {loading ? null : user ? renderUserMenu() : (
+          {loading ? null : (
             <>
-              <div className='hidden md:flex items-center gap-2'>
-                {/* Login buttons removed */}
-              </div>
-              {renderGuestMenu()}
+                {user?.role === 'passenger' && <Button variant="outline" onClick={logout}>{t.logout}</Button>}
+                {user?.role === 'admin' && renderAdminMenu()}
+                {!user && renderGuestMenu()}
+                {/* Driver menu is handled by BottomNav on mobile, and header is simplified on desktop */}
+                 {user?.role === 'driver' && (
+                    <Button variant="ghost" className="hidden md:flex" onClick={logout}><LogOut className='mr-2'/> {t.logout}</Button>
+                 )}
             </>
           )}
         </div>
