@@ -116,7 +116,7 @@ export default function DriverProfilePage() {
                     <LogOut className="mr-2 h-5 w-5"/>
                     {t.logout}
                 </Button>
-            </div>
+            </div> 
         </div>
     );
 }
