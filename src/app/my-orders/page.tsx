@@ -1,6 +1,6 @@
 'use client';
 
-import { useContext, useMemo } from 'react';
+import { useContext, useMemo, useEffect } from 'react';
 import { AppContext } from '@/contexts/AppContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -106,6 +106,13 @@ export default function PassengerOrdersPage() {
 
     const { user, rides, orders, drivers, loading, translations: t } = context;
 
+    useEffect(() => {
+        if (!loading && (!user || user.role !== 'passenger')) {
+            router.push('/');
+        }
+    }, [user, loading, router]);
+
+
     const myOrders = useMemo(() => {
         if (!user) return [];
         return orders
@@ -113,32 +120,10 @@ export default function PassengerOrdersPage() {
             .sort((a, b) => b.createdAt.seconds - a.createdAt.seconds);
     }, [orders, user]);
 
-    if (loading || !t.home) {
+    if (loading || !user || !t.home || user.role !== 'passenger') {
         return <MyOrdersSkeleton />;
-    }
-
-    if (!user) {
-        // This case should be handled by a layout in a real app,
-        // but as a fallback, we show a prompt.
-        return (
-             <div className="container mx-auto py-8 px-4 flex justify-center items-center h-[calc(100vh-8rem)]">
-                <Card className="w-full max-w-md text-center">
-                    <CardHeader>
-                        <CardTitle className="flex items-center justify-center gap-2"><ShieldAlert className="text-destructive h-8 w-8" />{t.accessDenied}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <p>{t.loginToSeeOrders || "Please log in to see your orders."}</p>
-                    </CardContent>
-                </Card>
-            </div>
-        )
     }
     
-    if (user.role !== 'passenger') {
-        router.push('/');
-        return <MyOrdersSkeleton />;
-    }
-
     return (
         <div className="container mx-auto py-8 px-4">
             <div className="mb-6">

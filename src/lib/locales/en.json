@@ -177,5 +177,7 @@
     "rating_title": "Your Rating",
     "rating_desc": "This is your average rating from passengers. A higher rating helps you get more bookings.",
     "rating_based_on": "Based on {count} ratings",
-    "diagnostics_profile_button_desc": "Submit or check your verification status"
+    "diagnostics_profile_button_desc": "Submit or check your verification status",
+    "activeRideTitle": "You have an active ride",
+    "activeRideDesc": "You can only have one active ride at a time. Please wait for it to be completed or contact support."
 }

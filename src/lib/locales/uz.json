@@ -177,5 +177,7 @@
     "rating_title": "Sizning reytingingiz",
     "rating_desc": "Bu sizning yo'lovchilardan olgan o'rtacha reytingingiz. Yuqori reyting ko'proq buyurtma olishga yordam beradi.",
     "rating_based_on": "{count} ta baho asosida",
-    "diagnostics_profile_button_desc": "Tekshiruv holatini yuborish yoki tekshirish"
+    "diagnostics_profile_button_desc": "Tekshiruv holatini yuborish yoki tekshirish",
+    "activeRideTitle": "Sizda faol qatnov mavjud",
+    "activeRideDesc": "Siz bir vaqtning o'zida faqat bitta faol qatnovga ega bo'lishingiz mumkin. Iltimos, uning tugashini kuting yoki qo'llab-quvvatlash xizmatiga murojaat qiling."
 }

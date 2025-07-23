@@ -10,9 +10,11 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { ShieldAlert, Loader2, Clock } from 'lucide-react';
+import { ShieldAlert, Loader2, Clock, Info, CheckCircle2 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useRouter } from 'next/navigation';
+import { Badge } from '@/components/ui/badge';
+import Link from 'next/link';
 
 const locations = ["Sirdaryo", "Navoiy", "Jizzax", "Xorazm", "Buxoro", "Surxondaryo", "Namangan", "Andijon", "Qashqadaryo", "Samarqand", "Fargʻona", "Toshkent"];
 
@@ -72,13 +74,18 @@ export default function CreateRidePage() {
     throw new Error('CreateRidePage must be used within an AppProvider');
   }
 
-  const { user, addRide, translations, drivers, loading } = context;
+  const { user, addRide, translations, drivers, loading, rides } = context;
   const t = translations;
 
   const driverProfile = useMemo(() => {
     if (!user) return null;
     return drivers.find(d => d.id === user.uid);
   }, [user, drivers]);
+
+  const existingRide = useMemo(() => {
+    if (!user) return null;
+    return rides.find(r => r.driverId === user.uid && (r.status === 'pending' || r.status === 'approved'));
+  }, [user, rides]);
 
   useEffect(() => {
     if (!loading) {
@@ -110,6 +117,38 @@ export default function CreateRidePage() {
   
   if (loading || !t.home || !isVerifiedDriver) {
       return <CreateRideSkeleton />;
+  }
+
+  if (existingRide) {
+    const statusMap = {
+        pending: { variant: 'default', label: t.pending || 'Pending' },
+        approved: { variant: 'secondary', label: t.verified || 'Approved' },
+        rejected: { variant: 'destructive', label: t.rejected || 'Rejected' }
+    };
+    const currentStatus = statusMap[existingRide.status as keyof typeof statusMap] || { variant: 'default', label: existingRide.status };
+
+    return (
+        <div className="container mx-auto py-8 px-4 flex justify-center">
+            <Card className="w-full max-w-lg text-center">
+                <CardHeader className="items-center">
+                    {existingRide.status === 'approved' 
+                        ? <CheckCircle2 className="h-16 w-16 text-green-500" />
+                        : <Info className="h-16 w-16 text-primary" />
+                    }
+                    <CardTitle className="mt-4">{t.activeRideTitle || "You have an active ride"}</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <CardDescription>{t.activeRideDesc || "You can only have one active ride at a time. Please wait for it to be completed or contact support."}</CardDescription>
+                    <div className="text-left border rounded-lg p-4 space-y-2">
+                        <p><strong>{t.from}:</strong> {existingRide.from}</p>
+                        <p><strong>{t.to}:</strong> {existingRide.to}</p>
+                        <p><strong>{t.price}:</strong> {new Intl.NumberFormat('fr-FR').format(existingRide.price)} UZS</p>
+                        <p><strong>{t.status}:</strong> <Badge variant={currentStatus.variant as any}>{currentStatus.label}</Badge></p>
+                    </div>
+                </CardContent>
+            </Card>
+        </div>
+    )
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
