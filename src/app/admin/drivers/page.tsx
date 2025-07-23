@@ -1,16 +1,18 @@
+
 'use client';
 
-import { useContext } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { AppContext } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { ArrowRight, BadgeCheck, BadgeAlert, BadgeX } from 'lucide-react';
+import { ArrowRight, BadgeCheck, BadgeAlert, BadgeX, List, LayoutGrid } from 'lucide-react';
 import Image from 'next/image';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Driver } from '@/lib/types';
+import { cn } from '@/lib/utils';
 
 
 function DriversPageSkeleton() {
@@ -90,10 +92,52 @@ const StatusBadge = ({ status, t }: { status: Driver['status'], t: any }) => {
     )
 }
 
+const DriverCard = ({ driver, onDetailsClick, onImageClick, t }: { driver: Driver, onDetailsClick: (id: string) => void, onImageClick: (url: string) => void, t: any }) => (
+    <Card>
+        <CardHeader className="p-4 flex-row items-start gap-4">
+             <Image 
+                src={driver.carPhotoUrl} 
+                alt={driver.name} 
+                width={80} 
+                height={80} 
+                className="rounded-full object-cover aspect-square cursor-pointer" 
+                data-ai-hint="driver portrait"
+                onClick={() => onImageClick(driver.carPhotoUrl)}
+            />
+            <div className="space-y-1 flex-grow">
+                <CardTitle className="text-lg">{driver.name}</CardTitle>
+                <CardDescription>{driver.id}</CardDescription>
+            </div>
+        </CardHeader>
+        <CardContent className="p-4 pt-0 space-y-2">
+            <p className="text-sm font-medium">{driver.carModel} <span className="text-muted-foreground font-mono">({driver.carNumber})</span></p>
+            <StatusBadge status={driver.status} t={t} />
+        </CardContent>
+        <CardFooter className="p-2">
+            <Button variant="outline" className="w-full" onClick={() => onDetailsClick(driver.id)}>
+                {t.details || 'Details'} <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+        </CardFooter>
+    </Card>
+)
+
 
 export default function DriversPage() {
   const context = useContext(AppContext);
   const router = useRouter();
+  const [viewMode, setViewMode] = useState<'table' | 'card'>('table');
+
+  useEffect(() => {
+    const savedViewMode = localStorage.getItem('drivers-view-mode') as 'table' | 'card';
+    if (savedViewMode) {
+      setViewMode(savedViewMode);
+    }
+  }, []);
+
+  const handleSetViewMode = (mode: 'table' | 'card') => {
+    setViewMode(mode);
+    localStorage.setItem('drivers-view-mode', mode);
+  }
   
   if (!context) {
     throw new Error('DriversPage must be used within an AppProvider');
@@ -109,67 +153,95 @@ export default function DriversPage() {
   return (
     <div className="container mx-auto py-8 px-4">
       <Card>
-        <CardHeader>
-            <CardTitle className="font-headline text-2xl">{t.drivers_title || 'Drivers'}</CardTitle>
-            <CardDescription>{t.drivers_desc || 'List of all drivers in the system.'}</CardDescription>
+        <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle className="font-headline text-2xl">{t.drivers_title || 'Drivers'}</CardTitle>
+              <CardDescription>{t.drivers_desc || 'List of all drivers in the system.'}</CardDescription>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button variant={viewMode === 'table' ? 'secondary' : 'ghost'} size="icon" onClick={() => handleSetViewMode('table')}>
+                  <List className="h-5 w-5" />
+              </Button>
+              <Button variant={viewMode === 'card' ? 'secondary' : 'ghost'} size="icon" onClick={() => handleSetViewMode('card')}>
+                  <LayoutGrid className="h-5 w-5" />
+              </Button>
+            </div>
         </CardHeader>
         <CardContent>
-            <div className="w-full overflow-x-auto">
-            <Table className="min-w-[800px]">
-                <TableHeader>
-                <TableRow>
-                    <TableHead>{t.driver}</TableHead>
-                    <TableHead>{t.car}</TableHead>
-                    <TableHead>{t.status}</TableHead>
-                    <TableHead className="text-right">{t.details || 'Details'}</TableHead>
-                </TableRow>
-                </TableHeader>
-                <TableBody>
-                {drivers.length > 0 ? (
-                    drivers.map(driver => (
-                    <TableRow key={driver.id}>
-                        <TableCell>
-                         <div className="flex items-center gap-3">
-                            <Image 
-                                src={driver.carPhotoUrl} 
-                                alt={driver.name} 
-                                width={40} 
-                                height={40} 
-                                className="rounded-full object-cover cursor-pointer" 
-                                data-ai-hint="driver portrait"
-                                onClick={() => setSelectedImage(driver.carPhotoUrl)}
-                            />
-                            <div>
-                                <div className="font-medium">{driver.name}</div>
-                                <div className="text-sm text-muted-foreground">{driver.id}</div>
-                            </div>
-                         </div>
-                        </TableCell>
-                        <TableCell>
-                            <div>{driver.carModel}</div>
-                            <div className="text-sm text-muted-foreground font-mono">{driver.carNumber}</div>
-                        </TableCell>
-                        <TableCell>
-                           <StatusBadge status={driver.status} t={t} />
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <Button variant="ghost" size="icon" onClick={() => router.push(`/admin/drivers/${driver.id}`)}>
-                            <ArrowRight className="h-4 w-4" />
-                          </Button>
-                        </TableCell>
-                    </TableRow>
-                    ))
-                ) : (
+            <div className={cn(viewMode !== 'table' && 'hidden')}>
+              <div className="w-full overflow-x-auto">
+                <Table className="min-w-[800px]">
+                    <TableHeader>
                     <TableRow>
-                    <TableCell colSpan={4} className="text-center h-24">{t.noDriversFound || 'No drivers found.'}</TableCell>
+                        <TableHead>{t.driver}</TableHead>
+                        <TableHead>{t.car}</TableHead>
+                        <TableHead>{t.status}</TableHead>
+                        <TableHead className="text-right">{t.details || 'Details'}</TableHead>
                     </TableRow>
-                )}
-                </TableBody>
-            </Table>
+                    </TableHeader>
+                    <TableBody>
+                    {drivers.length > 0 ? (
+                        drivers.map(driver => (
+                        <TableRow key={driver.id}>
+                            <TableCell>
+                            <div className="flex items-center gap-3">
+                                <Image 
+                                    src={driver.carPhotoUrl} 
+                                    alt={driver.name} 
+                                    width={40} 
+                                    height={40} 
+                                    className="rounded-full object-cover cursor-pointer" 
+                                    data-ai-hint="driver portrait"
+                                    onClick={() => setSelectedImage(driver.carPhotoUrl)}
+                                />
+                                <div>
+                                    <div className="font-medium">{driver.name}</div>
+                                    <div className="text-sm text-muted-foreground">{driver.id}</div>
+                                </div>
+                            </div>
+                            </TableCell>
+                            <TableCell>
+                                <div>{driver.carModel}</div>
+                                <div className="text-sm text-muted-foreground font-mono">{driver.carNumber}</div>
+                            </TableCell>
+                            <TableCell>
+                            <StatusBadge status={driver.status} t={t} />
+                            </TableCell>
+                            <TableCell className="text-right">
+                            <Button variant="ghost" size="icon" onClick={() => router.push(`/admin/drivers/${driver.id}`)}>
+                                <ArrowRight className="h-4 w-4" />
+                            </Button>
+                            </TableCell>
+                        </TableRow>
+                        ))
+                    ) : (
+                        <TableRow>
+                        <TableCell colSpan={4} className="text-center h-24">{t.noDriversFound || 'No drivers found.'}</TableCell>
+                        </TableRow>
+                    )}
+                    </TableBody>
+                </Table>
+              </div>
+            </div>
+            <div className={cn("grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4", viewMode !== 'card' && 'hidden')}>
+                 {drivers.length > 0 ? (
+                    drivers.map(driver => (
+                        <DriverCard 
+                            key={driver.id} 
+                            driver={driver}
+                            onDetailsClick={(id) => router.push(`/admin/drivers/${id}`)}
+                            onImageClick={setSelectedImage}
+                            t={t}
+                        />
+                    ))
+                 ) : (
+                    <div className="text-center py-16 col-span-full">
+                        <p className="text-muted-foreground">{t.noDriversFound || 'No drivers found.'}</p>
+                    </div>
+                 )}
             </div>
         </CardContent>
       </Card>
     </div>
   );
 }
-
