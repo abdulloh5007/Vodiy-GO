@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useContext, useState, useEffect } from 'react';
+import { useContext, useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -43,6 +43,11 @@ export function RideCard({ ride, onImageClick }: RideCardProps) {
   
   const acceptedOrdersCount = orders.filter(o => o.rideId === ride.id && o.status === 'accepted').length;
   const availableSeats = ride.seats - acceptedOrdersCount;
+
+  const existingOrderForThisRide = useMemo(() => {
+    if (!user) return null;
+    return orders.find(o => o.rideId === ride.id && o.passengerId === user.uid);
+  }, [user, orders, ride.id]);
 
   if (!driver || availableSeats <= 0) return null;
 
@@ -216,8 +221,12 @@ export function RideCard({ ride, onImageClick }: RideCardProps) {
           </div>
         </CardContent>
         <CardFooter className="p-4">
-          <Button className="w-full bg-accent hover:bg-accent/80 text-accent-foreground" onClick={handleBooking}>
-            {t.bookNow}
+          <Button 
+            className="w-full bg-accent hover:bg-accent/80 text-accent-foreground" 
+            onClick={handleBooking}
+            disabled={!!existingOrderForThisRide}
+          >
+            {existingOrderForThisRide ? (t.bookingRequestSent || 'Request Sent') : t.bookNow}
           </Button>
         </CardFooter>
       </Card>
