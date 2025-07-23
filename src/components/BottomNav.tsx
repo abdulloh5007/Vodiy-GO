@@ -39,9 +39,10 @@ export function BottomNav() {
   ];
 
   return (
-    <div className="md:hidden fixed bottom-2 left-1/2 -translate-x-1/2 z-50 w-[95%] h-16 
-    border bg-card/80 backdrop-blur-xl rounded-full shadow-lg
-    flex items-center justify-around px-2">
+    <div className="md:hidden fixed bottom-2 left-1/2 -translate-x-1/2 z-50 w-[95%] h-16
+      bg-white/5 backdrop-blur-2xl rounded-full border border-white/20 shadow-[0_4px_30px_rgba(0,0,0,0.1)] 
+      ring-1 ring-white/10 px-3 sm:px-5 flex items-center justify-around transition-all duration-300">
+      
       <div className="grid h-full max-w-lg grid-cols-4 mx-auto font-medium w-full">
         {navLinks.map((link) => {
           const isActive = pathname === link.href;
@@ -50,21 +51,23 @@ export function BottomNav() {
               key={link.href}
               href={link.href}
               className={cn(
-                `relative inline-flex flex-col items-center justify-center gap-0.5 px-3 sm:px-5 py-2 rounded-full transition-all duration-200 ease-out group`,
+                `relative inline-flex flex-col items-center justify-center px-4 py-2 rounded-full 
+                transition-all duration-200 ease-out group overflow-hidden`,
                 isActive
-                  ? 'bg-primary/90 text-primary-foreground'
-                  : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
+                  ? 'bg-white/20 text-white ring-1 ring-primary/50 shadow-[inset_0_1px_2px_rgba(255,255,255,0.2)]'
+                  : 'text-white/70 hover:bg-white/10 hover:text-white'
               )}
             >
               {!!link.badge && Number(link.badge) > 0 && (
-                <Badge className="absolute top-1 right-1 h-4 w-4 p-0 flex items-center justify-center text-xs">{link.badge}</Badge>
+                <Badge className="absolute -top-1 -right-1 h-4 w-4 p-0 text-[10px] flex items-center justify-center rounded-full bg-red-500 text-white shadow-md">
+                  {link.badge}
+                </Badge>
               )}
               <link.icon className="w-5 h-5 mb-0.5" />
-              <span className="text-[10px] sm:text-xs font-medium">{link.label}</span>
             </Link>
           );
         })}
       </div>
-    </div>  
+    </div>
   );
 }

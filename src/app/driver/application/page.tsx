@@ -9,12 +9,13 @@ import { useRouter } from 'next/navigation';
 export default function DriverApplicationRedirectPage() {
     const router = useRouter();
     useEffect(() => {
-        router.push('/driver/profile');
+        router.push('/driver/profile/diagnostics');
     }, [router]);
     
   return (
     <div className="container mx-auto py-8 px-4">
-      <p>Redirecting to profile...</p>
+      <p>Redirecting to diagnostics...</p>
     </div>
   );
 }
+

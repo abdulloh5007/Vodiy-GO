@@ -140,7 +140,7 @@
     "ride_table_status": "Holat",
     "ride_table_actions": "Harakatlar",
     "noPendingRideApplications": "Kutilayotgan qatnov arizalari yo'q",
-    "validationErrorDescStep1": "Iltimos, haqiqiy ism, familiya va pasport raqamini kiriting.",
+    "validationErrorDescStep1": "Iltimos, to'g'ri ism, familiya va pasport raqamini kiriting.",
     "validationErrorDescStep2": "Iltimos, barcha avtomobil ma'lumotlarini to'ldiring va rasm yuklang.",
     "validationErrorDescStep3": "Iltimos, texnik pasport raqamini to'g'ri kiriting.",
     "notifications": "Bildirishnomalar",
@@ -166,5 +166,9 @@
     "messages_title": "Xabarlar",
     "messages_desc": "Bu funksiya tez orada qo'shiladi.",
     "profile_title": "Profil",
-    "carPhotoRequired": "Avtomobil rasmi talab qilinadi."
+    "carPhotoRequired": "Avtomobil rasmi talab qilinadi.",
+    "rating_title": "Sizning reytingingiz",
+    "rating_desc": "Bu sizning yo'lovchilardan olgan o'rtacha reytingingiz. Yuqori reyting ko'proq buyurtma olishga yordam beradi.",
+    "rating_based_on": "{count} ta baho asosida",
+    "diagnostics_profile_button_desc": "Tekshiruv holatini yuborish yoki tekshirish"
 }

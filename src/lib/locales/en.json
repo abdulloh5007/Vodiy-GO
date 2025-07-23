@@ -140,7 +140,7 @@
     "ride_table_status": "Status",
     "ride_table_actions": "Actions",
     "noPendingRideApplications": "No pending ride applications",
-    "validationErrorDescStep1": "Please enter a valid name, email, and a password of at least 6 characters.",
+    "validationErrorDescStep1": "Please enter a valid first name, last name, and passport number.",
     "validationErrorDescStep2": "Please fill all car details and upload a photo.",
     "validationErrorDescStep3": "Please enter a valid vehicle registration certificate number.",
     "notifications": "Notifications",
@@ -166,5 +166,9 @@
     "messages_title": "Messages",
     "messages_desc": "This feature is coming soon.",
     "profile_title": "Profile",
-    "carPhotoRequired": "Car photo is required."
+    "carPhotoRequired": "Car photo is required.",
+    "rating_title": "Your Rating",
+    "rating_desc": "This is your average rating from passengers. A higher rating helps you get more bookings.",
+    "rating_based_on": "Based on {count} ratings",
+    "diagnostics_profile_button_desc": "Submit or check your verification status"
 }
