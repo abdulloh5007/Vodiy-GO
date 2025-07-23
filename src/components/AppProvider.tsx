@@ -165,12 +165,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
-  const addOrder = async (orderData: Omit<Order, 'id' | 'status' | 'passengerId'> & { passengerId: string }) => {
+  const addOrder = async (orderData: Omit<Order, 'id' | 'status' | 'createdAt' | 'passengerId'> & { passengerId: string }) => {
     const newOrderRef = doc(collection(db, "orders"))
     await setDoc(newOrderRef, {
       ...orderData,
       id: newOrderRef.id,
       status: 'new',
+      createdAt: serverTimestamp(),
     });
   };
 

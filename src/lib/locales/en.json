@@ -113,6 +113,7 @@
     "statusRejected": "Rejected",
     "availableSeats": "Available Seats",
     "selectSeats": "Select seats",
+    "seatsAvailable": "seats available",
     "dontHaveAccount": "Don't have an account?",
     "alreadyHaveAccount": "Already have an account?",
     "step1_title": "Step 1: Personal Information",

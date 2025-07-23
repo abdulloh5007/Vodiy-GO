@@ -17,7 +17,7 @@ interface AppContextType {
   updateRideStatus: (rideId: string, status: 'approved' | 'rejected') => void;
   updateOrderStatus: (orderId: string, status: 'accepted' | 'rejected') => void;
   addRide: (ride: Omit<Ride, 'id' | 'createdAt' | 'status'>) => void;
-  addOrder: (order: Omit<Order, 'id' | 'status'>) => void;
+  addOrder: (order: Omit<Order, 'id' | 'status' | 'createdAt'>) => void;
   login: (email: string, password: string, role?: 'admin' | 'driver' | 'passenger') => Promise<void>;
   register: (email: string, password: string, name: string, role: 'passenger' | 'driver') => Promise<void>;
   logout: () => void;

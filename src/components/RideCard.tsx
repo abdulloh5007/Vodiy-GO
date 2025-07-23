@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '@/components/ui/button';
 import { AppContext } from '@/contexts/AppContext';
 import { Ride, User } from '@/lib/types';
-import { User as UserIcon, Car, Tag, ArrowRight, Clock, LogIn, ShieldCheck } from 'lucide-react';
+import { User as UserIcon, Car, Tag, ArrowRight, Clock, LogIn, ShieldCheck, Armchair } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -34,12 +34,15 @@ export function RideCard({ ride, onImageClick }: RideCardProps) {
   const { toast } = useToast();
 
   if (!context) return null;
-  const { drivers, translations, addOrder, user, login, register } = context;
+  const { drivers, translations, addOrder, user, login, register, orders } = context;
   const t = translations;
 
   const driver = drivers.find(d => d.id === ride.driverId);
+  
+  const acceptedOrdersCount = orders.filter(o => o.rideId === ride.id && o.status === 'accepted').length;
+  const availableSeats = ride.seats - acceptedOrdersCount;
 
-  if (!driver) return null;
+  if (!driver || availableSeats <= 0) return null;
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formatted = formatPhoneNumber(e.target.value);
@@ -188,6 +191,10 @@ export function RideCard({ ride, onImageClick }: RideCardProps) {
                         <span>{t.departureTime}: {ride.time}</span>
                     </div>
                  )}
+                 <div className="flex items-center gap-2">
+                    <Armchair className="h-4 w-4 text-primary" />
+                    <span>{availableSeats} {t.seatsAvailable || 'seats available'}</span>
+                </div>
             </CardDescription>
           </div>
         </CardHeader>

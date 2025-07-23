@@ -79,17 +79,17 @@ const OrderStatusBadge = ({ status, t }: { status: Order['status'], t: any}) => 
 const OrderCard = ({ order, ride, onUpdateStatus, t }: { order: Order, ride?: Ride, onUpdateStatus: (id: string, status: 'accepted' | 'rejected') => void, t: any }) => {
     return (
         <Card>
-            <CardHeader>
+            <CardHeader className="pb-4">
                 {ride ? (
                     <>
-                    <CardTitle className='flex items-center gap-2 text-xl'>{ride.from} &rarr; {ride.to}</CardTitle>
+                    <CardTitle className='flex items-center gap-2 text-lg'>{ride.from} &rarr; {ride.to}</CardTitle>
                     {ride.time && <CardDescription className='flex items-center gap-1'><Clock className="h-4 w-4" />{ride.time}</CardDescription>}
                     </>
                 ) : (
                     <CardTitle>N/A</CardTitle>
                 )}
             </CardHeader>
-            <CardContent className="space-y-2">
+            <CardContent className="space-y-2 border-t pt-4">
                  <div className="flex items-center gap-2">
                     <User className="h-4 w-4 text-muted-foreground" />
                     <span>{order.clientName}</span>
@@ -105,13 +105,15 @@ const OrderCard = ({ order, ride, onUpdateStatus, t }: { order: Order, ride?: Ri
                 </div>
             </CardContent>
             {order.status === 'new' && (
-                <CardFooter className="flex justify-end gap-2">
-                    <Button variant="outline" size="icon" className="text-green-600 hover:text-green-700 hover:bg-green-50" onClick={() => onUpdateStatus(order.id, 'accepted')}>
-                        <Check className="h-4 w-4" />
-                    </Button>
-                    <Button variant="outline" size="icon" className="text-red-600 hover:text-red-700 hover:bg-red-50" onClick={() => onUpdateStatus(order.id, 'rejected')}>
-                        <X className="h-4 w-4" />
-                    </Button>
+                <CardFooter className="p-0">
+                    <div className="flex w-full">
+                        <Button variant="ghost" size="lg" className="flex-1 rounded-t-none rounded-br-none text-green-600 hover:text-green-700 hover:bg-green-50" onClick={() => onUpdateStatus(order.id, 'accepted')}>
+                            <Check className="h-5 w-5" />
+                        </Button>
+                        <Button variant="ghost" size="lg" className="flex-1 rounded-t-none rounded-bl-none text-red-600 hover:text-red-700 hover:bg-red-50" onClick={() => onUpdateStatus(order.id, 'rejected')}>
+                            <X className="h-5 w-5" />
+                        </Button>
+                    </div>
                 </CardFooter>
             )}
         </Card>
@@ -245,7 +247,7 @@ export default function MyOrdersPage() {
                 </CardContent>
             </Card>
 
-             <div className={cn("grid grid-cols-1 md:grid-cols-2 gap-4", viewMode !== 'card' && 'hidden')}>
+             <div className={cn("grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4", viewMode !== 'card' && 'hidden')}>
                 {myRideOrders.length > 0 ? (
                    myRideOrders.map(order => {
                         const ride = myRides.find(r => r.id === order.rideId);

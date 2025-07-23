@@ -38,6 +38,7 @@ export type Order = {
   clientName: string;
   clientPhone: string;
   status: 'new' | 'accepted' | 'rejected';
+  createdAt: any; // Allow server timestamp
 };
 
 export type Language = 'en' | 'ru' | 'uz';
