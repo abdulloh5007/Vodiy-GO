@@ -70,7 +70,7 @@ const OrderCard = ({ order, ride, driver, t }: { order: Order, ride?: Ride, driv
                 <CardTitle className='flex items-center gap-2 text-lg'>{ride.from} &rarr; {ride.to}</CardTitle>
                 <CardDescription className='flex items-center gap-1 text-sm'>
                     <Clock className="h-4 w-4" />
-                    {new Date(order.createdAt.seconds * 1000).toLocaleString()}
+                    {order.createdAt ? new Date(order.createdAt.seconds * 1000).toLocaleString() : t.loading }
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -111,7 +111,11 @@ export default function PassengerOrdersPage() {
         if (!user) return [];
         return orders
             .filter(order => order.passengerId === user.uid)
-            .sort((a, b) => b.createdAt.seconds - a.createdAt.seconds);
+            .sort((a, b) => {
+                if (!b.createdAt) return -1;
+                if (!a.createdAt) return 1;
+                return b.createdAt.seconds - a.createdAt.seconds
+            });
     }, [orders, user]);
 
     if (loading || !user || !t.home) {

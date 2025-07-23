@@ -167,14 +167,6 @@ export function Header() {
       </SheetContent>
     </Sheet>
   );
-
-  const renderGuestMenu = () => (
-     <div className='hidden md:flex items-center gap-2'>
-        <Button asChild variant="outline">
-            <Link href="/driver/login">{t.loginAsDriver}</Link>
-        </Button>
-     </div>
-  );
   
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -194,7 +186,7 @@ export function Header() {
             <>
                 {user?.role === 'passenger' && renderPassengerMenu()}
                 {user?.role === 'admin' && renderAdminMenu()}
-                {!user && renderGuestMenu()}
+                {!user}
                 {user?.role === 'driver' && (
                     <Button variant="ghost" className="hidden md:flex" onClick={logout}><LogOut className='mr-2'/> {t.logout}</Button>
                  )}
