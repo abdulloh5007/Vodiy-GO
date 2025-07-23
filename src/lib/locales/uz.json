@@ -181,5 +181,22 @@
     "activeRideTitle": "Sizda faol qatnov mavjud",
     "activeRideDesc": "Siz bir vaqtning o'zida faqat bitta faol qatnovga ega bo'lishingiz mumkin. Iltimos, uning tugashini kuting yoki qo'llab-quvvatlash xizmatiga murojaat qiling.",
     "published_ago": "E'lon qilindi",
-    "one_booking_limit_alert": "Siz bir vaqtning o'zida faqat bitta faol buyurtmaga ega bo'lishingiz mumkin."
+    "one_booking_limit_alert": "Siz bir vaqtning o'zida faqat bitta faol buyurtmaga ega bo'lishingiz mumkin.",
+    "viewApplication": "Arizani ko'rish",
+    "applicationDetails": "Ariza tafsilotlari",
+    "reviewApplicationFor": "Uchun arizani ko'rib chiqish",
+    "drivers_title": "Haydovchilar",
+    "drivers_desc": "Tizimdagi barcha haydovchilar ro'yxati.",
+    "details": "Tafsilotlar",
+    "noDriversFound": "Haydovchilar topilmadi.",
+    "driverDetails": "Haydovchi haqida ma'lumot",
+    "fullInformationFor": "Uchun to'liq ma'lumot",
+    "users_title": "Foydalanuvchilar",
+    "users_desc": "Tizimdagi barcha yo'lovchilar ro'yxati.",
+    "noUsersFound": "Foydalanuvchilar topilmadi.",
+    "userName": "Foydalanuvchi ismi",
+    "user_email": "Elektron pochta",
+    "user_phone": "Telefon",
+    "notSpecified": "Ko'rsatilmagan",
+    "totalOrders": "Jami buyurtmalar"
 }

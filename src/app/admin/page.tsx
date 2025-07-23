@@ -6,11 +6,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Check, X, ShieldAlert, Loader2, LayoutGrid, List } from 'lucide-react';
+import { Check, X, ShieldAlert, Loader2, LayoutGrid, List, ArrowRight } from 'lucide-react';
 import Image from 'next/image';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { Driver } from '@/lib/types';
+import { useRouter } from 'next/navigation';
 
 
 function AdminPageSkeleton() {
@@ -66,7 +67,7 @@ function AdminPageSkeleton() {
     )
 }
 
-const ApplicationCard = ({ driver, onUpdateStatus, onImageClick, t }: { driver: Driver, onUpdateStatus: (id: string, status: 'verified' | 'rejected') => void, onImageClick: (url:string) => void, t: any }) => {
+const ApplicationCard = ({ driver, onImageClick, t, onDetailsClick }: { driver: Driver, onImageClick: (url:string) => void, t: any, onDetailsClick: (id: string) => void }) => {
     return (
         <Card>
             <CardHeader className="p-4">
@@ -88,15 +89,10 @@ const ApplicationCard = ({ driver, onUpdateStatus, onImageClick, t }: { driver: 
                      <Badge variant="secondary">{driver.status}</Badge>
                 </div>
             </CardHeader>
-            <CardFooter className="p-0">
-                 <div className="flex w-full">
-                    <Button variant="ghost" size="lg" className="flex-1 rounded-t-none rounded-br-none text-green-600 hover:text-green-700 hover:bg-green-50" onClick={() => onUpdateStatus(driver.id, 'verified')}>
-                        <Check className="h-5 w-5" />
-                    </Button>
-                    <Button variant="ghost" size="lg" className="flex-1 rounded-t-none rounded-bl-none text-red-600 hover:text-red-700 hover:bg-red-50" onClick={() => onUpdateStatus(driver.id, 'rejected')}>
-                        <X className="h-5 w-5" />
-                    </Button>
-                </div>
+            <CardFooter className="p-2">
+                 <Button variant="outline" className="w-full" onClick={() => onDetailsClick(driver.id)}>
+                    {t.viewApplication || 'View Application'}
+                 </Button>
             </CardFooter>
         </Card>
     );
@@ -106,12 +102,13 @@ const ApplicationCard = ({ driver, onUpdateStatus, onImageClick, t }: { driver: 
 export default function AdminPage() {
   const context = useContext(AppContext);
   const [viewMode, setViewMode] = useState<'table' | 'card'>('table');
+  const router = useRouter();
   
   if (!context) {
     throw new Error('AdminPage must be used within an AppProvider');
   }
   
-  const { drivers, updateDriverStatus, user, translations, loading, setSelectedImage } = context;
+  const { drivers, user, translations, loading, setSelectedImage } = context;
   const t = translations;
 
   if (loading || !t.home) {
@@ -119,6 +116,10 @@ export default function AdminPage() {
   }
   
   const pendingDrivers = drivers.filter(d => d.status === 'pending');
+
+  const handleDetailsClick = (driverId: string) => {
+    router.push(`/admin/applications/${driverId}`);
+  };
 
   return (
     <div className="container mx-auto py-8 px-4">
@@ -178,12 +179,9 @@ export default function AdminPage() {
                           <Badge variant="secondary">{driver.status}</Badge>
                         </TableCell>
                         <TableCell className="text-right">
-                          <Button variant="ghost" size="icon" className="text-green-600 hover:text-green-700 hover:bg-green-50" onClick={() => updateDriverStatus(driver.id, 'verified')}>
-                            <Check className="h-4 w-4" />
-                          </Button>
-                          <Button variant="ghost" size="icon" className="text-red-600 hover:text-red-700 hover:bg-red-50" onClick={() => updateDriverStatus(driver.id, 'rejected')}>
-                            <X className="h-4 w-4" />
-                          </Button>
+                           <Button variant="outline" size="sm" onClick={() => handleDetailsClick(driver.id)}>
+                                {t.details || 'Details'} <ArrowRight className="ml-2 h-4 w-4" />
+                           </Button>
                         </TableCell>
                       </TableRow>
                     ))
@@ -202,7 +200,7 @@ export default function AdminPage() {
                         <ApplicationCard 
                             key={driver.id} 
                             driver={driver}
-                            onUpdateStatus={updateDriverStatus}
+                            onDetailsClick={handleDetailsClick}
                             onImageClick={setSelectedImage}
                             t={t}
                         />

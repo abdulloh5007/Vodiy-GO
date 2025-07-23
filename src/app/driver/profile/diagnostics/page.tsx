@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, ArrowLeft, UploadCloud, X, ArrowRight, CheckCircle2, ShieldX, ShieldAlert } from 'lucide-react';
-import { formatCarNumber, formatPassportNumber } from '@/lib/utils';
+import { formatCarNumber, formatPassportNumber, formatTechPassportNumber } from '@/lib/utils';
 import { Progress } from '@/components/ui/progress';
 import Image from 'next/image';
 import { Driver } from '@/lib/types';
@@ -124,7 +124,7 @@ export default function DriverDiagnosticsPage() {
     setPassport(formatted);
   };
    const handleTechPassportChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const formatted = formatPassportNumber(e.target.value);
+    const formatted = formatTechPassportNumber(e.target.value);
     setTechPassport(formatted);
   };
   

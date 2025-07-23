@@ -16,7 +16,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import { LogIn, Menu, Car, FileText, LogOut, Home, User, ShoppingBag, ShieldCheck, Settings, Globe, PackageCheck, Bell, UserCog } from 'lucide-react';
+import { LogIn, Menu, Car, FileText, LogOut, Home, User, ShoppingBag, ShieldCheck, Settings, Globe, PackageCheck, Bell, UserCog, Users } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from './ui/separator';
 
@@ -71,7 +71,9 @@ export function Header() {
 
   const adminLinks = [
     { href: '/admin', label: t.registrationApplications, icon: UserCog, badge: newDriverApplicationsCount },
-    { href: '/admin/ride-applications', label: t.rideApplications, icon: PackageCheck, badge: newRideApplicationsCount }
+    { href: '/admin/ride-applications', label: t.rideApplications, icon: PackageCheck, badge: newRideApplicationsCount },
+    { href: '/admin/drivers', label: t.drivers_title || 'Drivers', icon: Car },
+    { href: '/admin/users', label: t.users_title || 'Users', icon: Users },
   ];
 
   const passengerLinks = [
@@ -93,18 +95,18 @@ export function Header() {
         </SheetHeader>
         <div className="flex-grow py-4">
             <div className='flex flex-col gap-4'>
-              <div className="grid grid-cols-1 gap-4">
+              <div className="grid grid-cols-2 gap-2">
                   {adminLinks.map(link => (
                       <Button 
                           key={link.href}
                           variant={pathname === link.href ? 'secondary' : 'outline'} 
                           asChild 
-                          className="h-28 flex-col gap-2 text-sm rounded-lg relative"
+                          className="h-24 flex-col gap-1 text-xs rounded-lg relative px-1"
                           onClick={() => setIsSheetOpen(false)}
                       >
-                          <Link href={link.href}>
+                          <Link href={link.href} className="text-center flex flex-col items-center justify-center">
                             {link.badge && link.badge > 0 ? <Badge variant="destructive" className="absolute top-2 right-2">{link.badge}</Badge> : ''}
-                            <link.icon className="mb-1 h-8 w-8"/>
+                            <link.icon className="mb-1 h-6 w-6"/>
                             <span>{link.label}</span>
                           </Link>
                       </Button>
@@ -118,7 +120,7 @@ export function Header() {
                 onClick={handleLogout} 
                 className="w-full justify-start rounded-lg bg-red-600/90 hover:bg-red-600 text-white"
              >
-                <LogOut />
+                <LogOut className="mr-2" />
                 <span>{t.logout}</span>
             </Button>
         </div>

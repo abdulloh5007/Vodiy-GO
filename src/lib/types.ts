@@ -10,6 +10,7 @@ export type User = {
 export type Driver = {
   id: string; 
   name: string;
+  phone: string;
   passport: string;
   techPassport: string;
   carModel: string;
@@ -48,4 +49,4 @@ export type Translations = {
   [key: string]: any;
 };
 
-export type DriverApplicationData = Omit<Driver, 'id' | 'status' | 'carPhotoUrl'> & { carPhotoFile: File | null };
+export type DriverApplicationData = Omit<Driver, 'id' | 'status' | 'carPhotoUrl' | 'phone'> & { carPhotoFile: File | null };

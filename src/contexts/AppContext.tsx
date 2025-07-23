@@ -9,6 +9,7 @@ interface AppContextType {
   setLanguage: (language: Language) => void;
   translations: Translations;
   user: User | null;
+  users: User[];
   drivers: Driver[];
   rides: Ride[];
   orders: Order[];

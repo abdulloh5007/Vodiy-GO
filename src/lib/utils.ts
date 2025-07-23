@@ -42,6 +42,17 @@ export function formatPassportNumber(value: string): string {
     return letters;
 }
 
+export function formatTechPassportNumber(value: string): string {
+  const cleaned = value.replace(/\s/g, '').toUpperCase();
+  const letters = cleaned.slice(0, 3).replace(/[^A-Z]/g, '');
+  const numbers = cleaned.slice(3, 10).replace(/[^0-9]/g, '');
+  
+  if (numbers.length > 0) {
+      return `${letters} ${numbers}`;
+  }
+  return letters;
+}
+
 export function formatCarNumber(value: string): string {
     const cleaned = value.replace(/[\s\-]/g, '').toUpperCase();
     const region = cleaned.slice(0, 2).replace(/[^0-9]/g, '');

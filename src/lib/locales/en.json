@@ -181,5 +181,22 @@
     "activeRideTitle": "You have an active ride",
     "activeRideDesc": "You can only have one active ride at a time. Please wait for it to be completed or contact support.",
     "published_ago": "Published",
-    "one_booking_limit_alert": "You can only have one active booking at a time."
+    "one_booking_limit_alert": "You can only have one active booking at a time.",
+    "viewApplication": "View Application",
+    "applicationDetails": "Application Details",
+    "reviewApplicationFor": "Review application for",
+    "drivers_title": "Drivers",
+    "drivers_desc": "List of all drivers in the system.",
+    "details": "Details",
+    "noDriversFound": "No drivers found.",
+    "driverDetails": "Driver Details",
+    "fullInformationFor": "Full information for",
+    "users_title": "Users",
+    "users_desc": "List of all passengers in the system.",
+    "noUsersFound": "No users found.",
+    "userName": "User Name",
+    "user_email": "Email",
+    "user_phone": "Phone",
+    "notSpecified": "Not specified",
+    "totalOrders": "Total Orders"
 }

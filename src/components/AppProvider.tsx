@@ -29,6 +29,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguage] = useState<Language>('en');
   const [translations, setTranslations] = useState<Translations>(initialTranslations.en);
   const [user, setUser] = useState<User | null>(null);
+  const [users, setUsers] = useState<User[]>([]); // To store all users for admin
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [rides, setRides] = useState<Ride[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
@@ -81,6 +82,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       setOrders(ordersData);
     });
 
+    // For admin to view all users
+    const unsubscribeUsers = onSnapshot(collection(db, "users"), (snapshot) => {
+        const usersData = snapshot.docs.map(doc => doc.data() as User);
+        setUsers(usersData);
+    });
+
     const unsubscribeAuth = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         const userDocRef = doc(db, 'users', firebaseUser.uid);
@@ -88,8 +95,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         if (userDocSnap.exists()) {
             setUser({ uid: firebaseUser.uid, ...userDocSnap.data() } as User);
         } else {
-            // This case is for users that might not have a user doc yet.
-            // Let's create a passenger one by default.
             const newUser: User = { uid: firebaseUser.uid, email: firebaseUser.email, role: 'passenger' };
             await setDoc(userDocRef, newUser);
             setUser(newUser);
@@ -105,6 +110,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       unsubscribeRides();
       unsubscribeOrders();
       unsubscribeAuth();
+      unsubscribeUsers();
     };
   }, []);
   
@@ -123,6 +129,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     if (driverDocSnap.exists()) {
       throw new Error("Application already exists for this user.");
     }
+    
+    const userDocRef = doc(db, 'users', user.uid);
+    const userDoc = await getDoc(userDocRef);
+    const phone = userDoc.data()?.phone || '';
 
     // 1. Convert image to Data URL
     const carPhotoUrl = await imageToDataUrl(driverData.carPhotoFile);
@@ -133,6 +143,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     await setDoc(driverDocRef, {
         id: user.uid,
         ...driverInfo,
+        phone,
         carPhotoUrl,
         status: 'pending', // Application is pending review
     });
@@ -218,6 +229,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     <AppContext.Provider value={{ 
       language, setLanguage, translations,
       user,
+      users, // Provide all users
       drivers, rides, orders, 
       addDriverApplication, updateDriverStatus, updateOrderStatus, updateRideStatus,
       addRide, addOrder,
