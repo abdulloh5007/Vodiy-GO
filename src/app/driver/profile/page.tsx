@@ -8,7 +8,7 @@ import Image from 'next/image';
 import { AppContext } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, Star, ChevronRight, FileText } from 'lucide-react';
+import { Loader2, Star, ChevronRight, FileText, LogOut } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Driver } from '@/lib/types';
 
@@ -27,6 +27,7 @@ function ProfileSkeleton() {
                 </CardContent>
             </Card>
             <Skeleton className="h-12 w-full" />
+             <Skeleton className="h-12 w-full" />
         </div>
     );
 }
@@ -71,7 +72,7 @@ export default function DriverProfilePage() {
         throw new Error('DriverProfilePage must be used within an AppProvider');
     }
 
-    const { user, drivers, loading, translations: t } = context;
+    const { user, drivers, loading, translations: t, logout } = context;
 
     const driverProfile = user ? drivers.find(d => d.id === user.uid) : null;
     
@@ -93,21 +94,29 @@ export default function DriverProfilePage() {
     }
 
     return (
-        <div className="container mx-auto py-8 px-4 space-y-6">
-            <ProfileCard driver={driverProfile} t={t} />
+        <div className="container mx-auto py-8 px-4 flex flex-col h-full">
+            <div className="flex-grow space-y-6">
+                <ProfileCard driver={driverProfile} t={t} />
 
-            <Link href="/driver/profile/diagnostics">
-                <Button variant="outline" className="w-full justify-between h-16 text-left">
-                   <div className="flex items-center gap-4">
-                     <FileText className="h-6 w-6 text-primary" />
-                     <div>
-                        <p className="font-semibold">{t.diagnostics_title || "Diagnostics"}</p>
-                        <p className="text-sm text-muted-foreground">{t.diagnostics_profile_button_desc || "Submit or check your verification status"}</p>
-                     </div>
-                   </div>
-                   <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                <Link href="/driver/profile/diagnostics">
+                    <Button variant="outline" className="w-full justify-between h-16 text-left">
+                       <div className="flex items-center gap-4">
+                         <FileText className="h-6 w-6 text-primary" />
+                         <div>
+                            <p className="font-semibold">{t.diagnostics_title || "Diagnostics"}</p>
+                            <p className="text-sm text-muted-foreground">{t.diagnostics_profile_button_desc || "Submit or check your verification status"}</p>
+                         </div>
+                       </div>
+                       <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                    </Button>
+                </Link>
+            </div>
+            <div className="mt-8">
+                 <Button variant="destructive" className="w-full h-12" onClick={logout}>
+                    <LogOut className="mr-2 h-5 w-5"/>
+                    {t.logout}
                 </Button>
-            </Link>
+            </div>
         </div>
     );
 }
