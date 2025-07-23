@@ -48,7 +48,7 @@ export default function DriverRegisterPage() {
             title: t.registrationSuccessTitle,
             description: t.redirectingToApplication,
         });
-        router.push('/driver/application');
+        router.push('/driver/profile/diagnostics');
     } catch(error) {
         let errorMessage = t.unknownError;
         if (error instanceof FirebaseError) {
