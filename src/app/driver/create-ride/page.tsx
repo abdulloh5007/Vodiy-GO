@@ -143,7 +143,7 @@ export default function CreateRidePage() {
                         <p><strong>{t.from}:</strong> {existingRide.from}</p>
                         <p><strong>{t.to}:</strong> {existingRide.to}</p>
                         <p><strong>{t.price}:</strong> {new Intl.NumberFormat('fr-FR').format(existingRide.price)} UZS</p>
-                        <p><strong>{t.status}:</strong> <Badge variant={currentStatus.variant as any}>{currentStatus.label}</Badge></p>
+                        <div><strong>{t.status}:</strong> <Badge variant={currentStatus.variant as any}>{currentStatus.label}</Badge></div>
                     </div>
                 </CardContent>
             </Card>
