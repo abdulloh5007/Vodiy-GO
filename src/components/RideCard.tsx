@@ -18,6 +18,7 @@ import { FirebaseError } from 'firebase/app';
 import { useRouter } from 'next/navigation';
 import { formatDistanceToNow } from 'date-fns';
 import { ru, uz } from 'date-fns/locale';
+import { Badge } from '@/components/ui/badge';
 
 interface RideCardProps {
   ride: Ride;
