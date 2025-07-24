@@ -1,6 +1,7 @@
+
 'use client';
 
-import { useContext, useState } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { AppContext } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
@@ -104,6 +105,18 @@ export default function AdminPage() {
   const [viewMode, setViewMode] = useState<'table' | 'card'>('table');
   const router = useRouter();
   
+  useEffect(() => {
+    const savedViewMode = localStorage.getItem('admin-applications-view-mode') as 'table' | 'card';
+    if (savedViewMode) {
+      setViewMode(savedViewMode);
+    }
+  }, []);
+
+  const handleSetViewMode = (mode: 'table' | 'card') => {
+    setViewMode(mode);
+    localStorage.setItem('admin-applications-view-mode', mode);
+  }
+
   if (!context) {
     throw new Error('AdminPage must be used within an AppProvider');
   }
@@ -127,13 +140,13 @@ export default function AdminPage() {
         <CardHeader className="flex flex-row items-center justify-between">
             <div>
                 <CardTitle className="font-headline text-2xl">{t.registrationApplications}</CardTitle>
-                <CardDescription>{pendingDrivers.length > 0 ? `You have ${pendingDrivers.length} pending applications.` : t.noPendingApplications}</CardDescription>
+                <CardDescription>{pendingDrivers.length > 0 ? (t.rideApplications_desc || `You have {count} pending applications.`).replace('{count}', String(pendingDrivers.length)) : t.noPendingApplications}</CardDescription>
             </div>
              <div className="flex items-center gap-2">
-                <Button variant={viewMode === 'table' ? 'secondary' : 'ghost'} size="icon" onClick={() => setViewMode('table')}>
+                <Button variant={viewMode === 'table' ? 'secondary' : 'ghost'} size="icon" onClick={() => handleSetViewMode('table')}>
                     <List className="h-5 w-5" />
                 </Button>
-                 <Button variant={viewMode === 'card' ? 'secondary' : 'ghost'} size="icon" onClick={() => setViewMode('card')}>
+                 <Button variant={viewMode === 'card' ? 'secondary' : 'ghost'} size="icon" onClick={() => handleSetViewMode('card')}>
                     <LayoutGrid className="h-5 w-5" />
                 </Button>
             </div>
