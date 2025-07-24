@@ -55,7 +55,7 @@ export default function AdminLayout({
     }
   };
 
-  // useEffect(() => {
+  // useEffect(() => { 
   //   if (!loading) {
   //     const isAuthPage = pathname === '/admin/login'; 
   //     if (!user && !isAuthPage) {
