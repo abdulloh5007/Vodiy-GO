@@ -255,7 +255,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         id: newCodeRef.id,
         code,
         limit,
-        expiresAt: serverTimestamp(),
+        expiresAt,
         usageCount: 0,
         status: 'active',
         type: 'EXTEND_12H',
@@ -300,6 +300,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setUser(null);
     window.location.href = '/';
   };
+  
+  const saveFcmToken = async (uid: string, token: string) => {
+    try {
+        const tokenRef = doc(db, 'fcmTokens', token);
+        await setDoc(tokenRef, { uid, token, createdAt: serverTimestamp() }, { merge: true });
+    } catch (error) {
+        console.error("Error saving FCM token: ", error);
+    }
+  };
 
   return (
     <AppContext.Provider value={{ 
@@ -312,7 +321,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       addRide, addOrder,
       login, register, logout,
       loading,
-      selectedImage, setSelectedImage
+      selectedImage, setSelectedImage,
+      saveFcmToken
     }}>
       {children}
       <ImageViewer imageUrl={selectedImage} onOpenChange={(open) => !open && setSelectedImage(null)} />
