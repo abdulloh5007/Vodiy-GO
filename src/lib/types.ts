@@ -1,4 +1,5 @@
 
+
 export type User = {
   uid: string;
   email: string | null;
@@ -31,6 +32,7 @@ export type Ride = {
   createdAt: any; // Allow server timestamp
   status: 'pending' | 'approved' | 'rejected';
   approvedAt?: any; // Timestamp for when the ride was approved
+  promoCode?: string; // Optional promocode used
 };
 
 export type Order = {
@@ -41,6 +43,17 @@ export type Order = {
   clientPhone: string;
   status: 'new' | 'accepted' | 'rejected';
   createdAt: any; // Allow server timestamp
+};
+
+export type PromoCode = {
+    id: string;
+    code: string;
+    expiresAt: any;
+    limit: number;
+    usageCount: number;
+    status: 'active' | 'expired' | 'depleted';
+    createdAt: any;
+    type: 'EXTEND_12H';
 };
 
 export type Language = 'en' | 'ru' | 'uz';

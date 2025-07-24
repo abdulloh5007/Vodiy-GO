@@ -16,7 +16,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import { LogIn, Menu, Car, FileText, LogOut, Home, User, ShoppingBag, ShieldCheck, Settings, Globe, PackageCheck, Bell, UserCog, Users } from 'lucide-react';
+import { LogIn, Menu, Car, FileText, LogOut, Home, User, ShoppingBag, ShieldCheck, Settings, Globe, PackageCheck, Bell, UserCog, Users, Ticket } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from './ui/separator';
 
@@ -53,11 +53,8 @@ export function Header() {
   }, [user, drivers]);
   
   const handleLogout = async () => {
-    const userRole = user?.role;
-    await logout();
     setIsSheetOpen(false);
-    // Redirect to home page after logout for all roles
-    router.push('/');
+    await logout();
   };
 
 
@@ -74,6 +71,7 @@ export function Header() {
     { href: '/admin/ride-applications', label: t.rideApplications, icon: PackageCheck, badge: newRideApplicationsCount },
     { href: '/admin/drivers', label: t.drivers_title || 'Drivers', icon: Car },
     { href: '/admin/users', label: t.users_title || 'Users', icon: Users },
+    { href: '/admin/promocodes', label: t.promo_codes_title || 'Promo Codes', icon: Ticket },
   ];
 
   const passengerLinks = [
@@ -85,7 +83,7 @@ export function Header() {
      <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
       <SheetTrigger asChild>
         <Button variant="ghost" size="icon" className="relative">
-           {(newDriverApplicationsCount + newRideApplicationsCount > 0) && <Badge variant="destructive" className="absolute top-1 right-1 scale-75 animate-pulse">{newDriverApplicationsCount + newRideApplicationsCount}</Badge>}
+           {(newDriverApplicationsCount + newRideApplicationsCount > 0) && <Badge variant="destructive" className="absolute top-1 right-1 h-3 w-3 p-0 animate-pulse" />}
           <Menu className="h-6 w-6" />
         </Button>
       </SheetTrigger>
@@ -99,7 +97,7 @@ export function Header() {
                   {adminLinks.map(link => (
                       <Button 
                           key={link.href}
-                          variant={pathname === link.href ? 'secondary' : 'outline'} 
+                          variant={pathname.startsWith(link.href) ? 'secondary' : 'outline'} 
                           asChild 
                           className="h-24 flex-col gap-1 text-xs rounded-lg relative px-1"
                           onClick={() => setIsSheetOpen(false)}
@@ -189,9 +187,13 @@ export function Header() {
             <>
                 {user?.role === 'passenger' && renderPassengerMenu()}
                 {user?.role === 'admin' && renderAdminMenu()}
-                {!user}
+                {!user && (
+                    <Button asChild>
+                        <Link href="/driver/login">{t.login}</Link>
+                    </Button>
+                )}
                 {user?.role === 'driver' && (
-                    <Button variant="ghost" className="hidden md:flex" onClick={logout}><LogOut className='mr-2'/> {t.logout}</Button>
+                    <Button variant="ghost" className="hidden md:flex" onClick={handleLogout}><LogOut className='mr-2'/> {t.logout}</Button>
                  )}
             </>
           )}

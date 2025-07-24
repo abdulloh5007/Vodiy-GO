@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { ShieldAlert, Loader2, Clock, Info, CheckCircle2 } from 'lucide-react';
+import { ShieldAlert, Loader2, Clock, Info, CheckCircle2, Ticket } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useRouter } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
@@ -69,6 +69,8 @@ export default function CreateRidePage() {
   const [info, setInfo] = useState('');
   const [time, setTime] = useState('');
   const [seats, setSeats] = useState<'4' | '8'>('4');
+  const [promoCode, setPromoCode] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   if (!context) {
     throw new Error('CreateRidePage must be used within an AppProvider');
@@ -153,39 +155,57 @@ export default function CreateRidePage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
     const priceValue = Number(price.replace(/\s/g, ''));
 
     if (!from || !to || !price || from === to || isNaN(priceValue) || priceValue <= 0) {
       toast({
-        title: "Validation Error",
-        description: "Please fill all fields correctly. Origin and destination cannot be the same, and price must be a valid number.",
+        title: t.validationErrorTitle || "Validation Error",
+        description: t.validationErrorRideForm || "Please fill all fields correctly. Origin and destination cannot be the same, and price must be a valid number.",
         variant: "destructive",
       });
+      setIsSubmitting(false);
       return;
     }
     
     if (user) {
-        await addRide({
-          driverId: user.uid,
-          from,
-          to,
-          price: priceValue,
-          info,
-          time,
-          seats: parseInt(seats)
-        });
-        
-        toast({
-            title: t.ridePublished,
-            description: t.yourRideIsNowLive,
-        });
-
-        setFrom('');
-        setTo('');
-        setPrice('');
-        setInfo('');
-        setTime('');
-        setSeats('4');
+        try {
+            await addRide({
+              driverId: user.uid,
+              from,
+              to,
+              price: priceValue,
+              info,
+              time,
+              seats: parseInt(seats),
+              ...(promoCode && { promoCode }),
+            });
+            
+            toast({
+                title: t.ridePublished || "Ride Published!",
+                description: promoCode ? t.ridePublishedPromoSuccess || "Your ride is submitted and its duration has been extended!" : t.yourRideIsNowLive || "Your ride is submitted for review.",
+            });
+    
+            setFrom('');
+            setTo('');
+            setPrice('');
+            setInfo('');
+            setTime('');
+            setSeats('4');
+            setPromoCode('');
+        } catch (error: any) {
+            let desc = t.unknownError;
+            if (error.message.startsWith('promocode/')) {
+                desc = t[error.message.replace('/', '_')] || t.promocode_invalid || 'Invalid or expired promocode.';
+            }
+            toast({
+                title: t.ridePublishedError || "Error Publishing Ride",
+                description: desc,
+                variant: 'destructive'
+            })
+        } finally {
+            setIsSubmitting(false);
+        }
     }
   };
 
@@ -201,7 +221,7 @@ export default function CreateRidePage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                     <Label htmlFor="from">{t.from}</Label>
-                    <Select value={from} onValueChange={setFrom}>
+                    <Select value={from} onValueChange={setFrom} disabled={isSubmitting}>
                         <SelectTrigger id="from">
                             <SelectValue placeholder={t.selectOrigin} />
                         </SelectTrigger>
@@ -212,7 +232,7 @@ export default function CreateRidePage() {
                 </div>
                 <div className="space-y-2">
                     <Label htmlFor="to">{t.to}</Label>
-                    <Select value={to} onValueChange={setTo}>
+                    <Select value={to} onValueChange={setTo} disabled={isSubmitting}>
                         <SelectTrigger id="to">
                             <SelectValue placeholder={t.selectDestination} />
                         </SelectTrigger>
@@ -225,30 +245,42 @@ export default function CreateRidePage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="price">{t.price}</Label>
-                  <Input id="price" value={price} onChange={handlePriceChange} placeholder="100 000" required />
+                  <Input id="price" value={price} onChange={handlePriceChange} placeholder="100 000" required disabled={isSubmitting} />
                 </div>
                  <div className="space-y-2">
                   <Label htmlFor="time">{t.departureTimeOptional}</Label>
-                  <Input id="time" type="text" value={time} onChange={e => setTime(e.target.value)} placeholder={t.departureTimePlaceholder || 'e.g., 09:00 or Morning'} />
+                  <Input id="time" type="text" value={time} onChange={e => setTime(e.target.value)} placeholder={t.departureTimePlaceholder || 'e.g., 09:00 or Morning'} disabled={isSubmitting} />
+                </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                    <Label htmlFor="seats">{t.availableSeats || 'Available Seats'}</Label>
+                    <Select value={seats} onValueChange={(value) => setSeats(value as '4' | '8')} disabled={isSubmitting}>
+                        <SelectTrigger id="seats">
+                            <SelectValue placeholder={t.selectSeats || 'Select seats'} />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="4">4</SelectItem>
+                            <SelectItem value="8">8</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="promocode">{t.promoCode || 'Promo Code'} (Optional)</Label>
+                     <div className="relative">
+                        <Ticket className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                        <Input id="promocode" type="text" value={promoCode} onChange={e => setPromoCode(e.target.value)} placeholder={t.promoCodePlaceholder || "Enter code"} className="pl-10" disabled={isSubmitting} />
+                     </div>
                 </div>
             </div>
             <div className="space-y-2">
-                <Label htmlFor="seats">{t.availableSeats || 'Available Seats'}</Label>
-                <Select value={seats} onValueChange={(value) => setSeats(value as '4' | '8')}>
-                    <SelectTrigger id="seats">
-                        <SelectValue placeholder={t.selectSeats || 'Select seats'} />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="4">4</SelectItem>
-                        <SelectItem value="8">8</SelectItem>
-                    </SelectContent>
-                </Select>
-            </div>
-            <div className="space-y-2">
               <Label htmlFor="info">{t.additionalInfo}</Label>
-              <Textarea id="info" value={info} onChange={e => setInfo(e.target.value)} placeholder={t.additionalInfoPlaceholder} />
+              <Textarea id="info" value={info} onChange={e => setInfo(e.target.value)} placeholder={t.additionalInfoPlaceholder} disabled={isSubmitting} />
             </div>
-            <Button type="submit" className="w-full">{t.publishRide}</Button>
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {t.publishRide}
+            </Button>
           </form>
         </CardContent>
       </Card>

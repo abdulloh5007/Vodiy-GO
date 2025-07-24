@@ -3,10 +3,10 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { AppContext } from '@/contexts/AppContext';
-import { Driver, Ride, Order, Language, Translations, User, DriverApplicationData } from '@/lib/types';
+import { Driver, Ride, Order, Language, Translations, User, DriverApplicationData, PromoCode } from '@/lib/types';
 import { initialTranslations } from '@/lib/i18n';
 import { db, auth } from '@/lib/firebase';
-import { collection, doc, getDoc, setDoc, onSnapshot, query, orderBy, serverTimestamp, writeBatch, where, getDocs, deleteDoc, updateDoc } from "firebase/firestore";
+import { collection, doc, getDoc, setDoc, onSnapshot, query, orderBy, serverTimestamp, writeBatch, where, getDocs, deleteDoc, updateDoc, runTransaction } from "firebase/firestore";
 import { signInWithEmailAndPassword, onAuthStateChanged, signOut, createUserWithEmailAndPassword, User as FirebaseAuthUser } from "firebase/auth";
 import { ImageViewer } from './ImageViewer';
 
@@ -33,6 +33,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [rides, setRides] = useState<Ride[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
+  const [promoCodes, setPromoCodes] = useState<PromoCode[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
@@ -64,15 +65,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const ridesQuery = query(collection(db, "rides"), orderBy("createdAt", "desc"));
     const unsubscribeRides = onSnapshot(ridesQuery, (snapshot) => {
       const now = Date.now();
-      const oneDay = 24 * 60 * 60 * 1000;
       const ridesData = snapshot.docs
         .map(doc => ({ id: doc.id, ...doc.data() } as Ride))
         .filter(ride => {
-            if (ride.createdAt) {
-                const rideDate = ride.createdAt.toDate().getTime();
-                return (now - rideDate) < oneDay;
+            if (ride.approvedAt) {
+                const rideApprovedDate = ride.approvedAt.toDate().getTime();
+                const duration = ride.promoCode ? 24 * 60 * 60 * 1000 : 12 * 60 * 60 * 1000;
+                return (now - rideApprovedDate) < duration;
             }
-            return true; // keep rides without timestamp for now
+            // Keep pending rides or rides without approvedAt timestamp for now
+            return ride.status === 'pending';
         });
       setRides(ridesData);
     });
@@ -86,6 +88,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const unsubscribeUsers = onSnapshot(collection(db, "users"), (snapshot) => {
         const usersData = snapshot.docs.map(doc => doc.data() as User);
         setUsers(usersData);
+    });
+
+     const unsubscribePromoCodes = onSnapshot(query(collection(db, "promocodes"), orderBy("createdAt", "desc")), (snapshot) => {
+      const codesData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as PromoCode));
+      setPromoCodes(codesData);
     });
 
     const unsubscribeAuth = onAuthStateChanged(auth, async (firebaseUser) => {
@@ -111,6 +118,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       unsubscribeOrders();
       unsubscribeAuth();
       unsubscribeUsers();
+      unsubscribePromoCodes();
     };
   }, []);
   
@@ -170,14 +178,60 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const addRide = async (rideData: Omit<Ride, 'id' | 'createdAt' | 'status' | 'approvedAt'>) => {
     if (!user) throw new Error("User not logged in");
     
-    const newRideRef = doc(collection(db, "rides"))
-    await setDoc(newRideRef, {
-      ...rideData,
-      id: newRideRef.id,
-      createdAt: serverTimestamp(),
-      status: 'pending', // All new rides are pending
-      approvedAt: null
-    });
+    if (rideData.promoCode) {
+        try {
+            await runTransaction(db, async (transaction) => {
+                const promoQuery = query(collection(db, 'promocodes'), where('code', '==', rideData.promoCode));
+                const promoSnapshot = await getDocs(promoQuery);
+
+                if (promoSnapshot.empty) {
+                    throw new Error("promocode/not-found");
+                }
+
+                const promoDoc = promoSnapshot.docs[0];
+                const promoData = promoDoc.data() as PromoCode;
+
+                if (promoData.status !== 'active') {
+                    throw new Error("promocode/inactive");
+                }
+                if (promoData.expiresAt.toDate() < new Date()) {
+                    transaction.update(promoDoc.ref, { status: 'expired' });
+                    throw new Error("promocode/expired");
+                }
+                if (promoData.usageCount >= promoData.limit) {
+                     transaction.update(promoDoc.ref, { status: 'depleted' });
+                    throw new Error("promocode/limit-reached");
+                }
+                
+                const newUsageCount = promoData.usageCount + 1;
+                transaction.update(promoDoc.ref, { 
+                    usageCount: newUsageCount,
+                    ...(newUsageCount >= promoData.limit && { status: 'depleted' })
+                });
+
+                const newRideRef = doc(collection(db, "rides"));
+                transaction.set(newRideRef, {
+                    ...rideData,
+                    id: newRideRef.id,
+                    createdAt: serverTimestamp(),
+                    status: 'pending',
+                    approvedAt: null
+                });
+            });
+        } catch (error) {
+            console.error("Transaction failed: ", error);
+            throw error; // Re-throw the error to be caught by the caller
+        }
+    } else {
+        const newRideRef = doc(collection(db, "rides"))
+        await setDoc(newRideRef, {
+          ...rideData,
+          id: newRideRef.id,
+          createdAt: serverTimestamp(),
+          status: 'pending', 
+          approvedAt: null
+        });
+    }
   };
 
   const addOrder = async (orderData: Omit<Order, 'id' | 'status' | 'createdAt' | 'passengerId'> & { passengerId: string }) => {
@@ -189,6 +243,25 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       createdAt: serverTimestamp(),
     });
   };
+  
+  const createPromoCode = async (limit: number, validityHours: number) => {
+    const code = Math.random().toString(36).substring(2, 8).toUpperCase();
+    const newCodeRef = doc(collection(db, "promocodes"));
+    
+    const expiresAt = new Date();
+    expiresAt.setHours(expiresAt.getHours() + validityHours);
+
+    await setDoc(newCodeRef, {
+        id: newCodeRef.id,
+        code,
+        limit,
+        expiresAt: serverTimestamp(),
+        usageCount: 0,
+        status: 'active',
+        type: 'EXTEND_12H',
+        createdAt: serverTimestamp(),
+    });
+  }
 
   const login = async (email: string, password: string, role?: 'admin' | 'driver' | 'passenger'):Promise<void> => {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
@@ -204,6 +277,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
                   throw new Error('auth/unauthorized-role');
               }
           } else {
+              // This case should not happen for login, but as a safeguard:
               await signOut(auth);
               throw new Error('auth/no-user-record');
           }
@@ -223,14 +297,17 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   
   const logout = async () => {
     await signOut(auth);
+    setUser(null);
+    window.location.href = '/';
   };
 
   return (
     <AppContext.Provider value={{ 
       language, setLanguage, translations,
       user,
-      users, // Provide all users
+      users,
       drivers, rides, orders, 
+      promoCodes, createPromoCode,
       addDriverApplication, updateDriverStatus, updateOrderStatus, updateRideStatus,
       addRide, addOrder,
       login, register, logout,

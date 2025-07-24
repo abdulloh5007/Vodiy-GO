@@ -2,7 +2,7 @@
 'use client';
 
 import React from 'react';
-import { Driver, Ride, Order, Language, Translations, User, DriverApplicationData } from '@/lib/types';
+import { Driver, Ride, Order, Language, Translations, User, DriverApplicationData, PromoCode } from '@/lib/types';
 
 interface AppContextType {
   language: Language;
@@ -13,6 +13,8 @@ interface AppContextType {
   drivers: Driver[];
   rides: Ride[];
   orders: Order[];
+  promoCodes: PromoCode[];
+  createPromoCode: (limit: number, validityHours: number) => Promise<void>;
   addDriverApplication: (driver: DriverApplicationData) => Promise<void>;
   updateDriverStatus: (driverId: string, status: 'verified' | 'rejected') => void;
   updateRideStatus: (rideId: string, status: 'approved' | 'rejected') => void;
