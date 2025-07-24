@@ -10,11 +10,13 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { ShieldAlert, Loader2, Clock, Info, CheckCircle2, Ticket } from 'lucide-react';
+import { ShieldAlert, Loader2, Clock, Info, CheckCircle2, Ticket, Sparkles } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useRouter } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
+import { PromoCode } from '@/lib/types';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const locations = ["Sirdaryo", "Navoiy", "Jizzax", "Xorazm", "Buxoro", "Surxondaryo", "Namangan", "Andijon", "Qashqadaryo", "Samarqand", "Fargʻona", "Toshkent"];
 
@@ -69,14 +71,16 @@ export default function CreateRidePage() {
   const [info, setInfo] = useState('');
   const [time, setTime] = useState('');
   const [seats, setSeats] = useState<'4' | '8'>('4');
-  const [promoCode, setPromoCode] = useState('');
+  const [promoCodeInput, setPromoCodeInput] = useState('');
+  const [activatedPromo, setActivatedPromo] = useState<PromoCode | null>(null);
+  const [isActivatingPromo, setIsActivatingPromo] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   if (!context) {
     throw new Error('CreateRidePage must be used within an AppProvider');
   }
 
-  const { user, addRide, translations, drivers, loading, rides } = context;
+  const { user, addRide, translations, drivers, loading, rides, checkPromoCode } = context;
   const t = translations;
 
   const driverProfile = useMemo(() => {
@@ -111,6 +115,31 @@ export default function CreateRidePage() {
         })
     }
   };
+  
+  const handleActivatePromo = async () => {
+    if (!promoCodeInput || !user) return;
+    setIsActivatingPromo(true);
+    try {
+        const promo = await checkPromoCode(promoCodeInput, user.uid);
+        setActivatedPromo(promo);
+        toast({
+            title: t.promoCode_activated_title || "Promo Code Activated!",
+            description: t.promoCode_activated_desc || "Your ride's publication time will be extended to 24 hours.",
+        })
+    } catch (error: any) {
+        let desc = t.unknownError;
+        if (error.message.startsWith('promocode/')) {
+            desc = t[error.message.replace('/', '_')] || t.promocode_invalid || 'Invalid or expired promocode.';
+        }
+        toast({
+            title: t.promoCode_activation_failed_title || "Activation Failed",
+            description: desc,
+            variant: 'destructive'
+        })
+    } finally {
+        setIsActivatingPromo(false);
+    }
+  }
 
   const fromLocations = useMemo(() => locations.filter(loc => loc !== to), [to]);
   const toLocations = useMemo(() => locations.filter(loc => loc !== from), [from]);
@@ -178,12 +207,12 @@ export default function CreateRidePage() {
               info,
               time,
               seats: parseInt(seats),
-              ...(promoCode && { promoCode }),
+              ...(activatedPromo && { promoCode: activatedPromo.code }),
             });
             
             toast({
                 title: t.ridePublished || "Ride Published!",
-                description: promoCode ? t.ridePublishedPromoSuccess || "Your ride is submitted and its duration has been extended!" : t.yourRideIsNowLive || "Your ride is submitted for review.",
+                description: activatedPromo ? t.ridePublishedPromoSuccess || "Your ride is submitted and its duration has been extended!" : t.yourRideIsNowLive || "Your ride is submitted for review.",
             });
     
             setFrom('');
@@ -192,15 +221,12 @@ export default function CreateRidePage() {
             setInfo('');
             setTime('');
             setSeats('4');
-            setPromoCode('');
+            setPromoCodeInput('');
+            setActivatedPromo(null);
         } catch (error: any) {
-            let desc = t.unknownError;
-            if (error.message.startsWith('promocode/')) {
-                desc = t[error.message.replace('/', '_')] || t.promocode_invalid || 'Invalid or expired promocode.';
-            }
             toast({
                 title: t.ridePublishedError || "Error Publishing Ride",
-                description: desc,
+                description: t.unknownError,
                 variant: 'destructive'
             })
         } finally {
@@ -221,7 +247,7 @@ export default function CreateRidePage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                     <Label htmlFor="from">{t.from}</Label>
-                    <Select value={from} onValueChange={setFrom} disabled={isSubmitting}>
+                    <Select value={from} onValueChange={setFrom} required>
                         <SelectTrigger id="from">
                             <SelectValue placeholder={t.selectOrigin} />
                         </SelectTrigger>
@@ -232,7 +258,7 @@ export default function CreateRidePage() {
                 </div>
                 <div className="space-y-2">
                     <Label htmlFor="to">{t.to}</Label>
-                    <Select value={to} onValueChange={setTo} disabled={isSubmitting}>
+                    <Select value={to} onValueChange={setTo} required>
                         <SelectTrigger id="to">
                             <SelectValue placeholder={t.selectDestination} />
                         </SelectTrigger>
@@ -245,17 +271,17 @@ export default function CreateRidePage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="price">{t.price}</Label>
-                  <Input id="price" value={price} onChange={handlePriceChange} placeholder="100 000" required disabled={isSubmitting} />
+                  <Input id="price" value={price} onChange={handlePriceChange} placeholder="100 000" required />
                 </div>
                  <div className="space-y-2">
                   <Label htmlFor="time">{t.departureTimeOptional}</Label>
-                  <Input id="time" type="text" value={time} onChange={e => setTime(e.target.value)} placeholder={t.departureTimePlaceholder || 'e.g., 09:00 or Morning'} disabled={isSubmitting} />
+                  <Input id="time" type="text" value={time} onChange={e => setTime(e.target.value)} placeholder={t.departureTimePlaceholder || 'e.g., 09:00 or Morning'} />
                 </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                     <Label htmlFor="seats">{t.availableSeats || 'Available Seats'}</Label>
-                    <Select value={seats} onValueChange={(value) => setSeats(value as '4' | '8')} disabled={isSubmitting}>
+                    <Select value={seats} onValueChange={(value) => setSeats(value as '4' | '8')}>
                         <SelectTrigger id="seats">
                             <SelectValue placeholder={t.selectSeats || 'Select seats'} />
                         </SelectTrigger>
@@ -265,18 +291,40 @@ export default function CreateRidePage() {
                         </SelectContent>
                     </Select>
                 </div>
-                <div className="space-y-2">
-                    <Label htmlFor="promocode">{t.promoCode || 'Promo Code'} (Optional)</Label>
-                     <div className="relative">
-                        <Ticket className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                        <Input id="promocode" type="text" value={promoCode} onChange={e => setPromoCode(e.target.value)} placeholder={t.promoCodePlaceholder || "Enter code"} className="pl-10" disabled={isSubmitting} />
-                     </div>
-                </div>
             </div>
-            <div className="space-y-2">
+             <div className="space-y-2">
               <Label htmlFor="info">{t.additionalInfo}</Label>
-              <Textarea id="info" value={info} onChange={e => setInfo(e.target.value)} placeholder={t.additionalInfoPlaceholder} disabled={isSubmitting} />
+              <Textarea id="info" value={info} onChange={e => setInfo(e.target.value)} placeholder={t.additionalInfoPlaceholder} />
             </div>
+
+            <Card className="bg-muted/50">
+                <CardHeader className='pb-4'>
+                    <CardTitle className="text-lg flex items-center gap-2"><Ticket /> {t.promo_code_section_title || "Extend Publication"}</CardTitle>
+                    <CardDescription>{t.promo_code_section_desc || "Use a promo code to keep your ride listed for 24 hours instead of 12."}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    {activatedPromo ? (
+                        <Alert variant="default" className="bg-green-50 border-green-200 dark:bg-green-950 dark:border-green-800">
+                            <Sparkles className="h-5 w-5 text-green-600" />
+                            <AlertTitle className="text-green-800 dark:text-green-300">{t.promoCode_activated_title || "Promo Code Activated!"}</AlertTitle>
+                            <AlertDescription className="text-green-700 dark:text-green-400">
+                                {(t.promoCode_activated_alert || "The code {code} is active. Your ride will be published for 24 hours.").replace('{code}', activatedPromo.code)}
+                            </AlertDescription>
+                        </Alert>
+                    ) : (
+                        <div className="flex items-end gap-2">
+                            <div className="flex-grow space-y-1.5">
+                                <Label htmlFor="promocode">{t.promoCode || 'Promo Code'}</Label>
+                                <Input id="promocode" type="text" value={promoCodeInput} onChange={e => setPromoCodeInput(e.target.value.toUpperCase())} placeholder={t.promoCodePlaceholder || "Enter code"} />
+                            </div>
+                            <Button type="button" onClick={handleActivatePromo} disabled={isActivatingPromo || !promoCodeInput}>
+                                {isActivatingPromo ? <Loader2 className="h-4 w-4 animate-spin" /> : (t.activate_button || "Activate")}
+                            </Button>
+                        </div>
+                    )}
+                </CardContent>
+            </Card>
+
             <Button type="submit" className="w-full" disabled={isSubmitting}>
                 {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 {t.publishRide}

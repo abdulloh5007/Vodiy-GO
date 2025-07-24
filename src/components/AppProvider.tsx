@@ -6,7 +6,7 @@ import { AppContext } from '@/contexts/AppContext';
 import { Driver, Ride, Order, Language, Translations, User, DriverApplicationData, PromoCode } from '@/lib/types';
 import { initialTranslations } from '@/lib/i18n';
 import { db, auth } from '@/lib/firebase';
-import { collection, doc, getDoc, setDoc, onSnapshot, query, orderBy, serverTimestamp, writeBatch, where, getDocs, deleteDoc, updateDoc, runTransaction } from "firebase/firestore";
+import { collection, doc, getDoc, setDoc, onSnapshot, query, orderBy, serverTimestamp, writeBatch, where, getDocs, deleteDoc, updateDoc, runTransaction, arrayUnion } from "firebase/firestore";
 import { signInWithEmailAndPassword, onAuthStateChanged, signOut, createUserWithEmailAndPassword, User as FirebaseAuthUser } from "firebase/auth";
 import { ImageViewer } from './ImageViewer';
 
@@ -68,13 +68,18 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       const ridesData = snapshot.docs
         .map(doc => ({ id: doc.id, ...doc.data() } as Ride))
         .filter(ride => {
+            // Keep pending rides for admin review regardless of time
+            if (ride.status === 'pending') {
+                return true;
+            }
+            // Keep approved rides based on their duration
             if (ride.approvedAt) {
                 const rideApprovedDate = ride.approvedAt.toDate().getTime();
-                const duration = ride.promoCode ? 24 * 60 * 60 * 1000 : 12 * 60 * 60 * 1000;
-                return (now - rideApprovedDate) < duration;
+                const durationHours = ride.promoCode ? 24 : 12;
+                const durationMillis = durationHours * 60 * 60 * 1000;
+                return (now - rideApprovedDate) < durationMillis;
             }
-            // Keep pending rides or rides without approvedAt timestamp for now
-            return ride.status === 'pending';
+            return false;
         });
       setRides(ridesData);
     });
@@ -178,6 +183,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const addRide = async (rideData: Omit<Ride, 'id' | 'createdAt' | 'status' | 'approvedAt'>) => {
     if (!user) throw new Error("User not logged in");
     
+    // If a promocode was used, we need to mark it as used by this driver in the DB
     if (rideData.promoCode) {
         try {
             await runTransaction(db, async (transaction) => {
@@ -191,21 +197,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
                 const promoDoc = promoSnapshot.docs[0];
                 const promoData = promoDoc.data() as PromoCode;
 
-                if (promoData.status !== 'active') {
-                    throw new Error("promocode/inactive");
-                }
-                if (promoData.expiresAt.toDate() < new Date()) {
-                    transaction.update(promoDoc.ref, { status: 'expired' });
-                    throw new Error("promocode/expired");
-                }
-                if (promoData.usageCount >= promoData.limit) {
-                     transaction.update(promoDoc.ref, { status: 'depleted' });
-                    throw new Error("promocode/limit-reached");
+                // Double check validity just in case
+                if (promoData.status !== 'active' || promoData.expiresAt.toDate() < new Date() || (promoData.usedBy && promoData.usedBy.includes(user.uid))) {
+                    // This should be caught by checkPromoCode, but as a safeguard.
+                    throw new Error("promocode/invalid");
                 }
                 
                 const newUsageCount = promoData.usageCount + 1;
                 transaction.update(promoDoc.ref, { 
                     usageCount: newUsageCount,
+                    usedBy: arrayUnion(user.uid),
                     ...(newUsageCount >= promoData.limit && { status: 'depleted' })
                 });
 
@@ -220,7 +221,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             });
         } catch (error) {
             console.error("Transaction failed: ", error);
-            throw error; // Re-throw the error to be caught by the caller
+            throw error;
         }
     } else {
         const newRideRef = doc(collection(db, "rides"))
@@ -257,13 +258,42 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         limit,
         expiresAt,
         usageCount: 0,
+        usedBy: [],
         status: 'active',
         type: 'EXTEND_12H',
         createdAt: serverTimestamp(),
     });
   }
 
-  const login = async (email: string, password: string, role?: 'admin' | 'driver' | 'passenger'):Promise<void> => {
+  const checkPromoCode = async (code: string, driverId: string): Promise<PromoCode> => {
+    const promoQuery = query(collection(db, 'promocodes'), where('code', '==', code));
+    const promoSnapshot = await getDocs(promoQuery);
+
+    if (promoSnapshot.empty) {
+        throw new Error("promocode/not-found");
+    }
+
+    const promoDoc = promoSnapshot.docs[0];
+    const promoData = { id: promoDoc.id, ...promoDoc.data() } as PromoCode;
+
+    if (promoData.status !== 'active') {
+        throw new Error("promocode/inactive");
+    }
+    if (promoData.expiresAt.toDate() < new Date()) {
+        // Optionally update status to 'expired' in a separate transaction
+        throw new Error("promocode/expired");
+    }
+    if (promoData.usageCount >= promoData.limit) {
+        throw new Error("promocode/limit-reached");
+    }
+    if (promoData.usedBy && promoData.usedBy.includes(driverId)) {
+        throw new Error("promocode/already-used");
+    }
+
+    return promoData;
+  }
+
+  const login = async (email: string, password: string, role?: 'admin' | 'driver' | 'passenger'):Promise<FirebaseAuthUser> => {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const firebaseUser = userCredential.user;
   
@@ -282,9 +312,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
               throw new Error('auth/no-user-record');
           }
       }
+      return firebaseUser;
   };
   
-  const register = async (email: string, password: string, name: string, role: 'passenger' | 'driver', phone?: string): Promise<void> => {
+  const register = async (email: string, password: string, name: string, role: 'passenger' | 'driver', phone?: string): Promise<FirebaseAuthUser> => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const firebaseUser = userCredential.user;
     
@@ -292,7 +323,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const newUser: User = { uid: firebaseUser.uid, email: firebaseUser.email, name, role, ...(phone && { phone }) };
     await setDoc(userDocRef, newUser);
 
-    // DO NOT create a driver document here. It will be created upon application submission.
+    return firebaseUser;
   };
   
   const logout = async () => {
@@ -316,7 +347,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       user,
       users,
       drivers, rides, orders, 
-      promoCodes, createPromoCode,
+      promoCodes, createPromoCode, checkPromoCode,
       addDriverApplication, updateDriverStatus, updateOrderStatus, updateRideStatus,
       addRide, addOrder,
       login, register, logout,

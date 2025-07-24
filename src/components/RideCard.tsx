@@ -19,6 +19,7 @@ import { useRouter } from 'next/navigation';
 import { formatDistanceToNow } from 'date-fns';
 import { ru, uz } from 'date-fns/locale';
 import { Badge } from '@/components/ui/badge';
+import { User as FirebaseAuthUser } from 'firebase/auth';
 
 interface RideCardProps {
   ride: Ride;
@@ -28,13 +29,7 @@ interface RideCardProps {
 export function RideCard({ ride, onImageClick }: RideCardProps) {
   const context = useContext(AppContext);
   const router = useRouter();
-  const [isBooking, setIsBooking] = useState(false);
-  const [authAction, setAuthAction] = useState<'login'>('login');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [clientName, setClientName] = useState('');
-  const [clientPhone, setClientPhone] = useState('+998');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   
   const { toast } = useToast();
 
@@ -59,58 +54,10 @@ export function RideCard({ ride, onImageClick }: RideCardProps) {
 
 
   if (!driver || availableSeats <= 0) return null;
-
-  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const formatted = formatPhoneNumber(e.target.value);
-    setClientPhone(formatted);
-  };
   
-  const handleAuthAndBook = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email || !password) {
-        toast({
-            title: t.validationErrorTitle,
-            description: t.validationErrorDesc,
-            variant: "destructive",
-        });
-        return;
-    }
-    setIsSubmitting(true);
-    try {
-        await login(email, password, 'passenger');
-        toast({ title: t.loginSuccessTitle });
-    } catch (error) {
-        let errorMessage = t.unknownError;
-        if (error instanceof FirebaseError) {
-            switch (error.code) {
-                case 'auth/invalid-credential':
-                case 'auth/user-not-found':
-                case 'auth/wrong-password':
-                    errorMessage = t.errorInvalidCredential;
-                    break;
-                case 'auth/email-already-in-use':
-                    errorMessage = t.errorEmailInUse;
-                    break;
-                case 'auth/weak-password':
-                    errorMessage = t.errorWeakPassword;
-                    break;
-                default:
-                    errorMessage = t.unknownAuthError;
-            }
-        }
-        toast({
-            title: t.loginFailedTitle,
-            description: errorMessage,
-            variant: "destructive",
-        });
-    } finally {
-        setIsSubmitting(false);
-    }
-  }
-
-  const handleBooking = () => {
+  const handleBooking = async () => {
     if (!user) {
-        setIsBooking(true);
+        setIsAuthModalOpen(true);
         return;
     }
      if (user.role !== 'passenger') {
@@ -122,7 +69,7 @@ export function RideCard({ ride, onImageClick }: RideCardProps) {
          return;
     }
     
-    addOrder({
+    await addOrder({
         rideId: ride.id,
         passengerId: user.uid,
         clientName: user.name || user.email || 'Unknown',
@@ -136,28 +83,6 @@ export function RideCard({ ride, onImageClick }: RideCardProps) {
     router.push('/my-orders');
   };
   
-   useEffect(() => {
-    if (user && isBooking && user.role === 'passenger') {
-        addOrder({
-            rideId: ride.id,
-            passengerId: user.uid,
-            clientName: user.name || clientName, 
-            clientPhone: user.phone || clientPhone,
-        });
-         toast({
-            title: t.bookingRequestSent,
-            description: t.bookingRequestSent_desc,
-        });
-        setIsBooking(false);
-        setClientName('');
-        setClientPhone('+998');
-        setEmail('');
-        setPassword('');
-        router.push('/my-orders');
-    }
-  }, [user, isBooking, addOrder, clientName, clientPhone, ride.id, router, t]);
-
-
   if (!t.home) {
       return null;
   }
@@ -239,31 +164,119 @@ export function RideCard({ ride, onImageClick }: RideCardProps) {
         </CardFooter>
       </Card>
       
-      <Dialog open={isBooking} onOpenChange={setIsBooking}>
+      <Dialog open={isAuthModalOpen} onOpenChange={setIsAuthModalOpen}>
         <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{t.bookYourRide}</DialogTitle>
-            <DialogDescription>
-              {t.loginToBook}
-            </DialogDescription>
-          </DialogHeader>
-            <form onSubmit={handleAuthAndBook}>
-                <div className="space-y-4 py-4">
-                    <div className="space-y-2">
-                    <Label htmlFor="login-email">{t.email}</Label>
-                    <Input id="login-email" type="email" value={email} onChange={e => setEmail(e.target.value)} required />
-                    </div>
-                    <div className="space-y-2">
-                    <Label htmlFor="login-password">{t.password}</Label>
-                    <Input id="login-password" type="password" value={password} onChange={e => setPassword(e.target.value)} required />
-                    </div>
-                </div>
-              <DialogFooter>
-                <Button type="submit" disabled={isSubmitting}>{t.loginAndBook}</Button>
-              </DialogFooter>
-            </form>
+            <Tabs defaultValue="login" className="w-full">
+                <DialogHeader className="mb-4">
+                    <DialogTitle>{t.auth_modal_title || 'Authentication Required'}</DialogTitle>
+                    <DialogDescription>{t.auth_modal_desc || 'Please log in or register to continue.'}</DialogDescription>
+                    <TabsList className="grid w-full grid-cols-2 mt-2">
+                        <TabsTrigger value="login">{t.login}</TabsTrigger>
+                        <TabsTrigger value="register">{t.register}</TabsTrigger>
+                    </TabsList>
+                </DialogHeader>
+                <TabsContent value="login">
+                   <AuthForm type="login" onAuthSuccess={() => setIsAuthModalOpen(false)} />
+                </TabsContent>
+                <TabsContent value="register">
+                    <AuthForm type="register" onAuthSuccess={() => setIsAuthModalOpen(false)} />
+                </TabsContent>
+            </Tabs>
         </DialogContent>
       </Dialog>
     </>
   );
+}
+
+
+function AuthForm({ type, onAuthSuccess }: { type: 'login' | 'register', onAuthSuccess: (user: FirebaseAuthUser) => void }) {
+    const context = useContext(AppContext);
+    const { toast } = useToast();
+
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [name, setName] = useState('');
+    const [phone, setPhone] = useState('+998');
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    if (!context) return null;
+    const { translations: t, login, register } = context;
+
+    const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const formatted = formatPhoneNumber(e.target.value);
+        setPhone(formatted);
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsSubmitting(true);
+        try {
+            let user;
+            if (type === 'login') {
+                user = await login(email, password, 'passenger');
+                toast({ title: t.loginSuccessTitle });
+            } else {
+                 if (!name || !email || password.length < 6 || phone.replace(/\D/g, '').length !== 12) {
+                    toast({ title: t.validationErrorTitle, description: t.validationErrorDescRegister, variant: "destructive" });
+                    setIsSubmitting(false);
+                    return;
+                }
+                user = await register(email, password, name, 'passenger', phone);
+                toast({ title: t.registrationSuccessTitle });
+            }
+            onAuthSuccess(user);
+        } catch (error) {
+            let errorMessage = t.unknownError;
+            if (error instanceof FirebaseError) {
+                switch (error.code) {
+                    case 'auth/invalid-credential':
+                    case 'auth/user-not-found':
+                    case 'auth/wrong-password':
+                        errorMessage = t.errorInvalidCredential;
+                        break;
+                    case 'auth/email-already-in-use':
+                        errorMessage = t.errorEmailInUse;
+                        break;
+                    case 'auth/weak-password':
+                        errorMessage = t.errorWeakPassword;
+                        break;
+                    default:
+                        errorMessage = t.unknownAuthError;
+                }
+            } else if (error instanceof Error && error.message === 'auth/unauthorized-role') {
+                errorMessage = t.unauthorizedAccess;
+            }
+            toast({ title: type === 'login' ? t.loginFailedTitle : t.registrationFailedTitle, description: errorMessage, variant: "destructive" });
+        } finally {
+            setIsSubmitting(false);
+        }
+    }
+
+    return (
+        <form onSubmit={handleSubmit} className="space-y-4">
+            {type === 'register' && (
+                <>
+                    <div className="space-y-2">
+                        <Label htmlFor={`${type}-name`}>{t.fullName}</Label>
+                        <Input id={`${type}-name`} value={name} onChange={e => setName(e.target.value)} required />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor={`${type}-phone`}>{t.yourPhone}</Label>
+                        <Input id={`${type}-phone`} type="tel" value={phone} onChange={handlePhoneChange} required />
+                    </div>
+                </>
+            )}
+            <div className="space-y-2">
+                <Label htmlFor={`${type}-email`}>{t.email}</Label>
+                <Input id={`${type}-email`} type="email" value={email} onChange={e => setEmail(e.target.value)} required />
+            </div>
+            <div className="space-y-2">
+                <Label htmlFor={`${type}-password`}>{t.password}</Label>
+                <Input id={`${type}-password`} type="password" value={password} onChange={e => setPassword(e.target.value)} required />
+            </div>
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+                {isSubmitting ? <Loader2 className="animate-spin" /> : (type === 'login' ? t.login : t.register)}
+            </Button>
+        </form>
+    );
 }

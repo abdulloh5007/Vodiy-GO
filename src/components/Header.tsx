@@ -192,11 +192,7 @@ export function Header() {
             <>
                 {user?.role === 'passenger' && renderPassengerMenu()}
                 {user?.role === 'admin' && renderAdminMenu()}
-                {!user && (
-                    <Button asChild>
-                        <Link href="/driver/login">{t.login}</Link>
-                    </Button>
-                )}
+                {!user}
                 {user?.role === 'driver' && (
                     <Button variant="ghost" className="hidden md:flex" onClick={handleLogout}><LogOut className='mr-2'/> {t.logout}</Button>
                  )}

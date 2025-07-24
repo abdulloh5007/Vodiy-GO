@@ -51,6 +51,7 @@ export type PromoCode = {
     expiresAt: any;
     limit: number;
     usageCount: number;
+    usedBy: string[]; // Array of driver UIDs who have used this code
     status: 'active' | 'expired' | 'depleted';
     createdAt: any;
     type: 'EXTEND_12H';
