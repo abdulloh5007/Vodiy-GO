@@ -55,47 +55,47 @@ export default function AdminLayout({
     }
   };
 
-  useEffect(() => {
-    if (!loading) {
-      const isAuthPage = pathname === '/admin/login'; 
-      if (!user && !isAuthPage) {
-        router.push('/admin/login');
-      } else if (user) {
-        if (user.role !== 'admin') {
-           router.push('/');
-        } else if (isAuthPage) {
-          router.push('/admin');
-        } else {
-          // If admin is logged in, request notification permission
-          requestNotificationPermission(user.uid);
-        }
-      }
-    }
-  }, [user, loading, router, pathname]);
+  // useEffect(() => {
+  //   if (!loading) {
+  //     const isAuthPage = pathname === '/admin/login'; 
+  //     if (!user && !isAuthPage) {
+  //       router.push('/admin/login');
+  //     } else if (user) {
+  //       if (user.role !== 'admin') {
+  //          router.push('/');
+  //       } else if (isAuthPage) {
+  //         router.push('/admin');
+  //       } else {
+  //         // If admin is logged in, request notification permission
+  //         requestNotificationPermission(user.uid);
+  //       }
+  //     }
+  //   }
+  // }, [user, loading, router, pathname]);
   
   
-  if (loading || (!user && pathname !== '/admin/login')) {
-     return (
-        <div className="flex h-screen w-full items-center justify-center">
-            <Loader2 className="h-12 w-12 animate-spin text-primary" />
-        </div>
-    );
-  }
+  // if (loading || (!user && pathname !== '/admin/login')) {
+  //    return (
+  //       <div className="flex h-screen w-full items-center justify-center">
+  //           <Loader2 className="h-12 w-12 animate-spin text-primary" />
+  //       </div>
+  //   );
+  // }
   
-  if (user && user.role !== 'admin') {
-       return (
-        <div className="container mx-auto py-8 px-4 flex justify-center items-center h-[calc(100vh-8rem)]">
-            <Card className="w-full max-w-md text-center">
-                <CardHeader>
-                    <CardTitle className="flex items-center justify-center gap-2"><ShieldAlert className="text-destructive h-8 w-8"/>{t.accessDenied}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <p>{t.onlyAdminsCanAccess}</p>
-                </CardContent>
-            </Card>
-        </div>
-    );
-  }
+  // if (user && user.role !== 'admin') {
+  //      return (
+  //       <div className="container mx-auto py-8 px-4 flex justify-center items-center h-[calc(100vh-8rem)]">
+  //           <Card className="w-full max-w-md text-center">
+  //               <CardHeader>
+  //                   <CardTitle className="flex items-center justify-center gap-2"><ShieldAlert className="text-destructive h-8 w-8"/>{t.accessDenied}</CardTitle>
+  //               </CardHeader>
+  //               <CardContent>
+  //                   <p>{t.onlyAdminsCanAccess}</p>
+  //               </CardContent>
+  //           </Card>
+  //       </div>
+  //   );
+  // }
 
   return <>{children}</>;
 }

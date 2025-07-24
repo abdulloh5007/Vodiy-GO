@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useContext, useMemo } from 'react';
+import { useState, useContext, useMemo, useEffect } from 'react';
 import { AppContext } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,12 +9,48 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Ticket, CheckCircle, AlertCircle, XCircle } from 'lucide-react';
+import { Loader2, Ticket, CheckCircle, AlertCircle, XCircle, List, LayoutGrid } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { PromoCode } from '@/lib/types';
 import { format } from 'date-fns';
+import { enUS, ru, uz } from 'date-fns/locale';
+import { cn } from '@/lib/utils';
+
+
+const getStatusBadge = (code: PromoCode, t: any) => {
+    const now = new Date();
+    let status = code.status;
+    if (status === 'active' && code.expiresAt.toDate() < now) {
+        status = 'expired';
+    }
+
+    switch (status) {
+        case 'active':
+            return <Badge variant="secondary"><CheckCircle className="h-4 w-4 mr-1 text-green-500" />{t.promo_status_active || 'Active'}</Badge>;
+        case 'depleted':
+            return <Badge variant="destructive"><XCircle className="h-4 w-4 mr-1" />{t.promo_status_depleted || 'Depleted'}</Badge>;
+        case 'expired':
+            return <Badge variant="outline"><AlertCircle className="h-4 w-4 mr-1" />{t.promo_status_expired || 'Expired'}</Badge>;
+        default:
+            return <Badge>{status}</Badge>
+    }
+}
+
+const PromoCodeCard = ({ code, t, getLocale }: { code: PromoCode, t: any, getLocale: () => Locale }) => (
+    <Card>
+        <CardHeader>
+            <CardTitle className="font-mono font-bold text-2xl tracking-wider">{code.code}</CardTitle>
+            <CardDescription>{t.promo_table_usage}: {code.usageCount} / {code.limit}</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+            <div>{getStatusBadge(code, t)}</div>
+            <p className="text-xs text-muted-foreground">{t.promo_table_expires}: {format(code.expiresAt.toDate(), 'PPP p', { locale: getLocale() })}</p>
+        </CardContent>
+    </Card>
+);
+
 
 export default function PromoCodesPage() {
     const context = useContext(AppContext);
@@ -23,12 +59,33 @@ export default function PromoCodesPage() {
     const [limit, setLimit] = useState(1);
     const [validity, setValidity] = useState('12');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [viewMode, setViewMode] = useState<'table' | 'card'>('table');
+
+    useEffect(() => {
+        const savedViewMode = localStorage.getItem('promocodes-view-mode') as 'table' | 'card';
+        if (savedViewMode) {
+            setViewMode(savedViewMode);
+        }
+    }, []);
 
     if (!context) {
         throw new Error('PromoCodesPage must be used within an AppProvider');
     }
 
-    const { translations: t, createPromoCode, promoCodes, loading } = context;
+    const { translations: t, createPromoCode, promoCodes, loading, language } = context;
+
+    const handleSetViewMode = (mode: 'table' | 'card') => {
+        setViewMode(mode);
+        localStorage.setItem('promocodes-view-mode', mode);
+    }
+
+    const getLocale = () => {
+        switch (language) {
+            case 'ru': return ru;
+            case 'uz': return uz;
+            default: return enUS;
+        }
+    }
 
     const handleCreateCode = async () => {
         setIsSubmitting(true);
@@ -51,26 +108,6 @@ export default function PromoCodesPage() {
             setIsSubmitting(false);
         }
     };
-    
-    const getStatusBadge = (code: PromoCode) => {
-        const now = new Date();
-        let status = code.status;
-        if (status === 'active' && code.expiresAt.toDate() < now) {
-            status = 'expired';
-        }
-
-        switch(status) {
-            case 'active':
-                return <Badge variant="secondary"><CheckCircle className="h-4 w-4 mr-1 text-green-500"/>{t.promo_status_active || 'Active'}</Badge>;
-            case 'depleted':
-                return <Badge variant="destructive"><XCircle className="h-4 w-4 mr-1"/>{t.promo_status_depleted || 'Depleted'}</Badge>;
-            case 'expired':
-                return <Badge variant="outline"><AlertCircle className="h-4 w-4 mr-1"/>{t.promo_status_expired || 'Expired'}</Badge>;
-            default:
-                return <Badge>{status}</Badge>
-        }
-    }
-
 
     return (
         <div className="container mx-auto py-8 px-4">
@@ -88,12 +125,12 @@ export default function PromoCodesPage() {
                         <CardContent className="space-y-6">
                             <div className="space-y-2">
                                 <Label htmlFor="limit">{t.promo_limit_label || 'Usage Limit'}</Label>
-                                <Input 
-                                    id="limit" 
-                                    type="number" 
-                                    min="1" 
-                                    value={limit} 
-                                    onChange={(e) => setLimit(Math.max(1, parseInt(e.target.value) || 1))} 
+                                <Input
+                                    id="limit"
+                                    type="number"
+                                    min="1"
+                                    value={limit}
+                                    onChange={(e) => setLimit(Math.max(1, parseInt(e.target.value) || 1))}
                                     disabled={isSubmitting}
                                 />
                             </div>
@@ -111,7 +148,7 @@ export default function PromoCodesPage() {
                                     </SelectContent>
                                 </Select>
                             </div>
-                             <Button onClick={handleCreateCode} disabled={isSubmitting} className="w-full">
+                            <Button onClick={handleCreateCode} disabled={isSubmitting} className="w-full">
                                 {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                                 <Ticket className="mr-2 h-4 w-4" />
                                 {t.promo_create_button || 'Generate Code'}
@@ -121,41 +158,68 @@ export default function PromoCodesPage() {
                 </TabsContent>
                 <TabsContent value="existing">
                     <Card>
-                        <CardHeader>
-                             <CardTitle>{t.promo_existing_title || 'Existing Promo Codes'}</CardTitle>
-                             <CardDescription>{t.promo_existing_desc || 'Here is a list of all promo codes.'}</CardDescription>
+                        <CardHeader className="flex flex-row items-center justify-between">
+                            <div>
+                                <CardTitle>{t.promo_existing_title || 'Existing Promo Codes'}</CardTitle>
+                                <CardDescription>{t.promo_existing_desc || 'Here is a list of all promo codes.'}</CardDescription>
+                            </div>
+                             <div className="flex items-center gap-2">
+                                <Button variant={viewMode === 'table' ? 'secondary' : 'ghost'} size="icon" onClick={() => handleSetViewMode('table')}>
+                                    <List className="h-5 w-5" />
+                                </Button>
+                                <Button variant={viewMode === 'card' ? 'secondary' : 'ghost'} size="icon" onClick={() => handleSetViewMode('card')}>
+                                    <LayoutGrid className="h-5 w-5" />
+                                </Button>
+                            </div>
                         </CardHeader>
                         <CardContent>
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>{t.promo_table_code || 'Code'}</TableHead>
-                                        <TableHead>{t.promo_table_usage || 'Usage'}</TableHead>
-                                        <TableHead>{t.promo_table_expires || 'Expires At'}</TableHead>
-                                        <TableHead>{t.promo_table_status || 'Status'}</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {loading ? (
-                                        <TableRow>
-                                            <TableCell colSpan={4} className="h-24 text-center">{t.loading}</TableCell>
-                                        </TableRow>
-                                    ) : promoCodes.length > 0 ? (
-                                        promoCodes.map((code) => (
-                                            <TableRow key={code.id}>
-                                                <TableCell className="font-mono font-bold">{code.code}</TableCell>
-                                                <TableCell>{`${code.usageCount} / ${code.limit}`}</TableCell>
-                                                <TableCell>{format(code.expiresAt.toDate(), 'PPP p')}</TableCell>
-                                                <TableCell>{getStatusBadge(code)}</TableCell>
+                            <div className={cn(viewMode !== 'table' && 'hidden')}>
+                                <div className="w-full overflow-x-auto">
+                                    <Table className="min-w-[600px]">
+                                        <TableHeader>
+                                            <TableRow>
+                                                <TableHead>{t.promo_table_code || 'Code'}</TableHead>
+                                                <TableHead>{t.promo_table_usage || 'Usage'}</TableHead>
+                                                <TableHead>{t.promo_table_expires || 'Expires At'}</TableHead>
+                                                <TableHead>{t.promo_table_status || 'Status'}</TableHead>
                                             </TableRow>
-                                        ))
-                                    ) : (
-                                         <TableRow>
-                                            <TableCell colSpan={4} className="h-24 text-center">{t.promo_no_codes || 'No promo codes created yet.'}</TableCell>
-                                        </TableRow>
-                                    )}
-                                </TableBody>
-                            </Table>
+                                        </TableHeader>
+                                        <TableBody>
+                                            {loading ? (
+                                                <TableRow>
+                                                    <TableCell colSpan={4} className="h-24 text-center">{t.loading}</TableCell>
+                                                </TableRow>
+                                            ) : promoCodes.length > 0 ? (
+                                                promoCodes.map((code) => (
+                                                    <TableRow key={code.id}>
+                                                        <TableCell className="font-mono font-bold">{code.code}</TableCell>
+                                                        <TableCell>{`${code.usageCount} / ${code.limit}`}</TableCell>
+                                                        <TableCell>{format(code.expiresAt.toDate(), 'PPP p', { locale: getLocale() })}</TableCell>
+                                                        <TableCell>{getStatusBadge(code, t)}</TableCell>
+                                                    </TableRow>
+                                                ))
+                                            ) : (
+                                                <TableRow>
+                                                    <TableCell colSpan={4} className="h-24 text-center">{t.promo_no_codes || 'No promo codes created yet.'}</TableCell>
+                                                </TableRow>
+                                            )}
+                                        </TableBody>
+                                    </Table>
+                                </div>
+                            </div>
+                             <div className={cn("grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4", viewMode !== 'card' && 'hidden')}>
+                                 {loading ? (
+                                     <p>{t.loading}</p>
+                                 ) : promoCodes.length > 0 ? (
+                                    promoCodes.map((code) => (
+                                        <PromoCodeCard key={code.id} code={code} t={t} getLocale={getLocale} />
+                                    ))
+                                ) : (
+                                     <div className="col-span-full text-center py-16">
+                                        <p className="text-muted-foreground">{t.promo_no_codes || 'No promo codes created yet.'}</p>
+                                    </div>
+                                )}
+                            </div>
                         </CardContent>
                     </Card>
                 </TabsContent>
