@@ -16,8 +16,12 @@ import Image from 'next/image';
 import { Driver } from '@/lib/types';
 
 
+const MAX_FILE_SIZE_MB = 2;
+const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
+
 const ImageDropzone = ({ file, setFile, t, disabled }: { file: File | null, setFile: (file: File | null) => void, t: any, disabled: boolean }) => {
     const [preview, setPreview] = useState<string | null>(null);
+    const { toast } = useToast();
 
     useEffect(() => {
         if (file) {
@@ -31,21 +35,40 @@ const ImageDropzone = ({ file, setFile, t, disabled }: { file: File | null, setF
         }
     }, [file]);
 
+    const handleFile = (selectedFile: File | null | undefined) => {
+        if (!selectedFile) return;
+
+        if (selectedFile.size > MAX_FILE_SIZE_BYTES) {
+            toast({
+                variant: 'destructive',
+                title: t.fileTooLargeTitle || 'File is too large',
+                description: (t.fileTooLargeDesc || 'Maximum file size is {size}MB.').replace('{size}', MAX_FILE_SIZE_MB.toString()),
+            });
+            return;
+        }
+
+        if (selectedFile.type.startsWith('image/')) {
+            setFile(selectedFile);
+        } else {
+             toast({
+                variant: 'destructive',
+                title: t.invalidFileTypeTitle || 'Invalid file type',
+                description: t.invalidFileTypeDesc || 'Please upload an image file.',
+            });
+        }
+    }
+
     const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
         if (disabled) return;
         const droppedFile = e.dataTransfer.files[0];
-        if (droppedFile && droppedFile.type.startsWith('image/')) {
-            setFile(droppedFile);
-        }
+        handleFile(droppedFile);
     };
     
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (disabled) return;
         const selectedFile = e.target.files?.[0];
-        if (selectedFile) {
-            setFile(selectedFile);
-        }
+        handleFile(selectedFile);
     };
 
     return (
@@ -74,6 +97,7 @@ const ImageDropzone = ({ file, setFile, t, disabled }: { file: File | null, setF
                 <div className="flex flex-col items-center gap-2 text-muted-foreground">
                     <UploadCloud className="h-10 w-10"/>
                     <span>{t.carPhotoDropzone || 'Drag & drop or click to upload car photo'}</span>
+                    <span className="text-xs">({t.maxFileSize || 'Max size'}: {MAX_FILE_SIZE_MB}MB)</span>
                 </div>
             )}
         </div>
