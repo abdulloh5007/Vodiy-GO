@@ -128,6 +128,7 @@
     "next_button": "Следующий шаг",
     "passportNumber": "Номер паспорта",
     "passportPlaceholder": "AA 1234567",
+    "passportTechPlaceholder": "AAA 1234567",
     "carPhotoDropzone": "Перетащите или нажмите, чтобы загрузить фото машины",
     "statusPage_pending_title": "Заявка на рассмотрении",
     "statusPage_pending_desc": "Ваша заявка находится на рассмотрении. Мы сообщим вам, как только она будет обработана. Спасибо за ваше терпение.",

@@ -128,6 +128,7 @@
     "next_button": "Keyingi qadam",
     "passportNumber": "Pasport raqami",
     "passportPlaceholder": "AA 1234567",
+    "passportTechPlaceholder": "AAA 1234567",
     "carPhotoDropzone": "Mashina rasmini yuklash uchun bosing yoki bu yerga torting",
     "statusPage_pending_title": "Ariza kutilmoqda",
     "statusPage_pending_desc": "Sizning arizangiz ko'rib chiqilmoqda. Natijasi haqida sizga xabar beramiz. Sabringiz uchun rahmat.",

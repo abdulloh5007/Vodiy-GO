@@ -128,6 +128,7 @@
     "next_button": "Next Step",
     "passportNumber": "Passport Number",
     "passportPlaceholder": "AA 1234567",
+    "passportTechPlaceholder": "AAA 1234567",
     "carPhotoDropzone": "Drag & drop or click to upload car photo",
     "statusPage_pending_title": "Application Pending",
     "statusPage_pending_desc": "Your application is currently under review. We will notify you once it's processed. Thank you for your patience.",

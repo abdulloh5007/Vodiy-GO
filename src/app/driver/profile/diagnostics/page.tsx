@@ -306,7 +306,7 @@ export default function DriverDiagnosticsPage() {
                     <CardDescription>{t.step3_title || "Step 3: Car Documents"}</CardDescription>
                     <div className="space-y-2">
                         <Label htmlFor="techPassport">{t.techPassport || "Vehicle Registration Certificate (Tech Passport)"}</Label>
-                        <Input id="techPassport" value={techPassport} onChange={handleTechPassportChange} placeholder={t.passportPlaceholder || "AAF 1234567"} required disabled={isSubmitting} />
+                        <Input id="techPassport" value={techPassport} onChange={handleTechPassportChange} placeholder={t.passportTechPlaceholder || "AAF 1234567"} required disabled={isSubmitting} />
                     </div>
                 </div>
             )}
