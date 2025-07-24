@@ -73,12 +73,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
                 return true;
             }
             // Keep approved rides based on their duration
-            if (ride.approvedAt) {
+            if (ride.status === 'approved' && ride.approvedAt) {
                 const rideApprovedDate = ride.approvedAt.toDate().getTime();
                 const durationHours = ride.promoCode ? 24 : 12;
                 const durationMillis = durationHours * 60 * 60 * 1000;
                 return (now - rideApprovedDate) < durationMillis;
             }
+            // By default, filter out rides that don't match criteria (e.g., rejected, or approved without timestamp)
             return false;
         });
       setRides(ridesData);
@@ -188,13 +189,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         try {
             await runTransaction(db, async (transaction) => {
                 const promoQuery = query(collection(db, 'promocodes'), where('code', '==', rideData.promoCode));
-                const promoSnapshot = await getDocs(promoQuery);
+                const promoDocs = await transaction.get(promoQuery);
 
-                if (promoSnapshot.empty) {
+                if (promoDocs.empty) {
                     throw new Error("promocode/not-found");
                 }
 
-                const promoDoc = promoSnapshot.docs[0];
+                const promoDoc = promoDocs.docs[0];
                 const promoData = promoDoc.data() as PromoCode;
 
                 // Double check validity just in case
