@@ -32,7 +32,7 @@ export default function AdminLayout({
   //     const isAuthPage = pathname === '/admin/login'; 
   //     if (!user && !isAuthPage) {
   //       router.push('/admin/login');
-  //     } else if (user && user.role !== 'admin') {
+  //     } else if (user && user.role !== 'admin') { 
   //        router.push('/');
   //     }
   //   }
