@@ -235,6 +235,7 @@
     "maxFileSize": "Макс. размер",
     "fileTooLargeTitle": "Файл слишком большой",
     "fileTooLargeDesc": "Максимальный размер файла — {size}МБ.",
+    "fileTooLargeDescKB": "Максимальный размер файла — {size}КБ.",
     "invalidFileTypeTitle": "Неверный тип файла",
     "invalidFileTypeDesc": "Пожалуйста, загрузите файл изображения."
 }

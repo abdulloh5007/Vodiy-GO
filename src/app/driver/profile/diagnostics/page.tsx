@@ -16,8 +16,8 @@ import Image from 'next/image';
 import { Driver } from '@/lib/types';
 
 
-const MAX_FILE_SIZE_MB = 2;
-const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
+const MAX_FILE_SIZE_KB = 700;
+const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_KB * 1024;
 
 const ImageDropzone = ({ file, setFile, t, disabled }: { file: File | null, setFile: (file: File | null) => void, t: any, disabled: boolean }) => {
     const [preview, setPreview] = useState<string | null>(null);
@@ -42,7 +42,7 @@ const ImageDropzone = ({ file, setFile, t, disabled }: { file: File | null, setF
             toast({
                 variant: 'destructive',
                 title: t.fileTooLargeTitle || 'File is too large',
-                description: (t.fileTooLargeDesc || 'Maximum file size is {size}MB.').replace('{size}', MAX_FILE_SIZE_MB.toString()),
+                description: (t.fileTooLargeDescKB || 'Maximum file size is {size}KB.').replace('{size}', MAX_FILE_SIZE_KB.toString()),
             });
             return;
         }
@@ -97,7 +97,7 @@ const ImageDropzone = ({ file, setFile, t, disabled }: { file: File | null, setF
                 <div className="flex flex-col items-center gap-2 text-muted-foreground">
                     <UploadCloud className="h-10 w-10"/>
                     <span>{t.carPhotoDropzone || 'Drag & drop or click to upload car photo'}</span>
-                    <span className="text-xs">({t.maxFileSize || 'Max size'}: {MAX_FILE_SIZE_MB}MB)</span>
+                    <span className="text-xs">({t.maxFileSize || 'Max size'}: {MAX_FILE_SIZE_KB}KB)</span>
                 </div>
             )}
         </div>

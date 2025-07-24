@@ -25,7 +25,7 @@ export default function AdminLayout({
   }
 
   const { user, loading, translations } = context;
-  const t = translations;
+  const t = translations; 
 
   // useEffect(() => {
   //   if (!loading) {

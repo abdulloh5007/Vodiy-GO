@@ -235,6 +235,7 @@
     "maxFileSize": "Maks. hajm",
     "fileTooLargeTitle": "Fayl hajmi juda katta",
     "fileTooLargeDesc": "Maksimal fayl hajmi {size}MB.",
+    "fileTooLargeDescKB": "Maksimal fayl hajmi {size}KB.",
     "invalidFileTypeTitle": "Fayl turi noto'g'ri",
     "invalidFileTypeDesc": "Iltimos, rasm faylini yuklang."
 }

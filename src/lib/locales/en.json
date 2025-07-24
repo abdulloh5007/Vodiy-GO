@@ -235,6 +235,7 @@
     "maxFileSize": "Max size",
     "fileTooLargeTitle": "File is too large",
     "fileTooLargeDesc": "Maximum file size is {size}MB.",
+    "fileTooLargeDescKB": "Maximum file size is {size}KB.",
     "invalidFileTypeTitle": "Invalid file type",
     "invalidFileTypeDesc": "Please upload an image file."
 }
