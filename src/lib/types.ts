@@ -17,7 +17,8 @@ export type Driver = {
   carModel: string;
   carNumber: string;
   carPhotoUrl: string;
-  status: 'pending' | 'verified' | 'rejected';
+  status: 'pending' | 'verified' | 'rejected' | 'blocked';
+  rejectionReason?: string;
 };
 
 export type Ride = {
@@ -28,11 +29,12 @@ export type Ride = {
   price: number;
   seats: number;
   info: string;
-  time?: string; // Optional departure time
-  createdAt: any; // Allow server timestamp
+  time?: string;
+  createdAt: any;
   status: 'pending' | 'approved' | 'rejected';
-  approvedAt?: any; // Timestamp for when the ride was approved
-  promoCode?: string; // Optional promocode used
+  approvedAt?: any;
+  promoCode?: string;
+  rejectionReason?: string;
 };
 
 export type Order = {
@@ -42,8 +44,17 @@ export type Order = {
   clientName: string;
   clientPhone: string;
   status: 'new' | 'accepted' | 'rejected';
-  createdAt: any; // Allow server timestamp
+  createdAt: any;
 };
+
+export type Message = {
+    id: string;
+    type: 'REGISTRATION_PENDING' | 'REGISTRATION_APPROVED' | 'REGISTRATION_REJECTED' | 'RIDE_CREATED' | 'RIDE_APPROVED' | 'RIDE_REJECTED';
+    title: string;
+    body: string;
+    createdAt: any;
+    isRead: boolean;
+}
 
 export type PromoCode = {
     id: string;
@@ -51,7 +62,7 @@ export type PromoCode = {
     expiresAt: any;
     limit: number;
     usageCount: number;
-    usedBy: string[]; // Array of driver UIDs who have used this code
+    usedBy: string[];
     status: 'active' | 'expired' | 'depleted';
     createdAt: any;
     type: 'EXTEND_12H';

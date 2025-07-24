@@ -2,7 +2,7 @@
 'use client';
 
 import React from 'react';
-import { Driver, Ride, Order, Language, Translations, User, DriverApplicationData, PromoCode } from '@/lib/types';
+import { Driver, Ride, Order, Language, Translations, User, DriverApplicationData, PromoCode, Message } from '@/lib/types';
 import { User as FirebaseAuthUser } from 'firebase/auth';
 
 interface AppContextType {
@@ -15,11 +15,13 @@ interface AppContextType {
   rides: Ride[];
   orders: Order[];
   promoCodes: PromoCode[];
+  messages: Message[];
   createPromoCode: (limit: number, validityHours: number) => Promise<void>;
   checkPromoCode: (code: string, driverId: string) => Promise<PromoCode>;
   addDriverApplication: (driver: DriverApplicationData) => Promise<void>;
-  updateDriverStatus: (driverId: string, status: 'verified' | 'rejected') => void;
-  updateRideStatus: (rideId: string, status: 'approved' | 'rejected') => void;
+  updateDriverStatus: (driverId: string, status: 'verified' | 'rejected' | 'blocked', reason?: string) => Promise<void>;
+  deleteDriver: (driverId: string) => Promise<void>;
+  updateRideStatus: (rideId: string, status: 'approved' | 'rejected', reason?: string) => Promise<void>;
   updateOrderStatus: (orderId: string, status: 'accepted' | 'rejected') => void;
   addRide: (ride: Omit<Ride, 'id' | 'createdAt' | 'status' | 'approvedAt'>) => void;
   addOrder: (order: Omit<Order, 'id' | 'status' | 'createdAt'>) => void;

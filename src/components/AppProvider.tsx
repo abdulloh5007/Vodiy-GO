@@ -3,12 +3,13 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { AppContext } from '@/contexts/AppContext';
-import { Driver, Ride, Order, Language, Translations, User, DriverApplicationData, PromoCode } from '@/lib/types';
+import { Driver, Ride, Order, Language, Translations, User, DriverApplicationData, PromoCode, Message } from '@/lib/types';
 import { initialTranslations } from '@/lib/i18n';
 import { db, auth } from '@/lib/firebase';
 import { collection, doc, getDoc, setDoc, onSnapshot, query, orderBy, serverTimestamp, writeBatch, where, getDocs, deleteDoc, updateDoc, runTransaction, arrayUnion } from "firebase/firestore";
 import { signInWithEmailAndPassword, onAuthStateChanged, signOut, createUserWithEmailAndPassword, User as FirebaseAuthUser } from "firebase/auth";
 import { ImageViewer } from './ImageViewer';
+import { RejectionDialog } from './RejectionDialog';
 
 const imageToDataUrl = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -34,6 +35,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [rides, setRides] = useState<Ride[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [promoCodes, setPromoCodes] = useState<PromoCode[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
@@ -68,18 +70,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       const ridesData = snapshot.docs
         .map(doc => ({ id: doc.id, ...doc.data() } as Ride))
         .filter(ride => {
-            // Keep pending rides for admin review regardless of time
-            if (ride.status === 'pending') {
+            if (ride.status === 'pending' || ride.status === 'rejected') {
                 return true;
             }
-            // Keep approved rides based on their duration
             if (ride.status === 'approved' && ride.approvedAt) {
                 const rideApprovedDate = ride.approvedAt.toDate().getTime();
                 const durationHours = ride.promoCode ? 24 : 12;
                 const durationMillis = durationHours * 60 * 60 * 1000;
                 return (now - rideApprovedDate) < durationMillis;
             }
-            // By default, filter out rides that don't match criteria (e.g., rejected, or approved without timestamp)
             return false;
         });
       setRides(ridesData);
@@ -90,7 +89,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       setOrders(ordersData);
     });
 
-    // For admin to view all users
     const unsubscribeUsers = onSnapshot(collection(db, "users"), (snapshot) => {
         const usersData = snapshot.docs.map(doc => doc.data() as User);
         setUsers(usersData);
@@ -128,6 +126,31 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
   
+  // Effect to subscribe to messages for the current user
+  useEffect(() => {
+    if (user?.uid) {
+        const messagesQuery = query(collection(db, 'users', user.uid, 'messages'), orderBy('createdAt', 'desc'));
+        const unsubscribeMessages = onSnapshot(messagesQuery, (snapshot) => {
+            const messagesData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Message));
+            setMessages(messagesData);
+        });
+        return () => unsubscribeMessages();
+    } else {
+        setMessages([]);
+    }
+  }, [user]);
+
+  const addMessage = async (userId: string, type: Message['type'], title: string, body: string) => {
+    const messageRef = doc(collection(db, 'users', userId, 'messages'));
+    await setDoc(messageRef, {
+        id: messageRef.id,
+        type,
+        title,
+        body,
+        createdAt: serverTimestamp(),
+        isRead: false
+    });
+  }
 
   const addDriverApplication = async (driverData: DriverApplicationData) => {
     if (!user) {
@@ -148,10 +171,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const userDoc = await getDoc(userDocRef);
     const phone = userDoc.data()?.phone || '';
 
-    // 1. Convert image to Data URL
     const carPhotoUrl = await imageToDataUrl(driverData.carPhotoFile);
-
-    // 2. Prepare data for Firestore
     const { carPhotoFile, ...driverInfo } = driverData;
     
     await setDoc(driverDocRef, {
@@ -159,21 +179,52 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         ...driverInfo,
         phone,
         carPhotoUrl,
-        status: 'pending', // Application is pending review
+        status: 'pending',
     });
+    
+    await addMessage(user.uid, 'REGISTRATION_PENDING', 'Ariza yuborildi', 'Sizning haydovchilik arizangiz koʻrib chiqish uchun yuborildi. Tez orada sizga xabar beramiz.');
   };
 
-  const updateDriverStatus = async (driverId: string, status: 'verified' | 'rejected') => {
+  const updateDriverStatus = async (driverId: string, status: 'verified' | 'rejected' | 'blocked', reason?: string) => {
     const driverDoc = doc(db, "drivers", driverId);
-    await setDoc(driverDoc, { status }, { merge: true });
+    await setDoc(driverDoc, { status, ...(reason && { rejectionReason: reason }) }, { merge: true });
+
+    if (status === 'verified') {
+        await addMessage(driverId, 'REGISTRATION_APPROVED', 'Ariza tasdiqlandi', 'Tabriklaymiz! Sizning haydovchilik arizangiz tasdiqlandi. Endi siz qatnovlarni e’lon qilishingiz mumkin.');
+    } else if (status === 'rejected') {
+        await addMessage(driverId, 'REGISTRATION_REJECTED', 'Ariza rad etildi', `Sabab: ${reason || 'Sabab ko‘rsatilmagan'}`);
+    } else if (status === 'blocked') {
+        await addMessage(driverId, 'REGISTRATION_REJECTED', 'Hisob bloklandi', `Sabab: ${reason || 'Sabab ko‘rsatilmagan'}`);
+    }
   };
   
-  const updateRideStatus = async (rideId: string, status: 'approved' | 'rejected') => {
-    const rideDoc = doc(db, "rides", rideId);
-    await updateDoc(rideDoc, { 
+  const updateRideStatus = async (rideId: string, status: 'approved' | 'rejected', reason?: string) => {
+    const rideDocRef = doc(db, "rides", rideId);
+    const rideDocSnap = await getDoc(rideDocRef);
+    if (!rideDocSnap.exists()) return;
+    const rideData = rideDocSnap.data() as Ride;
+
+    await updateDoc(rideDocRef, { 
         status,
-        ...(status === 'approved' && { approvedAt: serverTimestamp() })
+        ...(status === 'approved' && { approvedAt: serverTimestamp() }),
+        ...(reason && { rejectionReason: reason })
     });
+
+    if (status === 'approved') {
+        await addMessage(rideData.driverId, 'RIDE_APPROVED', 'Qatnov tasdiqlandi', `Sizning ${rideData.from} - ${rideData.to} yo‘nalishidagi qatnovingiz tasdiqlandi.`);
+    } else if (status === 'rejected') {
+        await addMessage(rideData.driverId, 'RIDE_REJECTED', 'Qatnov rad etildi', `Sizning ${rideData.from} - ${rideData.to} yo‘nalishidagi qatnovingiz rad etildi. Sabab: ${reason || 'Sabab ko‘rsatilmagan'}`);
+    }
+  }
+
+  const deleteDriver = async (driverId: string) => {
+    // This is a destructive action. In a real app, you might want to "soft delete"
+    // by setting a status like 'deleted' instead of actually removing the document.
+    const driverDoc = doc(db, "drivers", driverId);
+    await deleteDoc(driverDoc);
+    const userDoc = doc(db, "users", driverId);
+    await deleteDoc(userDoc);
+    // You might also want to delete associated rides, etc.
   }
 
   const updateOrderStatus = async (orderId: string, status: 'accepted' | 'rejected') => {
@@ -184,56 +235,50 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const addRide = async (rideData: Omit<Ride, 'id' | 'createdAt' | 'status' | 'approvedAt'>) => {
     if (!user) throw new Error("User not logged in");
     
-    // If a promocode was used, we need to mark it as used by this driver in the DB
+    const ridePayload = {
+      ...rideData,
+      id: '',
+      createdAt: serverTimestamp(),
+      status: 'pending' as const,
+      approvedAt: null
+    };
+
     if (rideData.promoCode) {
-        try {
-            await runTransaction(db, async (transaction) => {
-                const promoQuery = query(collection(db, 'promocodes'), where('code', '==', rideData.promoCode));
-                const promoDocs = await transaction.get(promoQuery);
+        await runTransaction(db, async (transaction) => {
+            const promoQuery = query(collection(db, 'promocodes'), where('code', '==', rideData.promoCode));
+            const promoSnapshot = await getDocs(promoQuery);
 
-                if (promoDocs.empty) {
-                    throw new Error("promocode/not-found");
-                }
+            if (promoSnapshot.empty) throw new Error("promocode/not-found");
+            
+            const promoDocRef = promoSnapshot.docs[0].ref;
+            const promoDoc = await transaction.get(promoDocRef);
 
-                const promoDoc = promoDocs.docs[0];
-                const promoData = promoDoc.data() as PromoCode;
+            if (!promoDoc.exists()) throw new Error("promocode/not-found");
+            
+            const promoData = promoDoc.data() as PromoCode;
 
-                // Double check validity just in case
-                if (promoData.status !== 'active' || promoData.expiresAt.toDate() < new Date() || (promoData.usedBy && promoData.usedBy.includes(user.uid))) {
-                    // This should be caught by checkPromoCode, but as a safeguard.
-                    throw new Error("promocode/invalid");
-                }
-                
-                const newUsageCount = promoData.usageCount + 1;
-                transaction.update(promoDoc.ref, { 
-                    usageCount: newUsageCount,
-                    usedBy: arrayUnion(user.uid),
-                    ...(newUsageCount >= promoData.limit && { status: 'depleted' })
-                });
-
-                const newRideRef = doc(collection(db, "rides"));
-                transaction.set(newRideRef, {
-                    ...rideData,
-                    id: newRideRef.id,
-                    createdAt: serverTimestamp(),
-                    status: 'pending',
-                    approvedAt: null
-                });
+            if (promoData.status !== 'active' || promoData.expiresAt.toDate() < new Date() || (promoData.usedBy && promoData.usedBy.includes(user.uid))) {
+                throw new Error("promocode/invalid");
+            }
+            
+            const newUsageCount = (promoData.usageCount || 0) + 1;
+            transaction.update(promoDoc.ref, { 
+                usageCount: newUsageCount,
+                usedBy: arrayUnion(user.uid),
+                ...(newUsageCount >= promoData.limit && { status: 'depleted' })
             });
-        } catch (error) {
-            console.error("Transaction failed: ", error);
-            throw error;
-        }
+
+            const newRideRef = doc(collection(db, "rides"));
+            ridePayload.id = newRideRef.id;
+            transaction.set(newRideRef, ridePayload);
+        });
     } else {
         const newRideRef = doc(collection(db, "rides"))
-        await setDoc(newRideRef, {
-          ...rideData,
-          id: newRideRef.id,
-          createdAt: serverTimestamp(),
-          status: 'pending', 
-          approvedAt: null
-        });
+        ridePayload.id = newRideRef.id;
+        await setDoc(newRideRef, ridePayload);
     }
+
+    await addMessage(user.uid, 'RIDE_CREATED', 'Yangi qatnov yaratildi', `Sizning ${rideData.from} - ${rideData.to} yo‘nalishidagi qatnovingiz ko‘rib chiqish uchun yuborildi.`);
   };
 
   const addOrder = async (orderData: Omit<Order, 'id' | 'status' | 'createdAt' | 'passengerId'> & { passengerId: string }) => {
@@ -281,7 +326,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         throw new Error("promocode/inactive");
     }
     if (promoData.expiresAt.toDate() < new Date()) {
-        // Optionally update status to 'expired' in a separate transaction
         throw new Error("promocode/expired");
     }
     if (promoData.usageCount >= promoData.limit) {
@@ -308,7 +352,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
                   throw new Error('auth/unauthorized-role');
               }
           } else {
-              // This case should not happen for login, but as a safeguard:
               await signOut(auth);
               throw new Error('auth/no-user-record');
           }
@@ -328,9 +371,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   };
   
   const logout = async () => {
+    const userRole = user?.role;
     await signOut(auth);
     setUser(null);
-    window.location.href = '/';
+    if (userRole === 'driver') {
+        window.location.href = '/driver/login';
+    } else {
+        window.location.href = '/';
+    }
   };
   
   const saveFcmToken = async (uid: string, token: string) => {
@@ -349,7 +397,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       users,
       drivers, rides, orders, 
       promoCodes, createPromoCode, checkPromoCode,
-      addDriverApplication, updateDriverStatus, updateOrderStatus, updateRideStatus,
+      messages,
+      addDriverApplication, updateDriverStatus, deleteDriver, updateOrderStatus, updateRideStatus,
       addRide, addOrder,
       login, register, logout,
       loading,

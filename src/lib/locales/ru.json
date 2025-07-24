@@ -85,6 +85,7 @@
     "pending": "В ожидании",
     "verified": "Проверен",
     "rejected": "Отклонен",
+    "blocked": "Заблокирован",
     "unsubmitted": "Не подана",
     "completeYourApplication": "Завершите вашу заявку",
     "applicationUnsubmittedDesc": "Пожалуйста, завершите вашу заявку, чтобы стать водителем.",
@@ -252,6 +253,23 @@
     "promoCode_activated_title": "Промокод активирован!",
     "promoCode_activated_desc": "Время публикации вашей поездки будет продлено до 24 часов.",
     "promoCode_activation_failed_title": "Ошибка активации",
-    "promoCode_activated_alert": "Код {code} активирован. Ваша поездка будет опубликована на 24 часа."
+    "promoCode_activated_alert": "Код {code} активирован. Ваша поездка будет опубликована на 24 часа.",
+    "rejection_reason": "Причина отказа",
+    "block_reason": "Причина блокировки",
+    "rejection_reason_title": "Причина отказа",
+    "rejection_reason_desc": "Укажите причину отказа. Она будет видна заявителю.",
+    "reason": "Причина",
+    "reason_placeholder": "Введите причину...",
+    "cancel_button": "Отмена",
+    "confirm_rejection": "Подтвердить отказ",
+    "delete_driver": "Удалить",
+    "delete_driver_confirm_title": "Вы уверены?",
+    "delete_driver_confirm_desc": "Это действие нельзя отменить. Водитель и все связанные с ним данные будут удалены навсегда.",
+    "delete_button": "Удалить",
+    "block_driver": "Заблокировать",
+    "block_reason_title": "Причина блокировки",
+    "block_reason_desc": "Укажите причину блокировки этого водителя.",
+    "admin_chat_title": "Администратор",
+    "admin_chat_desc": "Статусы заявок и уведомления",
+    "no_messages_yet": "Сообщений пока нет."
 }
-

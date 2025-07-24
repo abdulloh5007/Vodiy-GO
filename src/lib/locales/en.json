@@ -85,6 +85,7 @@
     "pending": "Pending",
     "verified": "Verified",
     "rejected": "Rejected",
+    "blocked": "Blocked",
     "unsubmitted": "Not Submitted",
     "completeYourApplication": "Complete Your Application",
     "applicationUnsubmittedDesc": "Please complete your application to become a driver.",
@@ -252,6 +253,23 @@
     "promoCode_activated_title": "Promo Code Activated!",
     "promoCode_activated_desc": "Your ride's publication time will be extended to 24 hours.",
     "promoCode_activation_failed_title": "Activation Failed",
-    "promoCode_activated_alert": "The code {code} is active. Your ride will be published for 24 hours."
+    "promoCode_activated_alert": "The code {code} is active. Your ride will be published for 24 hours.",
+    "rejection_reason": "Rejection Reason",
+    "block_reason": "Block Reason",
+    "rejection_reason_title": "Reason for Rejection",
+    "rejection_reason_desc": "Please specify the reason for rejecting this application. This will be visible to the applicant.",
+    "reason": "Reason",
+    "reason_placeholder": "Enter reason here...",
+    "cancel_button": "Cancel",
+    "confirm_rejection": "Confirm Rejection",
+    "delete_driver": "Delete",
+    "delete_driver_confirm_title": "Are you sure?",
+    "delete_driver_confirm_desc": "This action cannot be undone. This will permanently delete the driver and all associated data.",
+    "delete_button": "Delete",
+    "block_driver": "Block",
+    "block_reason_title": "Reason for blocking",
+    "block_reason_desc": "Please specify the reason for blocking this driver.",
+    "admin_chat_title": "Admin",
+    "admin_chat_desc": "Application status and notifications",
+    "no_messages_yet": "No messages yet."
 }
-
