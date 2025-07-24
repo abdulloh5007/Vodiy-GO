@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useContext, useState, useMemo } from 'react';
+import { useContext, useState, useMemo, useEffect } from 'react';
 import { AppContext } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
@@ -118,6 +118,18 @@ export default function RideApplicationsPage() {
   const context = useContext(AppContext);
   const [viewMode, setViewMode] = useState<'table' | 'card'>('table');
   
+  useEffect(() => {
+    const savedViewMode = localStorage.getItem('ride-applications-view-mode') as 'table' | 'card';
+    if (savedViewMode) {
+      setViewMode(savedViewMode);
+    }
+  }, []);
+
+  const handleSetViewMode = (mode: 'table' | 'card') => {
+    setViewMode(mode);
+    localStorage.setItem('ride-applications-view-mode', mode);
+  }
+
   if (!context) {
     throw new Error('AdminPage must be used within an AppProvider');
   }
@@ -155,20 +167,20 @@ export default function RideApplicationsPage() {
                 <CardTitle className="font-headline text-2xl">{t.rideApplications || 'Ride Applications'}</CardTitle>
                 <CardDescription>
                     {pendingRides.length > 0 
-                        ? (t.rideApplications_desc || `You have {count} pending ride applications.`).replace('{count}', pendingRides.length) 
+                        ? (t.rideApplications_desc || `You have {count} pending ride applications.`).replace('{count}', String(pendingRides.length)) 
                         : (t.rideApplications_desc_none || 'No pending ride applications.')}
                 </CardDescription>
             </div>
-             <div className="hidden md:flex items-center gap-2">
-                <Button variant={viewMode === 'table' ? 'secondary' : 'ghost'} size="icon" onClick={() => setViewMode('table')}>
+             <div className="flex items-center gap-2">
+                <Button variant={viewMode === 'table' ? 'secondary' : 'ghost'} size="icon" onClick={() => handleSetViewMode('table')}>
                     <List className="h-5 w-5" />
                 </Button>
-                 <Button variant={viewMode === 'card' ? 'secondary' : 'ghost'} size="icon" onClick={() => setViewMode('card')}>
+                 <Button variant={viewMode === 'card' ? 'secondary' : 'ghost'} size="icon" onClick={() => handleSetViewMode('card')}>
                     <LayoutGrid className="h-5 w-5" />
                 </Button>
             </div>
         </CardHeader>
-        <CardContent className={cn("hidden p-0", viewMode === 'table' && 'md:block')}>
+        <CardContent className={cn("p-0", viewMode !== 'table' && 'hidden')}>
            <div className="w-full overflow-x-auto">
               <Table className="min-w-[900px]">
                 <TableHeader>
@@ -241,7 +253,7 @@ export default function RideApplicationsPage() {
             </CardContent>
       </Card>
 
-      <div className={cn("grid grid-cols-1 md:grid-cols-2 gap-4", viewMode === 'card' ? 'block' : 'md:hidden')}>
+      <div className={cn("grid grid-cols-1 md:grid-cols-2 gap-4", viewMode !== 'card' && 'block')}>
             {pendingRides.length > 0 ? (
             pendingRides.map(ride => {
                 const driver = drivers.find(d => d.id === ride.driverId);
@@ -257,7 +269,7 @@ export default function RideApplicationsPage() {
                 )
             })
             ) : (
-            <div className="text-center py-16 col-span-full">
+             <div className={cn("text-center py-16 col-span-full", viewMode === 'table' && 'hidden')}>
                 <p className="text-muted-foreground">{t.noPendingRideApplications || 'No pending ride applications'}</p>
             </div>
             )}
