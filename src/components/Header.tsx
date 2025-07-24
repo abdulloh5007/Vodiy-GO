@@ -94,21 +94,26 @@ export function Header() {
         <div className="flex-grow py-4">
             <div className='flex flex-col gap-4'>
               <div className="grid grid-cols-2 gap-2">
-                  {adminLinks.map(link => (
-                      <Button 
-                          key={link.href}
-                          variant={pathname.startsWith(link.href) ? 'secondary' : 'outline'} 
-                          asChild 
-                          className="h-24 flex-col gap-1 text-xs rounded-lg relative px-1"
-                          onClick={() => setIsSheetOpen(false)}
-                      >
-                          <Link href={link.href} className="text-center flex flex-col items-center justify-center">
-                            {link.badge && link.badge > 0 ? <Badge variant="destructive" className="absolute top-2 right-2">{link.badge}</Badge> : ''}
-                            <link.icon className="mb-1 h-6 w-6"/>
-                            <span>{link.label}</span>
-                          </Link>
-                      </Button>
-                  ))}
+                  {adminLinks.map(link => {
+                      const isActive = link.href === '/admin' 
+                          ? pathname === '/admin' 
+                          : pathname.startsWith(link.href);
+                      return (
+                          <Button 
+                              key={link.href}
+                              variant={isActive ? 'secondary' : 'outline'} 
+                              asChild 
+                              className="h-24 flex-col gap-1 text-xs rounded-lg relative px-1"
+                              onClick={() => setIsSheetOpen(false)}
+                          >
+                              <Link href={link.href} className="text-center flex flex-col items-center justify-center">
+                                {link.badge && link.badge > 0 ? <Badge variant="destructive" className="absolute top-2 right-2">{link.badge}</Badge> : ''}
+                                <link.icon className="mb-1 h-6 w-6"/>
+                                <span>{link.label}</span>
+                              </Link>
+                          </Button>
+                      )
+                  })}
               </div>
             </div>
         </div>
