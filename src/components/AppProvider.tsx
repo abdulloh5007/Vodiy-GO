@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { AppContext } from '@/contexts/AppContext';
 import { Driver, Ride, Order, Language, Translations, User, DriverApplicationData, PromoCode, Message } from '@/lib/types';
 import { initialTranslations } from '@/lib/i18n';
@@ -10,6 +10,8 @@ import { collection, doc, getDoc, setDoc, onSnapshot, query, orderBy, serverTime
 import { signInWithEmailAndPassword, onAuthStateChanged, signOut, createUserWithEmailAndPassword, User as FirebaseAuthUser } from "firebase/auth";
 import { ImageViewer } from './ImageViewer';
 import { RejectionDialog } from './RejectionDialog';
+import { getToken, getMessaging } from 'firebase/messaging';
+import { app } from '@/lib/firebase';
 
 const imageToDataUrl = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -26,6 +28,12 @@ const imageToDataUrl = (file: File): Promise<string> => {
     });
 }
 
+function showLocalNotification(title: string, options: NotificationOptions) {
+    if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification(title, options);
+    }
+}
+
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguage] = useState<Language>('en');
   const [translations, setTranslations] = useState<Translations>(initialTranslations.en);
@@ -38,6 +46,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
+  // Refs to track initial data load and prevent notifications on first render
+  const isInitialDriversLoad = useRef(true);
+  const isInitialRidesLoad = useRef(true);
 
   useEffect(() => {
     // Get saved language from local storage
@@ -61,6 +73,19 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setLoading(true);
     const unsubscribeDrivers = onSnapshot(collection(db, "drivers"), (snapshot) => {
       const driversData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Driver));
+      
+      if (user?.role === 'admin' && !isInitialDriversLoad.current) {
+          const newPendingDrivers = driversData.filter(d => d.status === 'pending' && !drivers.some(old => old.id === d.id && old.status === 'pending'));
+          newPendingDrivers.forEach(driver => {
+              showLocalNotification('Новая заявка на регистрацию!', {
+                  body: `Водитель ${driver.name} подал заявку.`,
+                  icon: "/icon-192.png",
+                  badge: "/badge-taxi.png",
+                  data: { url: `/admin/applications/${driver.id}` }
+              });
+          });
+      }
+      isInitialDriversLoad.current = false;
       setDrivers(driversData);
     });
 
@@ -81,6 +106,19 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             }
             return false;
         });
+
+      if (user?.role === 'admin' && !isInitialRidesLoad.current) {
+          const newPendingRides = ridesData.filter(r => r.status === 'pending' && !rides.some(old => old.id === r.id && old.status === 'pending'));
+          newPendingRides.forEach(ride => {
+               showLocalNotification('Новая заявка на поездку!', {
+                  body: `Новая поездка: ${ride.from} -> ${ride.to}.`,
+                  icon: "/icon-192.png",
+                  badge: "/badge-taxi.png",
+                  data: { url: `/admin/ride-applications/${ride.id}` }
+              });
+          })
+      }
+      isInitialRidesLoad.current = false;
       setRides(ridesData);
     });
     
@@ -104,7 +142,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         const userDocRef = doc(db, 'users', firebaseUser.uid);
         const userDocSnap = await getDoc(userDocRef);
         if (userDocSnap.exists()) {
-            setUser({ uid: firebaseUser.uid, ...userDocSnap.data() } as User);
+            const userData = { uid: firebaseUser.uid, ...userDocSnap.data() } as User;
+            setUser(userData);
+            if(userData.role === 'admin') {
+                requestNotificationPermission(firebaseUser.uid);
+            }
         } else {
             const newUser: User = { uid: firebaseUser.uid, email: firebaseUser.email, role: 'passenger' };
             await setDoc(userDocRef, newUser);
@@ -124,7 +166,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       unsubscribeUsers();
       unsubscribePromoCodes();
     };
-  }, []);
+  }, [user]);
   
   // Effect to subscribe to messages for the current user
   useEffect(() => {
@@ -139,6 +181,30 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         setMessages([]);
     }
   }, [user]);
+  
+  const saveFcmToken = async (uid: string, token: string) => {
+    try {
+        // This function is kept for potential future use if the user upgrades to Blaze.
+        console.log("FCM Token saving is disabled for client-side notifications.");
+        // const tokenRef = doc(db, 'fcmTokens', token);
+        // await setDoc(tokenRef, { uid, token, createdAt: serverTimestamp() }, { merge: true });
+    } catch (error) {
+        console.error("Error saving FCM token: ", error);
+    }
+  };
+  
+  const requestNotificationPermission = async (uid: string) => {
+     if ('Notification' in window) {
+      const permission = await Notification.requestPermission();
+      if (permission === 'granted') {
+        console.log('Local notification permission granted.');
+        // No token needed for local notifications
+      } else {
+        console.log('Unable to get permission to notify.');
+      }
+    }
+  };
+
 
   const addMessage = async (userId: string, type: Message['type'], title: string, body: string) => {
     const messageRef = doc(collection(db, 'users', userId, 'messages'));
@@ -246,7 +312,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     if (rideData.promoCode) {
         await runTransaction(db, async (transaction) => {
             const promoQuery = query(collection(db, 'promocodes'), where('code', '==', rideData.promoCode));
-            const promoSnapshot = await getDocs(promoQuery);
+            const promoSnapshot = await getDocs(promoQuery); // Use getDocs outside transaction for reads if possible, or use transaction.get() correctly
 
             if (promoSnapshot.empty) throw new Error("promocode/not-found");
             
@@ -378,15 +444,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         window.location.href = '/driver/login';
     } else {
         window.location.href = '/';
-    }
-  };
-  
-  const saveFcmToken = async (uid: string, token: string) => {
-    try {
-        const tokenRef = doc(db, 'fcmTokens', token);
-        await setDoc(tokenRef, { uid, token, createdAt: serverTimestamp() }, { merge: true });
-    } catch (error) {
-        console.error("Error saving FCM token: ", error);
     }
   };
 
