@@ -6,8 +6,6 @@ import { AppContext } from '@/contexts/AppContext';
 import { usePathname, useRouter } from 'next/navigation';
 import { Loader2, ShieldAlert } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { app, messaging } from '@/lib/firebase';
-import { getToken } from 'firebase/messaging';
 
 export default function AdminLayout({
   children,
@@ -16,7 +14,6 @@ export default function AdminLayout({
 }) {
   const context = useContext(AppContext);
   const router = useRouter();
-  const pathname = usePathname();
 
   if (!context) {
      return (
@@ -26,50 +23,19 @@ export default function AdminLayout({
     );
   }
 
-  const { user, loading, translations, saveFcmToken } = context;
-  const t = translations; 
-
+  const { user, loading } = context;
 
   useEffect(() => {
-    if (loading) return; // Не делать ничего, пока идет загрузка
-
-    const isAuthPage = pathname === '/admin/login';
-
-    if (!user && !isAuthPage) {
-      // Если пользователя нет и он не на странице входа, отправить на логин
-      router.push('/admin/login');
-    } else if (user) {
-      // Если пользователь есть
-      if (user.role !== 'admin') {
-        // но не админ, отправить на главную
-        router.push('/');
-      } else if (isAuthPage) {
-        // и он админ на странице входа, отправить в админку
-        router.push('/admin');
-      }
+    if (!loading && (!user || user.role !== 'admin')) {
+      router.push('/');
     }
-  }, [user, loading, router, pathname]);
-  
-  
-  if (loading || (!user && pathname !== '/admin/login')) {
+  }, [user, loading, router]);
+
+
+  if (loading || !user || user.role !== 'admin') {
      return (
         <div className="flex h-screen w-full items-center justify-center">
             <Loader2 className="h-12 w-12 animate-spin text-primary" />
-        </div>
-    );
-  }
-  
-  if (user && user.role !== 'admin') {
-       return (
-        <div className="container mx-auto py-8 px-4 flex justify-center items-center h-[calc(100vh-8rem)]">
-            <Card className="w-full max-w-md text-center">
-                <CardHeader>
-                    <CardTitle className="flex items-center justify-center gap-2"><ShieldAlert className="text-destructive h-8 w-8"/>{t.accessDenied}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <p>{t.onlyAdminsCanAccess}</p>
-                </CardContent>
-            </Card>
         </div>
     );
   }
