@@ -32,30 +32,25 @@ export default function DriverLayout({
   }, [user, drivers]);
 
   useEffect(() => {
-    if (!loading) {
-      const isAuthPage = pathname === '/driver/login' || pathname === '/driver/register';
-      const isDiagnosticsPage = pathname === '/driver/profile/diagnostics';
-      
-      if (!user && !isAuthPage) {
-        router.push('/driver/login');
+    if (loading) return;
+
+    const isAuthPage = pathname === '/driver/login' || pathname === '/driver/register';
+    
+    if (!user && !isAuthPage) {
+      router.push('/driver/login');
+      return;
+    }
+
+    if (user) {
+      if (user.role !== 'driver') {
+        router.push('/');
         return;
       }
 
-      if (user) {
-        if (user.role !== 'driver') {
-          router.push('/');
-          return;
-        }
-
-        // Core redirection logic for drivers
-        if (!driverProfile && !isDiagnosticsPage) {
-          // If no driver profile exists, they must complete diagnostics.
-           router.push('/driver/profile/diagnostics');
-        } else if (driverProfile && driverProfile.status !== 'verified' && pathname === '/driver/create-ride') {
-          // If driver is not verified, they cannot create a ride.
-          // Redirect them to check their status.
-          router.push('/driver/profile/diagnostics');
-        }
+      // If a driver user exists but they haven't started the application yet,
+      // and they are not on an auth or diagnostics page, redirect them.
+      if (!driverProfile && pathname !== '/driver/profile/diagnostics' && !isAuthPage) {
+         router.push('/driver/profile/diagnostics');
       }
     }
   }, [user, loading, driverProfile, router, pathname]);

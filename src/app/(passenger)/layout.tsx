@@ -3,9 +3,10 @@
 
 import { useContext, useEffect } from 'react';
 import { AppContext } from '@/contexts/AppContext';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 
 function PageSkeleton() {
   return (
@@ -40,7 +41,6 @@ function PageSkeleton() {
   );
 }
 
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
 
 export default function PassengerLayout({
   children,
@@ -70,7 +70,7 @@ export default function PassengerLayout({
     }
   }, [user, loading, router]);
   
-  if (loading || (user && (user.role === 'admin' || user.role === 'driver'))) {
+  if (loading || (user && user.role !== 'passenger')) {
      return (
         <div className="flex h-screen w-full items-center justify-center">
             <Loader2 className="h-12 w-12 animate-spin text-primary" />

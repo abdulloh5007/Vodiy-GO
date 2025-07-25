@@ -136,9 +136,13 @@ export default function CreateRidePage() {
   const fromLocations = useMemo(() => locations.filter(loc => loc !== to), [to]);
   const toLocations = useMemo(() => locations.filter(loc => loc !== from), [from]);
 
-  const isVerifiedDriver = user && driverProfile && driverProfile.status === 'verified';
+  useEffect(() => {
+      if (!loading && driverProfile && driverProfile.status !== 'verified') {
+          router.push('/driver/profile/diagnostics');
+      }
+  }, [loading, driverProfile, router]);
   
-  if (loading || !t.home || !isVerifiedDriver) {
+  if (loading || !t.home || !driverProfile || driverProfile.status !== 'verified') {
       return <CreateRideSkeleton />;
   }
 
