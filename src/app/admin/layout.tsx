@@ -31,16 +31,21 @@ export default function AdminLayout({
 
 
   useEffect(() => {
-    if (!loading) {
-      const isAuthPage = pathname === '/admin/login'; 
-      if (!user && !isAuthPage) {
-        router.push('/admin/login');
-      } else if (user) {
-        if (user.role !== 'admin') {
-           router.push('/');
-        } else if (isAuthPage) {
-          router.push('/admin');
-        }
+    if (loading) return; // Не делать ничего, пока идет загрузка
+
+    const isAuthPage = pathname === '/admin/login';
+
+    if (!user && !isAuthPage) {
+      // Если пользователя нет и он не на странице входа, отправить на логин
+      router.push('/admin/login');
+    } else if (user) {
+      // Если пользователь есть
+      if (user.role !== 'admin') {
+        // но не админ, отправить на главную
+        router.push('/');
+      } else if (isAuthPage) {
+        // и он админ на странице входа, отправить в админку
+        router.push('/admin');
       }
     }
   }, [user, loading, router, pathname]);
