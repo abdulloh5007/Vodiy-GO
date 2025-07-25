@@ -25,16 +25,18 @@ export default function AdminLayout({
 
   const { user, loading } = context;
 
-  useEffect(() => {
-    if (!loading && (!user || user.role !== 'admin')) {
-      router.push('/');
-    }
-  }, [user, loading, router]);
-
-
-  if (loading || !user || user.role !== 'admin') {
+  if (loading) {
      return (
         <div className="flex h-screen w-full items-center justify-center">
+            <Loader2 className="h-12 w-12 animate-spin text-primary" />
+        </div>
+    );
+  }
+
+  if (!user || user.role !== 'admin') {
+    router.push('/');
+    return (
+       <div className="flex h-screen w-full items-center justify-center">
             <Loader2 className="h-12 w-12 animate-spin text-primary" />
         </div>
     );
