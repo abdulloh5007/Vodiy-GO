@@ -31,7 +31,6 @@ interface AppContextType {
   loading: boolean;
   selectedImage: string | null;
   setSelectedImage: (url: string | null) => void;
-  saveFcmToken: (uid: string, token: string) => Promise<void>;
 }
 
 export const AppContext = React.createContext<AppContextType | null>(null);

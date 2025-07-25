@@ -1,11 +1,9 @@
-
 'use client';
 
 import { useContext, useEffect } from 'react';
 import { AppContext } from '@/contexts/AppContext';
-import { usePathname, useRouter } from 'next/navigation';
-import { Loader2, ShieldAlert } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useRouter } from 'next/navigation';
+import { Loader2 } from 'lucide-react';
 
 export default function AdminLayout({
   children,
@@ -15,32 +13,36 @@ export default function AdminLayout({
   const context = useContext(AppContext);
   const router = useRouter();
 
+  // Это начальное состояние, пока контекст не загрузился
   if (!context) {
-     return (
-        <div className="flex h-screen w-full items-center justify-center">
-            <Loader2 className="h-12 w-12 animate-spin text-primary" />
-        </div>
+    return (
+      <div className="flex h-screen w-full items-center justify-center">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+      </div>
     );
   }
 
   const { user, loading } = context;
 
-  if (loading) {
-     return (
-        <div className="flex h-screen w-full items-center justify-center">
-            <Loader2 className="h-12 w-12 animate-spin text-primary" />
-        </div>
-    );
-  }
+  useEffect(() => {
+    // Ждем окончания загрузки, чтобы принять решение
+    if (!loading) {
+      // Если после загрузки пользователя нет или он не админ, перенаправляем
+      if (!user || user.role !== 'admin') {
+        router.push('/');
+      }
+    }
+  }, [user, loading, router]);
 
-  if (!user || user.role !== 'admin') {
-    router.push('/');
+  // Пока идет загрузка или если пользователь не определен как админ, показываем загрузчик
+  if (loading || !user || user.role !== 'admin') {
     return (
-       <div className="flex h-screen w-full items-center justify-center">
-            <Loader2 className="h-12 w-12 animate-spin text-primary" />
-        </div>
+      <div className="flex h-screen w-full items-center justify-center">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+      </div>
     );
   }
 
+  // Если все проверки пройдены, показываем содержимое страницы
   return <>{children}</>;
 }
