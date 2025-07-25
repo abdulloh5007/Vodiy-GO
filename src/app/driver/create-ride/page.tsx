@@ -93,14 +93,6 @@ export default function CreateRidePage() {
     return rides.find(r => r.driverId === user.uid && (r.status === 'pending' || r.status === 'approved'));
   }, [user, rides]);
 
-  useEffect(() => {
-    if (!loading) {
-        if (driverProfile?.status !== 'verified') {
-            router.push('/driver/profile/diagnostics');
-        }
-    }
-  }, [loading, user, driverProfile, router]);
-
 
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const rawValue = e.target.value.replace(/\s/g, '');

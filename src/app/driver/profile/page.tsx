@@ -75,19 +75,6 @@ export default function DriverProfilePage() {
     const { user, drivers, loading, translations: t, logout } = context;
 
     const driverProfile = user ? drivers.find(d => d.id === user.uid) : null;
-    
-    useEffect(() => {
-        if (!loading) {
-            if (!user || user.role !== 'driver') {
-                router.push('/driver/login');
-            } else if (!driverProfile) {
-                // If there's no driver profile document at all, they haven't started the process.
-                // Send them to diagnostics to start.
-                router.push('/driver/profile/diagnostics');
-            }
-        }
-    }, [loading, user, driverProfile, router]);
-
 
     if (loading || !user || !t.home || !driverProfile) {
         return <ProfileSkeleton />;
