@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useContext, useState } from 'react';
@@ -6,7 +7,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Loader2, ArrowLeft, User, Car, Hash, Shield, BadgeCheck, BadgeAlert, BadgeX, Trash2, Ban } from 'lucide-react';
+import { Loader2, ArrowLeft, User, Car, Hash, Shield, BadgeCheck, BadgeAlert, BadgeX, Trash2, Ban, CheckCircle2 } from 'lucide-react';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { Driver } from '@/lib/types';
@@ -126,6 +127,10 @@ export default function DriverDetailPage() {
         // No need to redirect, status will update on page
     }
 
+    const handleUnblock = async () => {
+        await updateDriverStatus(driver.id, 'verified');
+    }
+
     return (
         <>
         <div className="container mx-auto py-8 px-4">
@@ -225,10 +230,17 @@ export default function DriverDetailPage() {
                             </AlertDialogFooter>
                         </AlertDialogContent>
                     </AlertDialog>
+                    
+                    {driver.status === 'blocked' ? (
+                         <Button variant="secondary" className='bg-green-600 hover:bg-green-700' onClick={handleUnblock}>
+                            <CheckCircle2 /> {t.unblock_driver || 'Unblock'}
+                        </Button>
+                    ) : (
+                        <Button variant="destructive" onClick={() => setIsBlockDialogOpen(true)}>
+                            <Ban /> {t.block_driver || 'Block'}
+                        </Button>
+                    )}
 
-                    <Button variant="destructive" onClick={() => setIsBlockDialogOpen(true)}>
-                        <Ban /> {t.block_driver || 'Block'}
-                    </Button>
                 </CardFooter>
             </Card>
         </div>

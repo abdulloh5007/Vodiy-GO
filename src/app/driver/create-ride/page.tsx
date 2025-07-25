@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { ShieldAlert, Loader2, Clock, Info, CheckCircle2, Ticket, Sparkles } from 'lucide-react';
+import { ShieldAlert, Loader2, Clock, Info, CheckCircle2, Ticket, Sparkles, Ban } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useRouter } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
@@ -142,8 +142,13 @@ export default function CreateRidePage() {
       }
   }, [loading, driverProfile, router]);
   
-  if (loading || !t.home || !driverProfile || driverProfile.status !== 'verified') {
+  if (loading || !t.home || !driverProfile) {
       return <CreateRideSkeleton />;
+  }
+
+  if (driverProfile.status !== 'verified') {
+    router.push('/driver/profile/diagnostics');
+    return <CreateRideSkeleton />;
   }
 
   if (existingRide) {

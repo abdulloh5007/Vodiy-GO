@@ -5,11 +5,11 @@ import { useState, useContext, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { AppContext } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, ArrowLeft, UploadCloud, X, ArrowRight, CheckCircle2, ShieldX, ShieldAlert } from 'lucide-react';
+import { Loader2, ArrowLeft, UploadCloud, X, ArrowRight, CheckCircle2, ShieldX, ShieldAlert, Ban } from 'lucide-react';
 import { formatCarNumber, formatPassportNumber, formatTechPassportNumber } from '@/lib/utils';
 import { Progress } from '@/components/ui/progress';
 import Image from 'next/image';
@@ -346,45 +346,69 @@ const DriverStatusPage = ({ driverProfile, t, router }: { driverProfile: Driver,
                     icon: <ShieldAlert className="h-16 w-16 text-yellow-500" />,
                     title: t.statusPage_pending_title || "Application Pending",
                     description: t.statusPage_pending_desc || "Your application is under review. We will notify you once it's processed.",
+                    rejectionReason: null,
+                    showContactButton: false,
                 };
             case 'verified':
                 return {
                      icon: <CheckCircle2 className="h-16 w-16 text-green-500" />,
                      title: t.diagnostics_complete_title || "Diagnostics Complete",
                      description: t.diagnostics_complete_desc || "Your profile is verified. You can now publish and manage rides.",
+                     rejectionReason: null,
+                     showContactButton: false,
                 };
             case 'rejected':
                 return {
                     icon: <ShieldX className="h-16 w-16 text-destructive" />,
                     title: t.statusPage_rejected_title || "Application Rejected",
                     description: t.statusPage_rejected_desc || "We're sorry, but your application could not be approved at this time.",
+                    rejectionReason: driverProfile.rejectionReason,
+                    showContactButton: true,
+                };
+            case 'blocked':
+                return {
+                    icon: <Ban className="h-16 w-16 text-destructive" />,
+                    title: t.statusPage_blocked_title || "Account Blocked",
+                    description: t.statusPage_blocked_desc || "Your account has been blocked by an administrator.",
+                    rejectionReason: driverProfile.rejectionReason,
+                    showContactButton: true,
                 };
             default:
                 return {
                     icon: <Loader2 className="h-16 w-16 animate-spin" />,
                     title: t.statusPage_checking_title || "Checking Status...",
                     description: t.statusPage_checking_desc || "Please wait while we check your application status.",
+                    rejectionReason: null,
+                    showContactButton: false,
                 };
         }
     };
     
-    const {icon, title, description} = getStatusContent();
+    const {icon, title, description, rejectionReason, showContactButton} = getStatusContent();
     
     return (
         <div className="container mx-auto py-8 px-4 flex justify-center">
              <Card className="w-full max-w-md text-center">
                 <CardHeader className="items-center">
-                    <div className="absolute top-4 left-4">
-                        <Button variant="ghost" size="icon" onClick={() => router.back()}>
-                            <ArrowLeft className="h-5 w-5" />
-                        </Button>
-                    </div>
                     {icon}
                     <CardTitle className="mt-4">{title}</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="space-y-4">
                     <CardDescription>{description}</CardDescription>
+                    {rejectionReason && (
+                        <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-lg text-destructive text-sm">
+                            <p className="font-semibold mb-1">{t.reason || 'Reason'}:</p>
+                            <p>{rejectionReason}</p>
+                        </div>
+                    )}
                 </CardContent>
+                <CardFooter className="flex flex-col gap-4">
+                     {showContactButton && (
+                         <Button variant="secondary" className="w-full">
+                            {t.contact_support || 'Contact Support'}
+                         </Button>
+                     )}
+                </CardFooter>
             </Card>
         </div>
     )

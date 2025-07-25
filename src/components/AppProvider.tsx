@@ -190,7 +190,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const updateDriverStatus = async (driverId: string, status: 'verified' | 'rejected' | 'blocked', reason?: string) => {
     const driverDoc = doc(db, "drivers", driverId);
-    await setDoc(driverDoc, { status, ...(reason && { rejectionReason: reason }) }, { merge: true });
+    
+    const updateData: { status: 'verified' | 'rejected' | 'blocked'; rejectionReason?: string } = { status };
+    if (reason) {
+        updateData.rejectionReason = reason;
+    } else if (status === 'verified') {
+        // Clear rejectionReason when unblocking or verifying
+        updateData.rejectionReason = '';
+    }
+
+    await setDoc(driverDoc, updateData, { merge: true });
 
     if (status === 'verified') {
         await addMessage(driverId, 'REGISTRATION_APPROVED', 'Ariza tasdiqlandi', 'Tabriklaymiz! Sizning haydovchilik arizangiz tasdiqlandi. Endi siz qatnovlarni e’lon qilishingiz mumkin.');
@@ -249,7 +258,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     if (rideData.promoCode) {
         await runTransaction(db, async (transaction) => {
             const promoQuery = query(collection(db, 'promocodes'), where('code', '==', rideData.promoCode));
-            const promoSnapshot = await getDocs(promoQuery);
+            const promoSnapshot = await transaction.get(promoQuery);
 
             if (promoSnapshot.empty) throw new Error("promocode/not-found");
             
