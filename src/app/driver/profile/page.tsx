@@ -47,16 +47,12 @@ const ProfileCard = ({ driver, t }: { driver: Driver, t: any }) => {
                 <div className="flex-grow">
                     <h2 className="text-xl font-bold">{driver.name}</h2>
                     <p className="text-sm text-muted-foreground">{driver.carModel} ({driver.carNumber})</p>
-                    <Link href="/driver/profile/rating">
-                        <div className="flex items-center gap-1 mt-2 text-amber-500 cursor-pointer">
-                            <Star className="w-5 h-5 fill-current" />
-                            <Star className="w-5 h-5 fill-current" />
-                            <Star className="w-5 h-5 fill-current" />
-                            <Star className="w-5 h-5 fill-current" />
-                            <Star className="w-5 h-5 fill-current" />
-                            <span className="text-sm text-muted-foreground ml-1">(5.0)</span>
-                        </div>
-                    </Link>
+                    <div className="flex items-center gap-1 mt-2 text-amber-500 cursor-default">
+                        {[...Array(5)].map((_, i) => (
+                           <Star key={i} className={`w-5 h-5 ${i < Math.round(driver.rating || 0) ? 'fill-current' : ''}`} />
+                        ))}
+                        <span className="text-sm text-muted-foreground ml-1">({(driver.rating || 0).toFixed(1)})</span>
+                    </div>
                 </div>
             </CardContent>
         </Card>

@@ -275,5 +275,7 @@
     "block_reason_desc": "Please specify the reason for blocking this driver.",
     "admin_chat_title": "Admin",
     "admin_chat_desc": "Application status and notifications",
-    "no_messages_yet": "No messages yet."
+    "no_messages_yet": "No messages yet.",
+    "promo_code_copied_title": "Copied!",
+    "promo_code_copied_desc": "Promo code {code} copied to clipboard."
 }

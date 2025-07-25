@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Ticket, CheckCircle, AlertCircle, XCircle, List, LayoutGrid } from 'lucide-react';
+import { Loader2, Ticket, CheckCircle, AlertCircle, XCircle, List, LayoutGrid, Copy } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
@@ -38,18 +38,31 @@ const getStatusBadge = (code: PromoCode, t: any) => {
     }
 }
 
-const PromoCodeCard = ({ code, t, getLocale }: { code: PromoCode, t: any, getLocale: () => Locale }) => (
-    <Card>
-        <CardHeader>
-            <CardTitle className="font-mono font-bold text-2xl tracking-wider">{code.code}</CardTitle>
-            <CardDescription>{t.promo_table_usage}: {code.usageCount} / {code.limit}</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-3">
-            <div>{getStatusBadge(code, t)}</div>
-            <p className="text-xs text-muted-foreground">{t.promo_table_expires}: {format(code.expiresAt.toDate(), 'PPP p', { locale: getLocale() })}</p>
-        </CardContent>
-    </Card>
-);
+const PromoCodeCard = ({ code, t, getLocale }: { code: PromoCode, t: any, getLocale: () => Locale }) => {
+    const { toast } = useToast();
+    const handleCopy = () => {
+        navigator.clipboard.writeText(code.code);
+        toast({ title: t.promo_code_copied_title || "Copied!", description: (t.promo_code_copied_desc || 'Promo code {code} copied to clipboard.').replace('{code}', code.code) });
+    };
+
+    return (
+        <Card>
+            <CardHeader className="flex-row items-start justify-between">
+                <div>
+                    <CardTitle className="font-mono font-bold text-2xl tracking-wider">{code.code}</CardTitle>
+                    <CardDescription>{t.promo_table_usage}: {code.usageCount} / {code.limit}</CardDescription>
+                </div>
+                <Button variant="ghost" size="icon" onClick={handleCopy}>
+                    <Copy className="h-5 w-5" />
+                </Button>
+            </CardHeader>
+            <CardContent className="space-y-3">
+                <div>{getStatusBadge(code, t)}</div>
+                <p className="text-xs text-muted-foreground">{t.promo_table_expires}: {format(code.expiresAt.toDate(), 'PPP p', { locale: getLocale() })}</p>
+            </CardContent>
+        </Card>
+    )
+};
 
 
 export default function PromoCodesPage() {
@@ -107,6 +120,11 @@ export default function PromoCodesPage() {
         } finally {
             setIsSubmitting(false);
         }
+    };
+
+    const handleCopyCode = (code: string) => {
+        navigator.clipboard.writeText(code);
+        toast({ title: t.promo_code_copied_title || "Copied!", description: (t.promo_code_copied_desc || 'Promo code {code} copied to clipboard.').replace('{code}', code) });
     };
 
     return (
@@ -192,7 +210,12 @@ export default function PromoCodesPage() {
                                             ) : promoCodes.length > 0 ? (
                                                 promoCodes.map((code) => (
                                                     <TableRow key={code.id}>
-                                                        <TableCell className="font-mono font-bold">{code.code}</TableCell>
+                                                        <TableCell className="font-mono font-bold flex items-center gap-2">
+                                                            {code.code}
+                                                            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleCopyCode(code.code)}>
+                                                                <Copy className="h-4 w-4" />
+                                                            </Button>
+                                                        </TableCell>
                                                         <TableCell>{`${code.usageCount} / ${code.limit}`}</TableCell>
                                                         <TableCell>{format(code.expiresAt.toDate(), 'PPP p', { locale: getLocale() })}</TableCell>
                                                         <TableCell>{getStatusBadge(code, t)}</TableCell>

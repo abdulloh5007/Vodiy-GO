@@ -7,7 +7,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Loader2, ArrowLeft, User, Car, Hash, Shield, BadgeCheck, BadgeAlert, BadgeX, Trash2, Ban, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, User, Car, Hash, Shield, BadgeCheck, BadgeAlert, BadgeX, Ban, CheckCircle2 } from 'lucide-react';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { Driver } from '@/lib/types';
@@ -104,7 +104,7 @@ export default function DriverDetailPage() {
         throw new Error('DriverDetailPage must be used within an AppProvider');
     }
 
-    const { drivers, loading, translations: t, setSelectedImage, deleteDriver, updateDriverStatus } = context;
+    const { drivers, loading, translations: t, setSelectedImage, updateDriverStatus } = context;
 
     const driver = drivers.find(d => d.id === driverId);
     
@@ -116,15 +116,9 @@ export default function DriverDetailPage() {
         return <div className="container mx-auto py-8 px-4">Driver not found.</div>;
     }
     
-    const handleDelete = async () => {
-        await deleteDriver(driver.id);
-        router.push('/admin/drivers');
-    }
-
     const handleBlock = async (reason: string) => {
         if (!reason) return;
         await updateDriverStatus(driver.id, 'blocked', reason);
-        // No need to redirect, status will update on page
     }
 
     const handleUnblock = async () => {
@@ -211,26 +205,6 @@ export default function DriverDetailPage() {
                     </div>
                 </CardContent>
                 <CardFooter className="flex justify-end gap-2">
-                     <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                            <Button variant="outline"><Trash2 /> {t.delete_driver || 'Delete'}</Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                            <AlertDialogHeader>
-                            <AlertDialogTitle>{t.delete_driver_confirm_title || 'Are you sure?'}</AlertDialogTitle>
-                            <AlertDialogDescription>
-                               {t.delete_driver_confirm_desc || 'This action cannot be undone. This will permanently delete the driver and all associated data.'}
-                            </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                            <AlertDialogCancel>{t.cancel_button || 'Cancel'}</AlertDialogCancel>
-                            <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">
-                                {t.delete_button || 'Delete'}
-                            </AlertDialogAction>
-                            </AlertDialogFooter>
-                        </AlertDialogContent>
-                    </AlertDialog>
-                    
                     {driver.status === 'blocked' ? (
                          <Button variant="secondary" className='bg-green-600 hover:bg-green-700' onClick={handleUnblock}>
                             <CheckCircle2 /> {t.unblock_driver || 'Unblock'}
