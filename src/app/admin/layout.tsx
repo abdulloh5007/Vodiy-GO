@@ -28,14 +28,14 @@ export default function AdminLayout({
     // Ждем окончания загрузки, чтобы принять решение
     if (!loading) {
       // Если после загрузки пользователя нет или он не админ, перенаправляем
-      if (!user || user.role !== 'admin') {
+      if (user?.role !== 'admin') {
         router.push('/');
       }
     }
   }, [user, loading, router]);
 
   // Пока идет загрузка или если пользователь не определен как админ, показываем загрузчик
-  if (loading || !user || user.role !== 'admin') {
+  if (loading || user?.role !== 'admin') {
     return (
       <div className="flex h-screen w-full items-center justify-center">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
