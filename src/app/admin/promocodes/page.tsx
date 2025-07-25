@@ -211,7 +211,7 @@ export default function PromoCodesPage() {
                                                 promoCodes.map((code) => (
                                                     <TableRow key={code.id}>
                                                         <TableCell className="font-mono font-bold flex items-center gap-2">
-                                                            {code.code}
+                                                            {code.code} 
                                                             <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleCopyCode(code.code)}>
                                                                 <Copy className="h-4 w-4" />
                                                             </Button>
