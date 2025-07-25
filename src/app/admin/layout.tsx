@@ -35,7 +35,7 @@ export default function AdminLayout({
   }, [user, loading, router]);
 
   // Пока идет загрузка или если пользователь не определен как админ, показываем загрузчик
-  if (loading || user?.role !== 'admin') {
+  if (loading || user?.role !== 'admin') { 
     return (
       <div className="flex h-screen w-full items-center justify-center">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
