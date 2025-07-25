@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { ArrowRight, BadgeCheck, BadgeAlert, BadgeX, List, LayoutGrid } from 'lucide-react';
+import { ArrowRight, BadgeCheck, BadgeAlert, BadgeX, List, LayoutGrid, Ban } from 'lucide-react';
 import Image from 'next/image';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Driver } from '@/lib/types';
@@ -66,7 +66,7 @@ function DriversPageSkeleton() {
 }
 
 const StatusBadge = ({ status, t }: { status: Driver['status'], t: any }) => {
-    const statusMap = {
+    const statusMap: { [key in Driver['status']]: { label: string, icon: React.ReactNode, variant: "default" | "secondary" | "destructive" | "outline" } } = {
         verified: {
             label: t.verified || "Verified",
             icon: <BadgeCheck className="h-4 w-4 mr-1"/>,
@@ -81,9 +81,18 @@ const StatusBadge = ({ status, t }: { status: Driver['status'], t: any }) => {
             label: t.rejected || "Rejected",
             icon: <BadgeX className="h-4 w-4 mr-1"/>,
             variant: "destructive"
+        },
+        blocked: {
+            label: t.blocked || "Blocked",
+            icon: <Ban className="h-4 w-4 mr-1" />,
+            variant: "destructive"
         }
     }
     const current = statusMap[status];
+
+    if (!current) {
+        return <Badge variant="outline">{status}</Badge>
+    }
 
     return (
         <Badge variant={current.variant as any} className="flex items-center w-fit">
