@@ -137,12 +137,12 @@ export default function AdminPage() {
   return (
     <div className="container mx-auto py-8 px-4">
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
+        <CardHeader className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
                 <CardTitle className="font-headline text-2xl">{t.registrationApplications}</CardTitle>
                 <CardDescription>{pendingDrivers.length > 0 ? (t.rideApplications_desc || `You have {count} pending applications.`).replace('{count}', String(pendingDrivers.length)) : t.noPendingApplications}</CardDescription>
             </div>
-             <div className="flex items-center gap-2">
+             <div className="flex items-center gap-2 self-end md:self-auto">
                 <Button variant={viewMode === 'table' ? 'secondary' : 'ghost'} size="icon" onClick={() => handleSetViewMode('table')}>
                     <List className="h-5 w-5" />
                 </Button>

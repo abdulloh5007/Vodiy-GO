@@ -176,12 +176,12 @@ export default function PromoCodesPage() {
                 </TabsContent>
                 <TabsContent value="existing">
                     <Card>
-                        <CardHeader className="flex flex-row items-center justify-between">
+                        <CardHeader className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                             <div>
                                 <CardTitle>{t.promo_existing_title || 'Existing Promo Codes'}</CardTitle>
                                 <CardDescription>{t.promo_existing_desc || 'Here is a list of all promo codes.'}</CardDescription>
                             </div>
-                             <div className="flex items-center gap-2">
+                             <div className="flex items-center gap-2 self-end md:self-auto">
                                 <Button variant={viewMode === 'table' ? 'secondary' : 'ghost'} size="icon" onClick={() => handleSetViewMode('table')}>
                                     <List className="h-5 w-5" />
                                 </Button>
