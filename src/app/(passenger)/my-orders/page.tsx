@@ -72,7 +72,7 @@ const OrderCard = ({ order, ride, driver, t, getLocale }: { order: Order, ride?:
                 <CardTitle className='flex items-center gap-2 text-lg'>{ride.from} &rarr; {ride.to}</CardTitle>
                 <CardDescription className='flex items-center gap-1 text-sm'>
                     <Clock className="h-4 w-4" />
-                    {order.createdAt ? format(order.createdAt.seconds * 1000, 'PPP HH:mm', { locale: getLocale() }) : t.loading }
+                    {order.createdAt ? format(order.createdAt.seconds * 1000, 'PPP, HH:mm', { locale: getLocale() }) : t.loading }
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">

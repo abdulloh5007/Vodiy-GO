@@ -58,7 +58,7 @@ const PromoCodeCard = ({ code, t, getLocale }: { code: PromoCode, t: any, getLoc
             </CardHeader>
             <CardContent className="space-y-3">
                 <div>{getStatusBadge(code, t)}</div>
-                <p className="text-xs text-muted-foreground">{t.promo_table_expires}: {format(code.expiresAt.toDate(), 'PPP HH:mm', { locale: getLocale() })}</p>
+                <p className="text-xs text-muted-foreground">{t.promo_table_expires}: {format(code.expiresAt.toDate(), 'PPP, HH:mm', { locale: getLocale() })}</p>
             </CardContent>
         </Card>
     )
@@ -217,7 +217,7 @@ export default function PromoCodesPage() {
                                                             </Button>
                                                         </TableCell>
                                                         <TableCell>{`${code.usageCount} / ${code.limit}`}</TableCell>
-                                                        <TableCell>{format(code.expiresAt.toDate(), 'PPP HH:mm', { locale: getLocale() })}</TableCell>
+                                                        <TableCell>{format(code.expiresAt.toDate(), 'PPP, HH:mm', { locale: getLocale() })}</TableCell>
                                                         <TableCell>{getStatusBadge(code, t)}</TableCell>
                                                     </TableRow>
                                                 ))

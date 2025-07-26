@@ -45,7 +45,7 @@ export function BottomNav() {
 
       <div className="grid grid-cols-4 gap-1 w-full h-full">
         {navLinks.map((link) => {
-          const isActive = pathname === link.href;
+          const isActive = pathname.startsWith(link.href);
           return (
             <Link
               key={link.href}

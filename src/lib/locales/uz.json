@@ -275,6 +275,7 @@
     "block_reason_desc": "Iltimos, ushbu haydovchini bloklash sababini ko'rsating.",
     "admin_chat_title": "Administrator",
     "admin_chat_desc": "Ariza holatlari va bildirishnomalar",
+    "admin_chat_desc_short": "Holat yangilanishlari va bildirishnomalar",
     "no_messages_yet": "Hozircha xabarlar yo'q.",
     "promo_code_copied_title": "Nusxalandi!",
     "promo_code_copied_desc": "{code} promo kodi vaqtinchalik xotiraga nusxalandi.",
