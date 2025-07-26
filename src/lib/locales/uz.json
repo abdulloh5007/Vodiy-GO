@@ -1,5 +1,4 @@
 
-
 {
     "home": "Bosh sahifa",
     "login": "Kirish",
@@ -286,6 +285,7 @@
     "message_reg_approved_body": "Tabriklaymiz! Sizning haydovchilik arizangiz tasdiqlandi. Endi siz qatnovlarni e’lon qilishingiz mumkin.",
     "message_reg_rejected_title": "Ariza rad etildi",
     "message_reg_rejected_body": "Sabab: {reason}",
+    "message_reg_rejected_body_with_attempts": "Sabab: {reason}. Sizda {attempts} ta urinish qoldi.",
     "message_reg_blocked_title": "Hisob bloklandi",
     "message_reg_blocked_body": "Sizning hisobingiz administrator tomonidan bloklandi. Sabab: {reason}",
     "message_ride_created_title": "Yangi qatnov yaratildi",
@@ -294,10 +294,13 @@
     "message_ride_approved_body": "Sizning {from} - {to} yo‘nalishidagi qatnovingiz tasdiqlandi.",
     "message_ride_rejected_title": "Qatnov rad etildi",
     "message_ride_rejected_body": "Sizning {from} - {to} yo‘nalishidagi qatnovingiz rad etildi. Sabab: {reason}",
+    "message_ride_rejected_body_with_attempts": "Sizning {from} dan {to} ga bo'lgan qatnovingiz rad etildi. Sababi: {reason}. Sizda qatnov yuborish uchun {attempts} ta urinish qoldi.",
+    "message_ride_blocked_title": "Hisob bloklandi",
+    "message_ride_blocked_body": "Ko‘p sonli rad etilgan qatnov arizalari tufayli hisobingiz bloklandi.",
     "reason_not_specified": "Ko'rsatilmagan",
     "rejection_count": "Rad etishlar soni",
     "rejection_limit_exceeded": "Ariza topshirish urinishlari chegarasi oshib ketdi.",
-    "message_reg_limit_exceeded_title": "Hisob Bloklandi",
+    "ride_rejection_limit_exceeded": "Qatnov arizalarini topshirish chegarasi oshib ketdi.",
     "message_reg_limit_exceeded_body": "Ko'p sonli muvaffaqiyatsiz ariza urinishlari tufayli hisobingiz bloklandi. Sabab: {reason}",
     "unblock_success_title": "Haydovchi blokdan chiqarildi",
     "unblock_success_desc": "Haydovchining profili o'chirildi. U qaytadan ariza topshirishi kerak bo'ladi.",
@@ -305,6 +308,6 @@
     "expired": "Tugagan",
     "resubmit_application_button": "Arizani qayta yuborish",
     "message_reg_unblocked_title": "Hisob blokdan chiqarildi",
-    "message_reg_unblocked_body": "Sizning hisobingiz administrator tomonidan blokdan chiqarildi. Endi yangi ariza topshirishingiz mumkin."
+    "message_reg_unblocked_body": "Sizning hisobingiz administrator tomonidan blokdan chiqarildi. Endi yangi ariza topshirishingiz mumkin.",
+    "attempts_left": "Sizda {count} ta urinish qoldi."
 }
-

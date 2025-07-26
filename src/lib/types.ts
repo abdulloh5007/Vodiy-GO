@@ -21,6 +21,7 @@ export type Driver = {
   rating: number;
   reviewCount: number;
   rejectionCount: number;
+  rideRejectionCount: number;
   rejectionReason?: string;
 };
 
@@ -53,7 +54,7 @@ export type Order = {
 
 export type Message = {
     id: string;
-    type: 'REGISTRATION_PENDING' | 'REGISTRATION_APPROVED' | 'REGISTRATION_REJECTED' | 'REGISTRATION_BLOCKED' | 'REGISTRATION_UNBLOCKED' | 'RIDE_CREATED' | 'RIDE_APPROVED' | 'RIDE_REJECTED';
+    type: 'REGISTRATION_PENDING' | 'REGISTRATION_APPROVED' | 'REGISTRATION_REJECTED' | 'REGISTRATION_BLOCKED' | 'REGISTRATION_UNBLOCKED' | 'RIDE_CREATED' | 'RIDE_APPROVED' | 'RIDE_REJECTED' | 'RIDE_BLOCKED';
     titleKey: string;
     bodyKey: string;
     bodyParams?: Record<string, string>;
@@ -79,5 +80,5 @@ export type Translations = {
   [key: string]: any;
 };
 
-export type DriverApplicationData = Omit<Driver, 'id' | 'status' | 'carPhotoUrl' | 'phone' | 'rating' | 'reviewCount' | 'rejectionCount'> & { carPhotoFile: File | null };
+export type DriverApplicationData = Omit<Driver, 'id' | 'status' | 'carPhotoUrl' | 'phone' | 'rating' | 'reviewCount' | 'rejectionCount' | 'rideRejectionCount'> & { carPhotoFile: File | null };
 

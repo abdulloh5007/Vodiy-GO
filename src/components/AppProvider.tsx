@@ -186,6 +186,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         rating: 0,
         reviewCount: 0,
         rejectionCount: 0,
+        rideRejectionCount: 0,
     });
     
     await addMessage(user.uid, 'REGISTRATION_PENDING', 'message_reg_pending_title', 'message_reg_pending_body');
@@ -212,14 +213,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     if (status === 'rejected') {
         const updatedDoc = await getDoc(driverDocRef);
         const driverData = updatedDoc.data() as Driver;
-        if (driverData.rejectionCount >= 3) {
+        const remainingAttempts = 3 - driverData.rejectionCount;
+
+        if (remainingAttempts <= 0) {
             await updateDoc(driverDocRef, { 
                 status: 'blocked',
                 rejectionReason: translations.rejection_limit_exceeded || 'Application attempt limit exceeded.'
             });
             await addMessage(driverId, 'REGISTRATION_BLOCKED', 'message_reg_limit_exceeded_title', 'message_reg_limit_exceeded_body', { reason: translations.rejection_limit_exceeded || 'Application attempt limit exceeded.' });
         } else {
-             await addMessage(driverId, 'REGISTRATION_REJECTED', 'message_reg_rejected_title', 'message_reg_rejected_body', { reason: reason || translations.reason_not_specified || "Not specified" });
+             await addMessage(driverId, 'REGISTRATION_REJECTED', 'message_reg_rejected_title', 'message_reg_rejected_body_with_attempts', { reason: reason || translations.reason_not_specified || "Not specified", attempts: remainingAttempts.toString() });
         }
     }
 
@@ -229,12 +232,28 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         await addMessage(driverId, 'REGISTRATION_BLOCKED', 'message_reg_blocked_title', 'message_reg_blocked_body', { reason: reason || translations.reason_not_specified || "Not specified" });
     }
   };
+
+  const deleteRidesByDriver = async (driverId: string) => {
+    const ridesQuery = query(collection(db, "rides"), where("driverId", "==", driverId));
+    const ridesSnapshot = await getDocs(ridesQuery);
+    const batch = writeBatch(db);
+    ridesSnapshot.forEach(doc => {
+      batch.delete(doc.ref);
+    });
+    await batch.commit();
+  }
   
   const updateRideStatus = async (rideId: string, status: 'approved' | 'rejected', reason?: string) => {
     const rideDocRef = doc(db, "rides", rideId);
     const rideDocSnap = await getDoc(rideDocRef);
     if (!rideDocSnap.exists()) return;
     const rideData = rideDocSnap.data() as Ride;
+
+    const driverDocRef = doc(db, "drivers", rideData.driverId);
+    const driverDocSnap = await getDoc(driverDocRef);
+    if (!driverDocSnap.exists()) return;
+    const driverData = driverDocSnap.data() as Driver;
+
 
     const updatePayload: any = { 
         status,
@@ -244,23 +263,33 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     if (status === 'approved') {
         updatePayload.approvedAt = serverTimestamp();
         updatePayload.availableSeats = rideData.seats; // Initialize available seats
-    }
-    
-    await updateDoc(rideDocRef, updatePayload);
-
-    if (status === 'approved') {
+        await updateDoc(rideDocRef, updatePayload);
         await addMessage(rideData.driverId, 'RIDE_APPROVED', 'message_ride_approved_title', 'message_ride_approved_body', { from: rideData.from, to: rideData.to });
     } else if (status === 'rejected') {
-        await addMessage(rideData.driverId, 'RIDE_REJECTED', 'message_ride_rejected_title', 'message_ride_rejected_body', { from: rideData.from, to: rideData.to, reason: reason || translations.reason_not_specified || "Not specified" });
+        await updateDoc(rideDocRef, updatePayload);
+        const newRejectionCount = (driverData.rideRejectionCount || 0) + 1;
+        const remainingAttempts = 3 - newRejectionCount;
+
+        if (remainingAttempts <= 0) {
+            await updateDoc(driverDocRef, { 
+                status: 'blocked',
+                rideRejectionCount: newRejectionCount,
+                rejectionReason: translations.ride_rejection_limit_exceeded || "Ride submission attempt limit exceeded." 
+            });
+            await deleteRidesByDriver(rideData.driverId);
+            await addMessage(rideData.driverId, 'RIDE_BLOCKED', 'message_ride_blocked_title', 'message_ride_blocked_body');
+        } else {
+             await updateDoc(driverDocRef, { rideRejectionCount: newRejectionCount });
+             await addMessage(rideData.driverId, 'RIDE_REJECTED', 'message_ride_rejected_body_with_attempts', 'message_ride_rejected_body', { from: rideData.from, to: rideData.to, reason: reason || translations.reason_not_specified || "Not specified", attempts: remainingAttempts.toString() });
+        }
     }
   }
 
   const deleteDriver = async (driverId: string) => {
     const driverDoc = doc(db, "drivers", driverId);
     await deleteDoc(driverDoc);
+    // Only send unblocked message if it was a manual action
     await addMessage(driverId, 'REGISTRATION_UNBLOCKED', 'message_reg_unblocked_title', 'message_reg_unblocked_body');
-    // We don't delete the user from auth, just their driver profile.
-    // They will be forced to re-apply.
   }
 
   const updateOrderStatus = async (orderId: string, status: 'accepted' | 'rejected') => {

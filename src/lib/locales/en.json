@@ -1,5 +1,4 @@
 
-
 {
     "home": "Home",
     "login": "Login",
@@ -286,6 +285,7 @@
     "message_reg_approved_body": "Congratulations! Your driver application has been approved. You can now publish rides.",
     "message_reg_rejected_title": "Application Rejected",
     "message_reg_rejected_body": "Reason: {reason}",
+    "message_reg_rejected_body_with_attempts": "Reason: {reason}. You have {attempts} attempts left.",
     "message_reg_blocked_title": "Account Blocked",
     "message_reg_blocked_body": "Your account has been blocked by an administrator. Reason: {reason}",
     "message_ride_created_title": "New Ride Created",
@@ -294,10 +294,13 @@
     "message_ride_approved_body": "Your ride from {from} to {to} has been approved.",
     "message_ride_rejected_title": "Ride Rejected",
     "message_ride_rejected_body": "Your ride from {from} to {to} was rejected. Reason: {reason}",
+    "message_ride_rejected_body_with_attempts": "Your ride from {from} to {to} was rejected. Reason: {reason}. You have {attempts} ride submission attempts left.",
+    "message_ride_blocked_title": "Account Blocked",
+    "message_ride_blocked_body": "Your account has been blocked due to multiple rejected ride submissions.",
     "reason_not_specified": "Not specified",
     "rejection_count": "Rejection Count",
     "rejection_limit_exceeded": "Application attempt limit exceeded.",
-    "message_reg_limit_exceeded_title": "Account Blocked",
+    "ride_rejection_limit_exceeded": "Ride submission attempt limit exceeded.",
     "message_reg_limit_exceeded_body": "Your account has been blocked due to multiple failed application attempts. Reason: {reason}",
     "unblock_success_title": "Driver Unblocked",
     "unblock_success_desc": "The driver's profile has been removed. They will need to re-apply.",
@@ -305,6 +308,6 @@
     "expired": "Expired",
     "resubmit_application_button": "Submit Application Again",
     "message_reg_unblocked_title": "Account Unblocked",
-    "message_reg_unblocked_body": "Your account has been unblocked by the administrator. You can now submit a new application."
+    "message_reg_unblocked_body": "Your account has been unblocked by the administrator. You can now submit a new application.",
+    "attempts_left": "You have {count} attempts left."
 }
-

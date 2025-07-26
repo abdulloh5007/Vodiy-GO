@@ -341,6 +341,8 @@ export default function DriverDiagnosticsPage() {
 const DriverStatusPage = ({ driverProfile, t, deleteDriver }: { driverProfile: Driver, t: any, deleteDriver: (id: string) => Promise<void>}) => {
     
     const getStatusContent = () => {
+        const remainingAttempts = 3 - driverProfile.rejectionCount;
+
         switch (driverProfile.status) {
             case 'pending':
                 return {
@@ -365,9 +367,12 @@ const DriverStatusPage = ({ driverProfile, t, deleteDriver }: { driverProfile: D
                     description: t.statusPage_rejected_desc || "We're sorry, but your application could not be approved at this time.",
                     rejectionReason: driverProfile.rejectionReason,
                     actionButton: (
-                        <Button className="w-full" onClick={() => deleteDriver(driverProfile.id)}>
-                            {t.resubmit_application_button || 'Submit Application Again'}
-                        </Button>
+                        <div className='w-full space-y-2'>
+                             <Button className="w-full" onClick={() => deleteDriver(driverProfile.id)}>
+                                {t.resubmit_application_button || 'Submit Application Again'}
+                             </Button>
+                             <p className='text-xs text-muted-foreground'>{t.attempts_left.replace('{count}', remainingAttempts)}</p>
+                        </div>
                     ),
                 };
             case 'blocked':
@@ -420,4 +425,3 @@ const DriverStatusPage = ({ driverProfile, t, deleteDriver }: { driverProfile: D
         </div>
     )
 }
-
