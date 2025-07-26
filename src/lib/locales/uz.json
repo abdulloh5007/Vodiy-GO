@@ -313,5 +313,8 @@
     "announcement_history_title": "E'lonlar tarixi",
     "announcement_history_desc": "O'tgan qatnov e'lonlaringizni ko'ring",
     "announcement_history_desc_long": "Bu yerda siz barcha o'tgan qatnov e'lonlaringizni topishingiz mumkin.",
-    "feature_coming_soon": "Bu xususiyat hozirda ishlab chiqilmoqda. Bizni kuzatib boring!"
+    "feature_coming_soon": "Bu xususiyat hozirda ishlab chiqilmoqda. Bizni kuzatib boring!",
+    "create_ride_warning_title": "Diqqat!",
+    "create_ride_warning_desc": "Iltimos, ma'lumotlarni diqqat bilan tekshiring. Yuborilgandan so'ng marshrut yoki narxni o'zgartira olmaysiz.",
+    "selectSeatsDesc": "Avtomobilingizdagi o'rindiqlar sonini tanlang."
 }

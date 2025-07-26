@@ -10,13 +10,14 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { ShieldAlert, Loader2, Clock, Info, CheckCircle2, Ticket, Sparkles, Ban, Minus, Plus, Armchair } from 'lucide-react';
+import { ShieldAlert, Loader2, Clock, Info, CheckCircle2, Ticket, Sparkles, Ban, Minus, Plus, Armchair, AlertTriangle, Users } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useRouter } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { PromoCode, Ride } from '@/lib/types';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { cn } from '@/lib/utils';
 
 const locations = ["Sirdaryo", "Navoiy", "Jizzax", "Xorazm", "Buxoro", "Surxondaryo", "Namangan", "Andijon", "Qashqadaryo", "Samarqand", "Fargʻona", "Toshkent"];
 
@@ -156,7 +157,7 @@ export default function CreateRidePage() {
   const [price, setPrice] = useState('');
   const [info, setInfo] = useState('');
   const [time, setTime] = useState('');
-  const [seats, setSeats] = useState<'4' | '8'>('4');
+  const [seats, setSeats] = useState<4 | 8>(4);
   const [promoCodeInput, setPromoCodeInput] = useState('');
   const [activatedPromo, setActivatedPromo] = useState<PromoCode | null>(null);
   const [isActivatingPromo, setIsActivatingPromo] = useState(false);
@@ -281,7 +282,7 @@ export default function CreateRidePage() {
               price: priceValue,
               info,
               time,
-              seats: parseInt(seats),
+              seats,
               ...(activatedPromo && { promoCode: activatedPromo.code }),
             });
             
@@ -295,7 +296,7 @@ export default function CreateRidePage() {
             setPrice('');
             setInfo('');
             setTime('');
-            setSeats('4');
+            setSeats(4);
             setPromoCodeInput('');
             setActivatedPromo(null);
         } catch (error: any) {
@@ -354,20 +355,32 @@ export default function CreateRidePage() {
                   <Input id="time" type="text" value={time} onChange={e => setTime(e.target.value)} placeholder={t.departureTimePlaceholder || 'e.g., 09:00 or Morning'} />
                 </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                    <Label htmlFor="seats">{t.availableSeats || 'Available Seats'}</Label>
-                    <Select value={seats} onValueChange={(value) => setSeats(value as '4' | '8')}>
-                        <SelectTrigger id="seats">
-                            <SelectValue placeholder={t.selectSeats || 'Select seats'} />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="4">4</SelectItem>
-                            <SelectItem value="8">8</SelectItem>
-                        </SelectContent>
-                    </Select>
-                </div>
-            </div>
+
+            <Card className="bg-muted/50">
+                <CardHeader className='pb-4'>
+                    <CardTitle className="text-lg flex items-center justify-center gap-2"><Users /> {t.availableSeats || 'Available Seats'}</CardTitle>
+                    <CardDescription className="text-center">{t.selectSeatsDesc || 'Choose the number of seats in your car.'}</CardDescription>
+                </CardHeader>
+                <CardContent className="flex justify-center gap-4">
+                    <Button 
+                        type="button" 
+                        variant={seats === 4 ? 'secondary' : 'outline'}
+                        className="h-16 w-24 text-lg"
+                        onClick={() => setSeats(4)}
+                    >
+                        4
+                    </Button>
+                    <Button 
+                        type="button" 
+                        variant={seats === 8 ? 'secondary' : 'outline'}
+                        className="h-16 w-24 text-lg"
+                        onClick={() => setSeats(8)}
+                    >
+                        8
+                    </Button>
+                </CardContent>
+            </Card>
+
              <div className="space-y-2">
               <Label htmlFor="info">{t.additionalInfo}</Label>
               <Textarea id="info" value={info} onChange={e => setInfo(e.target.value)} placeholder={t.additionalInfoPlaceholder} />
@@ -400,6 +413,15 @@ export default function CreateRidePage() {
                     )}
                 </CardContent>
             </Card>
+            
+            <Alert variant="default" className="bg-yellow-50 border-yellow-200 dark:bg-yellow-950 dark:border-yellow-800">
+                <AlertTriangle className="h-5 w-5 text-yellow-600" />
+                <AlertTitle className="text-yellow-800 dark:text-yellow-300">{t.create_ride_warning_title || "Attention!"}</AlertTitle>
+                <AlertDescription className="text-yellow-700 dark:text-yellow-400">
+                    {t.create_ride_warning_desc || "Please check the details carefully. You will not be able to change the route or price after submission."}
+                </AlertDescription>
+            </Alert>
+
 
             <Button type="submit" className="w-full" disabled={isSubmitting}>
                 {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
