@@ -40,8 +40,8 @@ export function BottomNav() {
 
   return (
     <div className="md:hidden fixed bottom-2 left-1/2 -translate-x-1/2 z-50 
-      w-[95%] h-16 bg-white/10 border border-white/20 backdrop-blur-xl 
-      rounded-full shadow-xl ring-1 ring-white/10 flex items-center px-2 py-2">
+      w-[95%] h-16 bg-slate-100/80 dark:bg-black/50 border border-slate-300 dark:border-white/20 backdrop-blur-xl 
+      rounded-full shadow-xl ring-1 ring-black/5 dark:ring-white/10 flex items-center px-2 py-2">
 
       <div className="grid grid-cols-4 gap-1 w-full h-full">
         {navLinks.map((link) => {
@@ -52,10 +52,10 @@ export function BottomNav() {
               href={link.href}
               className={cn(
                 `relative flex flex-col items-center justify-center rounded-full transition-all duration-200 
-                ease-out group text-xs hover:bg-white/10`,
+                ease-out group text-xs`,
                 isActive
-                  ? 'bg-white/20 text-white shadow-inner ring-1 ring-primary/50'
-                  : 'text-white/70'
+                  ? 'bg-white dark:bg-white/20 text-slate-900 dark:text-white shadow-inner ring-1 ring-primary/50'
+                  : 'text-slate-600 dark:text-slate-300 hover:bg-black/5 dark:hover:bg-white/10'
               )}
             >
               {!!link.badge && Number(link.badge) > 0 && (
