@@ -157,7 +157,7 @@ export default function CreateRidePage() {
   const [price, setPrice] = useState('');
   const [info, setInfo] = useState('');
   const [time, setTime] = useState('');
-  const [seats, setSeats] = useState<4 | 8>(4);
+  const [seats, setSeats] = useState(4);
   const [promoCodeInput, setPromoCodeInput] = useState('');
   const [activatedPromo, setActivatedPromo] = useState<PromoCode | null>(null);
   const [isActivatingPromo, setIsActivatingPromo] = useState(false);
@@ -356,30 +356,18 @@ export default function CreateRidePage() {
                 </div>
             </div>
 
-            <Card className="bg-muted/50">
-                <CardHeader className='pb-4'>
-                    <CardTitle className="text-lg flex items-center justify-center gap-2"><Users /> {t.availableSeats || 'Available Seats'}</CardTitle>
-                    <CardDescription className="text-center">{t.selectSeatsDesc || 'Choose the number of seats in your car.'}</CardDescription>
-                </CardHeader>
-                <CardContent className="flex justify-center gap-4">
-                    <Button 
-                        type="button" 
-                        variant={seats === 4 ? 'secondary' : 'outline'}
-                        className="h-16 w-24 text-lg"
-                        onClick={() => setSeats(4)}
-                    >
-                        4
-                    </Button>
-                    <Button 
-                        type="button" 
-                        variant={seats === 8 ? 'secondary' : 'outline'}
-                        className="h-16 w-24 text-lg"
-                        onClick={() => setSeats(8)}
-                    >
-                        8
-                    </Button>
-                </CardContent>
-            </Card>
+            <div className="space-y-2">
+                <Label htmlFor="seats">{t.selectSeats || 'Number of seats'}</Label>
+                <Select value={String(seats)} onValueChange={(val) => setSeats(Number(val) as 4 | 8)} required>
+                    <SelectTrigger id="seats">
+                        <SelectValue placeholder="Select seats" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="4">4</SelectItem>
+                        <SelectItem value="8">8</SelectItem>
+                    </SelectContent>
+                </Select>
+            </div>
 
              <div className="space-y-2">
               <Label htmlFor="info">{t.additionalInfo}</Label>
