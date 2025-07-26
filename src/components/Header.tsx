@@ -99,19 +99,32 @@ export function Header() {
                           ? pathname === '/admin' 
                           : pathname.startsWith(link.href);
                       return (
-                          <Button 
-                              key={link.href}
-                              variant={isActive ? 'secondary' : 'outline'} 
-                              asChild 
-                              className="h-24 flex-col gap-1 text-xs rounded-lg relative px-1"
-                              onClick={() => setIsSheetOpen(false)}
-                          >
-                              <Link href={link.href} className="text-center flex flex-col items-center justify-center">
-                                {link.badge && link.badge > 0 ? <Badge variant="destructive" className="absolute top-2 right-2">{link.badge}</Badge> : ''}
-                                <link.icon className="mb-1 h-6 w-6"/>
-                                <span>{link.label}</span>
-                              </Link>
-                          </Button>
+                        <Button 
+                          key={link.href}
+                          variant={isActive ? 'secondary' : 'outline'} 
+                          asChild 
+                          className="h-24 flex-col gap-1 text-xs rounded-lg relative px-1 overflow-hidden"
+                          onClick={() => setIsSheetOpen(false)}
+                        >
+                          <Link href={link.href} className="text-center flex flex-col items-center justify-center relative w-full h-full">
+                            {link.badge && link.badge > 0 ? (
+                              <Badge variant="destructive" className="absolute top-2 right-2">{link.badge}</Badge>
+                            ) : ''}
+                        
+                            <link.icon className="mb-1 h-6 w-6" />
+                        
+                            {/* Тень по краям */}
+                            <div className="pointer-events-none absolute left-0 top-[70%] h-5 w-6 bg-gradient-to-r from-white via-white/70 to-transparent z-10 rounded-lg" />
+                            <div className="pointer-events-none absolute right-0 top-[70%] h-5 w-6 bg-gradient-to-l from-white via-white/70 to-transparent z-10 rounded-lg" />
+                        
+                            {/* Анимированный текст */}
+                            <div className="relative w-full overflow-hidden h-5">
+                              <div className="whitespace-nowrap animate-marquee px-2 text-center">
+                                {link.label}
+                              </div>
+                            </div>
+                          </Link>
+                        </Button>                      
                       )
                   })}
               </div>

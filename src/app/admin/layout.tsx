@@ -1,8 +1,9 @@
+
 'use client';
 
 import { useContext, useEffect } from 'react';
 import { AppContext } from '@/contexts/AppContext';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 
 export default function AdminLayout({
@@ -12,6 +13,7 @@ export default function AdminLayout({
 }) {
   const context = useContext(AppContext);
   const router = useRouter();
+  const pathname = usePathname();
 
   // Это начальное состояние, пока контекст не загрузился
   if (!context) {
@@ -23,19 +25,25 @@ export default function AdminLayout({
   }
 
   const { user, loading } = context;
+  const isLoginPage = pathname === '/admin/login';
 
   useEffect(() => {
-    // Ждем окончания загрузки, чтобы принять решение
-    if (!loading) {
-      // Если после загрузки пользователя нет или он не админ, перенаправляем
-      if (user?.role !== 'admin') {
-        router.push('/');
-      }
-    }
-  }, [user, loading, router]);
+    if (loading) return; // Не делать ничего, пока идет загрузка
 
-  // Пока идет загрузка или если пользователь не определен как админ, показываем загрузчик
-  if (loading || user?.role !== 'admin') {
+    // Если пользователь - админ и пытается зайти на страницу логина, перенаправляем в админку
+    if (user?.role === 'admin' && isLoginPage) {
+      router.push('/admin');
+    }
+    
+    // Если пользователь не админ и пытается зайти НЕ на страницу логина, перенаправляем на главную
+    if (user?.role !== 'admin' && !isLoginPage) {
+      router.push('/');
+    }
+
+  }, [user, loading, router, isLoginPage]);
+
+  // Показываем загрузчик, пока идет проверка
+  if (loading) {
     return (
       <div className="flex h-screen w-full items-center justify-center">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
@@ -43,6 +51,15 @@ export default function AdminLayout({
     );
   }
 
-  // Если все проверки пройдены, показываем содержимое страницы
-  return <>{children}</>;
+  // Если пользователь - админ, или если это страница логина, показываем контент
+  if (user?.role === 'admin' || isLoginPage) {
+     return <>{children}</>;
+  }
+  
+  // В противном случае (не админ и не страница логина) показываем загрузчик, пока происходит редирект
+  return (
+    <div className="flex h-screen w-full items-center justify-center">
+      <Loader2 className="h-12 w-12 animate-spin text-primary" />
+    </div>
+  );
 }
