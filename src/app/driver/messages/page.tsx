@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { CheckBadge } from 'lucide-react';
+import { BadgeCheck } from 'lucide-react';
 import { ChevronRight } from 'lucide-react';
 
 function MessagesSkeleton() {
@@ -47,7 +47,7 @@ export default function MessagesPage() {
                     <div className="flex-grow">
                         <CardTitle className="flex items-center gap-2">
                             {t.admin_chat_title || "Admin"}
-                            <CheckBadge className="h-5 w-5 text-primary" />
+                            <BadgeCheck className="h-5 w-5 text-primary" />
                         </CardTitle>
                         <CardDescription>{t.admin_chat_desc_short || "Status updates & notifications"}</CardDescription>
                     </div>
