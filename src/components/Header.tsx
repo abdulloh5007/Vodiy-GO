@@ -19,6 +19,7 @@ import {
 import { LogIn, Menu, Car, FileText, LogOut, Home, User, ShoppingBag, ShieldCheck, Settings, Globe, PackageCheck, Bell, UserCog, Users, Ticket } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from './ui/separator';
+import { MarqueeText } from './MarqueeText';
 
 export function Header() {
   const context = useContext(AppContext);
@@ -106,23 +107,15 @@ export function Header() {
                           className="h-24 flex-col gap-1 text-xs rounded-lg relative px-1 overflow-hidden"
                           onClick={() => setIsSheetOpen(false)}
                         >
-                          <Link href={link.href} className="text-center flex flex-col items-center justify-center relative w-full h-full">
+                          <Link href={link.href} className="text-center flex flex-col items-center justify-center w-full h-full">
                             {link.badge && link.badge > 0 ? (
                               <Badge variant="destructive" className="absolute top-2 right-2">{link.badge}</Badge>
                             ) : ''}
                         
                             <link.icon className="mb-1 h-6 w-6" />
-                        
-                            {/* Тень по краям */}
-                            <div className="pointer-events-none absolute left-0 top-[70%] h-5 w-6 bg-gradient-to-r from-white via-white/70 to-transparent z-10 rounded-lg" />
-                            <div className="pointer-events-none absolute right-0 top-[70%] h-5 w-6 bg-gradient-to-l from-white via-white/70 to-transparent z-10 rounded-lg" />
-                        
-                            {/* Анимированный текст */}
-                            <div className="relative w-full overflow-hidden h-5">
-                              <div className="whitespace-nowrap animate-marquee px-2 text-center">
-                                {link.label}
-                              </div>
-                            </div>
+                            <MarqueeText>
+                              {link.label}
+                            </MarqueeText>
                           </Link>
                         </Button>                      
                       )
@@ -205,7 +198,16 @@ export function Header() {
             <>
                 {user?.role === 'passenger' && renderPassengerMenu()}
                 {user?.role === 'admin' && renderAdminMenu()}
-                {!user}
+                {!user && pathname.startsWith('/driver') && (
+                     <Button asChild variant="outline">
+                        <Link href="/driver/login"><LogIn className='mr-2' /> {t.login}</Link>
+                    </Button>
+                 )}
+                 {!user && !pathname.startsWith('/driver') && !pathname.startsWith('/admin') && (
+                     <Button asChild variant="outline">
+                        <Link href="/driver/login">{t.registerDriver}</Link>
+                    </Button>
+                 )}
                 {user?.role === 'driver' && (
                     <Button variant="ghost" className="hidden md:flex" onClick={handleLogout}><LogOut className='mr-2'/> {t.logout}</Button>
                  )}
