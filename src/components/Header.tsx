@@ -198,16 +198,6 @@ export function Header() {
             <>
                 {user?.role === 'passenger' && renderPassengerMenu()}
                 {user?.role === 'admin' && renderAdminMenu()}
-                {!user && pathname.startsWith('/driver') && (
-                     <Button asChild variant="outline">
-                        <Link href="/driver/login"><LogIn className='mr-2' /> {t.login}</Link>
-                    </Button>
-                 )}
-                 {!user && !pathname.startsWith('/driver') && !pathname.startsWith('/admin') && (
-                     <Button asChild variant="outline">
-                        <Link href="/driver/login">{t.registerDriver}</Link>
-                    </Button>
-                 )}
                 {user?.role === 'driver' && (
                     <Button variant="ghost" className="hidden md:flex" onClick={handleLogout}><LogOut className='mr-2'/> {t.logout}</Button>
                  )}
