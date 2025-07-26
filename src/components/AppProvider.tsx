@@ -234,7 +234,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   };
 
   const deleteRidesByDriver = async (driverId: string) => {
-    const ridesQuery = query(collection(db, "rides"), where("driverId", "==", driverId));
+    const ridesQuery = query(collection(db, "rides"), where("driverId", "==", driverId), where("status", "in", ["pending", "approved"]));
     const ridesSnapshot = await getDocs(ridesQuery);
     const batch = writeBatch(db);
     ridesSnapshot.forEach(doc => {
@@ -510,4 +510,5 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     </AppContext.Provider>
   );
 }
+
 
