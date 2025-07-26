@@ -141,13 +141,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
   }, [user]);
 
-  const addMessage = async (userId: string, type: Message['type'], title: string, body: string) => {
+  const addMessage = async (userId: string, type: Message['type'], titleKey: string, bodyKey: string, bodyParams?: Record<string, string>) => {
     const messageRef = doc(collection(db, 'users', userId, 'messages'));
     await setDoc(messageRef, {
         id: messageRef.id,
         type,
-        title,
-        body,
+        titleKey,
+        bodyKey,
+        ...(bodyParams && { bodyParams }),
         createdAt: serverTimestamp(),
         isRead: false
     });
@@ -185,27 +186,28 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         reviewCount: 0
     });
     
-    await addMessage(user.uid, 'REGISTRATION_PENDING', 'Ariza yuborildi', 'Sizning haydovchilik arizangiz koʻrib chiqish uchun yuborildi. Tez orada sizga xabar beramiz.');
+    await addMessage(user.uid, 'REGISTRATION_PENDING', 'message_reg_pending_title', 'message_reg_pending_body');
   };
 
   const updateDriverStatus = async (driverId: string, status: 'verified' | 'rejected' | 'blocked', reason?: string) => {
     const driverDoc = doc(db, "drivers", driverId);
     
-    const updateData: { status: 'verified' | 'rejected' | 'blocked'; rejectionReason?: string } = { status };
+    const updateData: any = { status };
     if (reason) {
         updateData.rejectionReason = reason;
     } else if (status === 'verified') {
+        // Clear rejection reason on re-verification/unblocking
         updateData.rejectionReason = '';
     }
 
     await setDoc(driverDoc, updateData, { merge: true });
 
     if (status === 'verified') {
-        await addMessage(driverId, 'REGISTRATION_APPROVED', 'Ariza tasdiqlandi', 'Tabriklaymiz! Sizning haydovchilik arizangiz tasdiqlandi. Endi siz qatnovlarni e’lon qilishingiz mumkin.');
+        await addMessage(driverId, 'REGISTRATION_APPROVED', 'message_reg_approved_title', 'message_reg_approved_body');
     } else if (status === 'rejected') {
-        await addMessage(driverId, 'REGISTRATION_REJECTED', 'Ariza rad etildi', `Sabab: ${reason || 'Sabab ko‘rsatilmagan'}`);
+        await addMessage(driverId, 'REGISTRATION_REJECTED', 'message_reg_rejected_title', 'message_reg_rejected_body', { reason: reason || translations.reason_not_specified || "Not specified" });
     } else if (status === 'blocked') {
-        await addMessage(driverId, 'REGISTRATION_REJECTED', 'Hisob bloklandi', `Sabab: ${reason || 'Sabab ko‘rsatilmagan'}`);
+        await addMessage(driverId, 'REGISTRATION_BLOCKED', 'message_reg_blocked_title', 'message_reg_blocked_body', { reason: reason || translations.reason_not_specified || "Not specified" });
     }
   };
   
@@ -227,9 +229,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     await updateDoc(rideDocRef, updatePayload);
 
     if (status === 'approved') {
-        await addMessage(rideData.driverId, 'RIDE_APPROVED', 'Qatnov tasdiqlandi', `Sizning ${rideData.from} - ${rideData.to} yo‘nalishidagi qatnovingiz tasdiqlandi.`);
+        await addMessage(rideData.driverId, 'RIDE_APPROVED', 'message_ride_approved_title', 'message_ride_approved_body', { from: rideData.from, to: rideData.to });
     } else if (status === 'rejected') {
-        await addMessage(rideData.driverId, 'RIDE_REJECTED', 'Qatnov rad etildi', `Sizning ${rideData.from} - ${rideData.to} yo‘nalishidagi qatnovingiz rad etildi. Sabab: ${reason || 'Sabab ko‘rsatilmagan'}`);
+        await addMessage(rideData.driverId, 'RIDE_REJECTED', 'message_ride_rejected_title', 'message_ride_rejected_body', { from: rideData.from, to: rideData.to, reason: reason || translations.reason_not_specified || "Not specified" });
     }
   }
 
@@ -257,19 +259,26 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     };
 
     if (rideData.promoCode) {
+        // Run as transaction
         const promoQuery = query(collection(db, 'promocodes'), where('code', '==', rideData.promoCode));
         const promoSnapshot = await getDocs(promoQuery);
 
         if (promoSnapshot.empty) throw new Error("promocode/not-found");
         
         const promoDocRef = promoSnapshot.docs[0].ref;
-        const promoData = promoSnapshot.docs[0].data() as PromoCode;
-
-        if (promoData.status !== 'active' || promoData.expiresAt.toDate() < new Date() || (promoData.usedBy && promoData.usedBy.includes(user.uid))) {
-            throw new Error("promocode/invalid");
-        }
 
         await runTransaction(db, async (transaction) => {
+            const promoDoc = await transaction.get(promoDocRef);
+            if (!promoDoc.exists()) {
+                throw new Error("promocode/not-found");
+            }
+            const promoData = promoDoc.data() as PromoCode;
+            
+            // Re-check conditions inside transaction for safety
+            if (promoData.status !== 'active' || promoData.expiresAt.toDate() < new Date() || (promoData.usedBy && promoData.usedBy.includes(user.uid))) {
+                throw new Error("promocode/invalid");
+            }
+
             const newUsageCount = (promoData.usageCount || 0) + 1;
             transaction.update(promoDocRef, { 
                 usageCount: newUsageCount,
@@ -283,12 +292,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         });
 
     } else {
+        // Simple write without transaction
         const newRideRef = doc(collection(db, "rides"))
         ridePayload.id = newRideRef.id;
         await setDoc(newRideRef, ridePayload);
     }
 
-    await addMessage(user.uid, 'RIDE_CREATED', 'Yangi qatnov yaratildi', `Sizning ${rideData.from} - ${rideData.to} yo‘nalishidagi qatnovingiz ko‘rib chiqish uchun yuborildi.`);
+    await addMessage(user.uid, 'RIDE_CREATED', 'message_ride_created_title', 'message_ride_created_body', { from: rideData.from, to: rideData.to });
   };
 
   const addOrder = async (orderData: Omit<Order, 'id' | 'status' | 'createdAt' | 'passengerId'> & { passengerId: string }) => {

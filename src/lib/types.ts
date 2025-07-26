@@ -51,9 +51,10 @@ export type Order = {
 
 export type Message = {
     id: string;
-    type: 'REGISTRATION_PENDING' | 'REGISTRATION_APPROVED' | 'REGISTRATION_REJECTED' | 'RIDE_CREATED' | 'RIDE_APPROVED' | 'RIDE_REJECTED';
-    title: string;
-    body: string;
+    type: 'REGISTRATION_PENDING' | 'REGISTRATION_APPROVED' | 'REGISTRATION_REJECTED' | 'REGISTRATION_BLOCKED' | 'RIDE_CREATED' | 'RIDE_APPROVED' | 'RIDE_REJECTED';
+    titleKey: string;
+    bodyKey: string;
+    bodyParams?: Record<string, string>;
     createdAt: any;
     isRead: boolean;
 }

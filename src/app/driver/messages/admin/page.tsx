@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useContext, useMemo } from 'react';
+import { useContext, useMemo, useEffect, useRef } from 'react';
 import { AppContext } from '@/contexts/AppContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { MessageSquare, CheckCircle2, XCircle, FileText, PackageCheck, Ban, ArrowLeft } from 'lucide-react';
@@ -16,7 +16,7 @@ import { useRouter } from 'next/navigation';
 function MessagesPageSkeleton() {
     return (
         <div className="container mx-auto py-8 px-4">
-            <Card className="flex flex-col h-[calc(100vh-8rem)]">
+            <Card className="flex flex-col h-full">
                 <CardHeader className="border-b">
                     <div className="flex items-center gap-3">
                         <Skeleton className="h-10 w-10 rounded-full" />
@@ -46,7 +46,7 @@ const getMessageIcon = (type: Message['type']) => {
         case 'REGISTRATION_REJECTED':
         case 'RIDE_REJECTED':
         case 'REGISTRATION_BLOCKED':
-            return <XCircle className="h-5 w-5 text-red-500" />;
+            return <Ban className="h-5 w-5 text-red-500" />;
         case 'REGISTRATION_PENDING':
             return <FileText className="h-5 w-5 text-yellow-500" />;
         case 'RIDE_CREATED':
@@ -60,6 +60,7 @@ const getMessageIcon = (type: Message['type']) => {
 export default function AdminChatPage() {
     const context = useContext(AppContext);
     const router = useRouter();
+    const scrollAreaRef = useRef<HTMLDivElement>(null);
     
     if (!context) {
         throw new Error('MessagesPage must be used within an AppProvider');
@@ -80,14 +81,35 @@ export default function AdminChatPage() {
         return messages.sort((a,b) => a.createdAt.toMillis() - b.createdAt.toMillis());
     }, [messages]);
 
+    const getTranslatedMessage = (message: Message): { title: string, body: string } => {
+        const title = t[message.titleKey] || message.titleKey;
+        let body = t[message.bodyKey] || message.bodyKey;
+
+        if (message.bodyParams) {
+            Object.keys(message.bodyParams).forEach(key => {
+                const placeholder = `{${key}}`;
+                // Use a RegExp with 'g' flag to replace all occurrences
+                body = body.replace(new RegExp(placeholder, 'g'), message.bodyParams[key]);
+            });
+        }
+        return { title, body };
+    }
+
+    // Scroll to bottom when messages change
+    useEffect(() => {
+        if (scrollAreaRef.current) {
+            scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
+        }
+    }, [sortedMessages]);
+
     if (loading || !user || !t.home) {
         return <MessagesPageSkeleton />;
     }
     
     return (
-        <div className="container mx-auto py-8 px-4 h-full">
-            <Card className="flex flex-col h-[calc(100vh-10rem)]">
-                <CardHeader className="border-b flex-row items-center gap-3 space-y-0">
+        <div className="container mx-auto py-4 px-4 h-full">
+            <Card className="flex flex-col h-full">
+                <CardHeader className="border-b flex-row items-center gap-3 space-y-0 p-4">
                      <Button variant="ghost" size="icon" className="mr-2" onClick={() => router.back()}>
                         <ArrowLeft className="h-5 w-5" />
                      </Button>
@@ -100,22 +122,25 @@ export default function AdminChatPage() {
                         <p className="text-sm text-muted-foreground">{t.admin_chat_desc || 'Application status and notifications'}</p>
                     </div>
                 </CardHeader>
-                <CardContent className="flex-1 p-4 overflow-y-auto">
+                <CardContent ref={scrollAreaRef} className="flex-1 p-4 overflow-y-auto">
                     <div className="space-y-4">
-                        {sortedMessages.length > 0 ? sortedMessages.map(msg => (
-                            <div key={msg.id} className="flex items-start gap-3 max-w-xl">
-                                <div className="p-3 bg-muted rounded-full">
-                                    {getMessageIcon(msg.type)}
+                        {sortedMessages.length > 0 ? sortedMessages.map(msg => {
+                            const { title, body } = getTranslatedMessage(msg);
+                            return (
+                                <div key={msg.id} className="flex items-start gap-3 max-w-xl">
+                                    <div className="p-3 bg-muted rounded-full">
+                                        {getMessageIcon(msg.type)}
+                                    </div>
+                                    <div className="bg-muted p-3 rounded-lg w-full">
+                                        <p className="font-semibold text-sm">{title}</p>
+                                        <p className="text-sm text-muted-foreground">{body}</p>
+                                        <p className="text-xs text-muted-foreground/70 mt-2 text-right">
+                                            {format(msg.createdAt.toDate(), 'PPP, HH:mm', { locale: getLocale() })}
+                                        </p>
+                                    </div>
                                 </div>
-                                <div className="bg-muted p-3 rounded-lg w-full">
-                                    <p className="font-semibold text-sm">{msg.title}</p>
-                                    <p className="text-sm text-muted-foreground">{msg.body}</p>
-                                    <p className="text-xs text-muted-foreground/70 mt-2 text-right">
-                                        {format(msg.createdAt.toDate(), 'PPP, HH:mm', { locale: getLocale() })}
-                                    </p>
-                                </div>
-                            </div>
-                        )) : (
+                            )
+                        }) : (
                             <div className="text-center text-muted-foreground py-10">
                                 {t.no_messages_yet || 'No messages yet.'}
                             </div>
