@@ -247,7 +247,7 @@ export default function MyOrdersPage() {
                 </CardContent>
             </Card>
 
-             <div className={cn("grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4", viewMode !== 'card' && 'hidden')}>
+             <div className={cn("grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4", viewMode !== 'card' && 'hidden')}>
                 {myRideOrders.length > 0 ? (
                    myRideOrders.map(order => {
                         const ride = myRides.find(r => r.id === order.rideId);

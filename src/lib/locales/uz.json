@@ -277,5 +277,20 @@
     "admin_chat_desc": "Ariza holatlari va bildirishnomalar",
     "no_messages_yet": "Hozircha xabarlar yo'q.",
     "promo_code_copied_title": "Nusxalandi!",
-    "promo_code_copied_desc": "{code} promo kodi vaqtinchalik xotiraga nusxalandi."
+    "promo_code_copied_desc": "{code} promo kodi vaqtinchalik xotiraga nusxalandi.",
+    "message_reg_pending_title": "Ariza yuborildi",
+    "message_reg_pending_body": "Sizning haydovchilik arizangiz koʻrib chiqish uchun yuborildi. Tez orada sizga xabar beramiz.",
+    "message_reg_approved_title": "Ariza tasdiqlandi",
+    "message_reg_approved_body": "Tabriklaymiz! Sizning haydovchilik arizangiz tasdiqlandi. Endi siz qatnovlarni e’lon qilishingiz mumkin.",
+    "message_reg_rejected_title": "Ariza rad etildi",
+    "message_reg_rejected_body": "Sabab: {reason}",
+    "message_reg_blocked_title": "Hisob bloklandi",
+    "message_reg_blocked_body": "Sizning hisobingiz administrator tomonidan bloklandi. Sabab: {reason}",
+    "message_ride_created_title": "Yangi qatnov yaratildi",
+    "message_ride_created_body": "Sizning {from} - {to} yo‘nalishidagi qatnovingiz ko‘rib chiqish uchun yuborildi.",
+    "message_ride_approved_title": "Qatnov tasdiqlandi",
+    "message_ride_approved_body": "Sizning {from} - {to} yo‘nalishidagi qatnovingiz tasdiqlandi.",
+    "message_ride_rejected_title": "Qatnov rad etildi",
+    "message_ride_rejected_body": "Sizning {from} - {to} yo‘nalishidagi qatnovingiz rad etildi. Sabab: {reason}",
+    "reason_not_specified": "Ko'rsatilmagan"
 }

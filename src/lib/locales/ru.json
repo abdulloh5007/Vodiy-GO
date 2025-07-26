@@ -277,5 +277,20 @@
     "admin_chat_desc": "Статусы заявок и уведомления",
     "no_messages_yet": "Сообщений пока нет.",
     "promo_code_copied_title": "Скопировано!",
-    "promo_code_copied_desc": "Промокод {code} скопирован в буфер обмена."
+    "promo_code_copied_desc": "Промокод {code} скопирован в буфер обмена.",
+    "message_reg_pending_title": "Заявка отправлена",
+    "message_reg_pending_body": "Ваша заявка на регистрацию водителя отправлена на рассмотрение. Мы скоро сообщим вам.",
+    "message_reg_approved_title": "Заявка одобрена",
+    "message_reg_approved_body": "Поздравляем! Ваша заявка водителя одобрена. Теперь вы можете публиковать поездки.",
+    "message_reg_rejected_title": "Заявка отклонена",
+    "message_reg_rejected_body": "Причина: {reason}",
+    "message_reg_blocked_title": "Аккаунт заблокирован",
+    "message_reg_blocked_body": "Ваш аккаунт был заблокирован администратором. Причина: {reason}",
+    "message_ride_created_title": "Создана новая поездка",
+    "message_ride_created_body": "Ваша поездка из {from} в {to} отправлена на рассмотрение.",
+    "message_ride_approved_title": "Поездка одобрена",
+    "message_ride_approved_body": "Ваша поездка из {from} в {to} была одобрена.",
+    "message_ride_rejected_title": "Поездка отклонена",
+    "message_ride_rejected_body": "Ваша поездка из {from} в {to} была отклонена. Причина: {reason}",
+    "reason_not_specified": "Не указана"
 }

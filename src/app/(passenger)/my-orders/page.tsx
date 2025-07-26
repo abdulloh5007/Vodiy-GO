@@ -10,6 +10,8 @@ import { Badge } from '@/components/ui/badge';
 import { Order, Ride, Driver } from '@/lib/types';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { format } from 'date-fns';
+import { enUS, ru, uz } from 'date-fns/locale';
 
 function MyOrdersSkeleton() {
     return (
@@ -54,7 +56,7 @@ const OrderStatusBadge = ({ status, t }: { status: Order['status'], t: any }) =>
 }
 
 
-const OrderCard = ({ order, ride, driver, t }: { order: Order, ride?: Ride, driver?: Driver, t: any }) => {
+const OrderCard = ({ order, ride, driver, t, getLocale }: { order: Order, ride?: Ride, driver?: Driver, t: any, getLocale: () => Locale }) => {
     if (!ride || !driver) {
         return (
             <Card>
@@ -70,7 +72,7 @@ const OrderCard = ({ order, ride, driver, t }: { order: Order, ride?: Ride, driv
                 <CardTitle className='flex items-center gap-2 text-lg'>{ride.from} &rarr; {ride.to}</CardTitle>
                 <CardDescription className='flex items-center gap-1 text-sm'>
                     <Clock className="h-4 w-4" />
-                    {order.createdAt ? new Date(order.createdAt.seconds * 1000).toLocaleString() : t.loading }
+                    {order.createdAt ? format(order.createdAt.seconds * 1000, 'PPP HH:mm', { locale: getLocale() }) : t.loading }
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -105,7 +107,7 @@ export default function PassengerOrdersPage() {
         throw new Error('PassengerOrdersPage must be used within an AppProvider');
     }
 
-    const { user, rides, orders, drivers, loading, translations: t } = context;
+    const { user, rides, orders, drivers, loading, translations: t, language } = context;
 
     const myOrders = useMemo(() => {
         if (!user) return [];
@@ -117,6 +119,14 @@ export default function PassengerOrdersPage() {
                 return b.createdAt.seconds - a.createdAt.seconds
             });
     }, [orders, user]);
+
+    const getLocale = () => {
+        switch (language) {
+            case 'ru': return ru;
+            case 'uz': return uz;
+            default: return enUS;
+        }
+    }
 
     if (loading || !user || !t.home) {
         return <MyOrdersSkeleton />;
@@ -135,7 +145,7 @@ export default function PassengerOrdersPage() {
                         const ride = rides.find(r => r.id === order.rideId);
                         const driver = ride ? drivers.find(d => d.id === ride.driverId) : undefined;
                         return (
-                            <OrderCard key={order.id} order={order} ride={ride} driver={driver} t={t} />
+                            <OrderCard key={order.id} order={order} ride={ride} driver={driver} t={t} getLocale={getLocale}/>
                         )
                     })}
                  </div>

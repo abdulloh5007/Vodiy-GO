@@ -277,5 +277,20 @@
     "admin_chat_desc": "Application status and notifications",
     "no_messages_yet": "No messages yet.",
     "promo_code_copied_title": "Copied!",
-    "promo_code_copied_desc": "Promo code {code} copied to clipboard."
+    "promo_code_copied_desc": "Promo code {code} copied to clipboard.",
+    "message_reg_pending_title": "Application Sent",
+    "message_reg_pending_body": "Your driver application has been submitted for review. We will notify you shortly.",
+    "message_reg_approved_title": "Application Approved",
+    "message_reg_approved_body": "Congratulations! Your driver application has been approved. You can now publish rides.",
+    "message_reg_rejected_title": "Application Rejected",
+    "message_reg_rejected_body": "Reason: {reason}",
+    "message_reg_blocked_title": "Account Blocked",
+    "message_reg_blocked_body": "Your account has been blocked by an administrator. Reason: {reason}",
+    "message_ride_created_title": "New Ride Created",
+    "message_ride_created_body": "Your ride from {from} to {to} has been submitted for review.",
+    "message_ride_approved_title": "Ride Approved",
+    "message_ride_approved_body": "Your ride from {from} to {to} has been approved.",
+    "message_ride_rejected_title": "Ride Rejected",
+    "message_ride_rejected_body": "Your ride from {from} to {to} was rejected. Reason: {reason}",
+    "reason_not_specified": "Not specified"
 }
