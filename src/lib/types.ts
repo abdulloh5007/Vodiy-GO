@@ -53,7 +53,7 @@ export type Order = {
 
 export type Message = {
     id: string;
-    type: 'REGISTRATION_PENDING' | 'REGISTRATION_APPROVED' | 'REGISTRATION_REJECTED' | 'REGISTRATION_BLOCKED' | 'RIDE_CREATED' | 'RIDE_APPROVED' | 'RIDE_REJECTED';
+    type: 'REGISTRATION_PENDING' | 'REGISTRATION_APPROVED' | 'REGISTRATION_REJECTED' | 'REGISTRATION_BLOCKED' | 'REGISTRATION_UNBLOCKED' | 'RIDE_CREATED' | 'RIDE_APPROVED' | 'RIDE_REJECTED';
     titleKey: string;
     bodyKey: string;
     bodyParams?: Record<string, string>;
@@ -80,3 +80,4 @@ export type Translations = {
 };
 
 export type DriverApplicationData = Omit<Driver, 'id' | 'status' | 'carPhotoUrl' | 'phone' | 'rating' | 'reviewCount' | 'rejectionCount'> & { carPhotoFile: File | null };
+

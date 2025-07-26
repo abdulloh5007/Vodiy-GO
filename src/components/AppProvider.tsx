@@ -217,7 +217,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
                 status: 'blocked',
                 rejectionReason: translations.rejection_limit_exceeded || 'Application attempt limit exceeded.'
             });
-            await addMessage(driverId, 'REGISTRATION_BLOCKED', 'message_reg_blocked_title', 'message_reg_limit_exceeded_body', { reason: translations.rejection_limit_exceeded || 'Application attempt limit exceeded.' });
+            await addMessage(driverId, 'REGISTRATION_BLOCKED', 'message_reg_limit_exceeded_title', 'message_reg_limit_exceeded_body', { reason: translations.rejection_limit_exceeded || 'Application attempt limit exceeded.' });
         } else {
              await addMessage(driverId, 'REGISTRATION_REJECTED', 'message_reg_rejected_title', 'message_reg_rejected_body', { reason: reason || translations.reason_not_specified || "Not specified" });
         }
@@ -258,6 +258,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const deleteDriver = async (driverId: string) => {
     const driverDoc = doc(db, "drivers", driverId);
     await deleteDoc(driverDoc);
+    await addMessage(driverId, 'REGISTRATION_UNBLOCKED', 'message_reg_unblocked_title', 'message_reg_unblocked_body');
     // We don't delete the user from auth, just their driver profile.
     // They will be forced to re-apply.
   }
@@ -446,14 +447,17 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   
   const logout = async () => {
     const userRole = user?.role;
+    const isDriverPage = window.location.pathname.startsWith('/driver');
+    const isAdminPage = window.location.pathname.startsWith('/admin');
+
     await signOut(auth);
     setUser(null);
-    if (userRole === 'driver') {
-        window.location.href = '/driver/login';
-    } else if (userRole === 'admin') {
+
+    if (isAdminPage) {
         window.location.href = '/admin/login';
-    }
-     else {
+    } else if (isDriverPage) {
+        window.location.href = '/driver/login';
+    } else {
         window.location.href = '/';
     }
   };
@@ -477,3 +481,4 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     </AppContext.Provider>
   );
 }
+

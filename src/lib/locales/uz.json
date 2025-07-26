@@ -297,9 +297,14 @@
     "reason_not_specified": "Ko'rsatilmagan",
     "rejection_count": "Rad etishlar soni",
     "rejection_limit_exceeded": "Ariza topshirish urinishlari chegarasi oshib ketdi.",
+    "message_reg_limit_exceeded_title": "Hisob Bloklandi",
     "message_reg_limit_exceeded_body": "Ko'p sonli muvaffaqiyatsiz ariza urinishlari tufayli hisobingiz bloklandi. Sabab: {reason}",
     "unblock_success_title": "Haydovchi blokdan chiqarildi",
     "unblock_success_desc": "Haydovchining profili o'chirildi. U qaytadan ariza topshirishi kerak bo'ladi.",
     "time_left": "Qolgan vaqt",
-    "expired": "Tugagan"
+    "expired": "Tugagan",
+    "resubmit_application_button": "Arizani qayta yuborish",
+    "message_reg_unblocked_title": "Hisob blokdan chiqarildi",
+    "message_reg_unblocked_body": "Sizning hisobingiz administrator tomonidan blokdan chiqarildi. Endi yangi ariza topshirishingiz mumkin."
 }
+

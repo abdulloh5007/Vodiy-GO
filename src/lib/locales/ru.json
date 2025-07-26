@@ -297,9 +297,14 @@
     "reason_not_specified": "Не указана",
     "rejection_count": "Количество отказов",
     "rejection_limit_exceeded": "Превышен лимит попыток подачи заявки.",
+    "message_reg_limit_exceeded_title": "Аккаунт Заблокирован",
     "message_reg_limit_exceeded_body": "Ваш аккаунт был заблокирован из-за многократных неудачных попыток подачи заявки. Причина: {reason}",
     "unblock_success_title": "Водитель разблокирован",
     "unblock_success_desc": "Профиль водителя был удален. Ему нужно будет подать заявку заново.",
     "time_left": "Осталось времени",
-    "expired": "Истекло"
+    "expired": "Истекло",
+    "resubmit_application_button": "Подать заявку снова",
+    "message_reg_unblocked_title": "Аккаунт разблокирован",
+    "message_reg_unblocked_body": "Ваш аккаунт был разблокирован администратором. Теперь вы можете подать новую заявку."
 }
+

@@ -297,9 +297,14 @@
     "reason_not_specified": "Not specified",
     "rejection_count": "Rejection Count",
     "rejection_limit_exceeded": "Application attempt limit exceeded.",
+    "message_reg_limit_exceeded_title": "Account Blocked",
     "message_reg_limit_exceeded_body": "Your account has been blocked due to multiple failed application attempts. Reason: {reason}",
     "unblock_success_title": "Driver Unblocked",
     "unblock_success_desc": "The driver's profile has been removed. They will need to re-apply.",
     "time_left": "Time left",
-    "expired": "Expired"
+    "expired": "Expired",
+    "resubmit_application_button": "Submit Application Again",
+    "message_reg_unblocked_title": "Account Unblocked",
+    "message_reg_unblocked_body": "Your account has been unblocked by the administrator. You can now submit a new application."
 }
+

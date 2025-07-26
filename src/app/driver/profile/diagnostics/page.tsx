@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useContext, useMemo, useEffect } from 'react';
@@ -132,7 +133,7 @@ export default function DriverDiagnosticsPage() {
     throw new Error('DriverDiagnosticsPage must be used within an AppProvider');
   }
 
-  const { addDriverApplication, translations: t, user, drivers, loading } = context;
+  const { addDriverApplication, translations: t, user, drivers, loading, deleteDriver } = context;
 
   const driverProfile = useMemo(() => {
     if (!user) return null;
@@ -244,7 +245,7 @@ export default function DriverDiagnosticsPage() {
   
   // If a driver profile exists, show their status instead of the application form
   if (driverProfile) {
-    return <DriverStatusPage driverProfile={driverProfile} t={t} router={router} />
+    return <DriverStatusPage driverProfile={driverProfile} t={t} deleteDriver={deleteDriver} />
   }
 
   // If no driver profile, show the application form
@@ -337,7 +338,7 @@ export default function DriverDiagnosticsPage() {
 }
 
 
-const DriverStatusPage = ({ driverProfile, t, router }: { driverProfile: Driver, t: any, router: any}) => {
+const DriverStatusPage = ({ driverProfile, t, deleteDriver }: { driverProfile: Driver, t: any, deleteDriver: (id: string) => Promise<void>}) => {
     
     const getStatusContent = () => {
         switch (driverProfile.status) {
@@ -347,7 +348,7 @@ const DriverStatusPage = ({ driverProfile, t, router }: { driverProfile: Driver,
                     title: t.statusPage_pending_title || "Application Pending",
                     description: t.statusPage_pending_desc || "Your application is under review. We will notify you once it's processed.",
                     rejectionReason: null,
-                    showContactButton: false,
+                    actionButton: null,
                 };
             case 'verified':
                 return {
@@ -355,7 +356,7 @@ const DriverStatusPage = ({ driverProfile, t, router }: { driverProfile: Driver,
                      title: t.diagnostics_complete_title || "Diagnostics Complete",
                      description: t.diagnostics_complete_desc || "Your profile is verified. You can now publish and manage rides.",
                      rejectionReason: null,
-                     showContactButton: false,
+                     actionButton: null,
                 };
             case 'rejected':
                 return {
@@ -363,7 +364,11 @@ const DriverStatusPage = ({ driverProfile, t, router }: { driverProfile: Driver,
                     title: t.statusPage_rejected_title || "Application Rejected",
                     description: t.statusPage_rejected_desc || "We're sorry, but your application could not be approved at this time.",
                     rejectionReason: driverProfile.rejectionReason,
-                    showContactButton: true,
+                    actionButton: (
+                        <Button className="w-full" onClick={() => deleteDriver(driverProfile.id)}>
+                            {t.resubmit_application_button || 'Submit Application Again'}
+                        </Button>
+                    ),
                 };
             case 'blocked':
                 return {
@@ -371,7 +376,11 @@ const DriverStatusPage = ({ driverProfile, t, router }: { driverProfile: Driver,
                     title: t.statusPage_blocked_title || "Account Blocked",
                     description: t.statusPage_blocked_desc || "Your account has been blocked by an administrator.",
                     rejectionReason: driverProfile.rejectionReason,
-                    showContactButton: true,
+                    actionButton: (
+                        <Button variant="secondary" className="w-full">
+                           {t.contact_support || 'Contact Support'}
+                        </Button>
+                    ),
                 };
             default:
                 return {
@@ -379,12 +388,12 @@ const DriverStatusPage = ({ driverProfile, t, router }: { driverProfile: Driver,
                     title: t.statusPage_checking_title || "Checking Status...",
                     description: t.statusPage_checking_desc || "Please wait while we check your application status.",
                     rejectionReason: null,
-                    showContactButton: false,
+                    actionButton: null,
                 };
         }
     };
     
-    const {icon, title, description, rejectionReason, showContactButton} = getStatusContent();
+    const {icon, title, description, rejectionReason, actionButton} = getStatusContent();
     
     return (
         <div className="container mx-auto py-8 px-4 flex justify-center">
@@ -402,14 +411,13 @@ const DriverStatusPage = ({ driverProfile, t, router }: { driverProfile: Driver,
                         </div>
                     )}
                 </CardContent>
-                <CardFooter className="flex flex-col gap-4">
-                     {showContactButton && (
-                         <Button variant="secondary" className="w-full">
-                            {t.contact_support || 'Contact Support'}
-                         </Button>
-                     )}
-                </CardFooter>
+                {actionButton && (
+                    <CardFooter className="flex flex-col gap-4">
+                        {actionButton}
+                    </CardFooter>
+                )}
             </Card>
         </div>
     )
 }
+

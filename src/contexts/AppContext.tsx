@@ -36,3 +36,4 @@ interface AppContextType {
 }
 
 export const AppContext = React.createContext<AppContextType | null>(null);
+
