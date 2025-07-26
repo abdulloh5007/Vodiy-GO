@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import React from 'react';
@@ -23,7 +24,8 @@ interface AppContextType {
   deleteDriver: (driverId: string) => Promise<void>;
   updateRideStatus: (rideId: string, status: 'approved' | 'rejected', reason?: string) => Promise<void>;
   updateOrderStatus: (orderId: string, status: 'accepted' | 'rejected') => void;
-  addRide: (ride: Omit<Ride, 'id' | 'createdAt' | 'status' | 'approvedAt'>) => void;
+  updateRideSeats: (rideId: string, newSeatCount: number) => Promise<void>;
+  addRide: (ride: Omit<Ride, 'id' | 'createdAt' | 'status' | 'approvedAt' | 'availableSeats'>) => void;
   addOrder: (order: Omit<Order, 'id' | 'status' | 'createdAt'>) => void;
   login: (email: string, password: string, role?: 'admin' | 'driver' | 'passenger') => Promise<FirebaseAuthUser>;
   register: (email: string, password: string, name: string, role: 'passenger' | 'driver', phone?: string) => Promise<FirebaseAuthUser>;

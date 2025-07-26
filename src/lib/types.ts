@@ -31,6 +31,7 @@ export type Ride = {
   to: string;
   price: number;
   seats: number;
+  availableSeats: number;
   info: string;
   time?: string;
   createdAt: any;

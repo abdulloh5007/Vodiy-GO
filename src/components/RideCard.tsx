@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useContext, useState, useEffect, useMemo } from 'react';
@@ -39,9 +40,6 @@ export function RideCard({ ride, onImageClick }: RideCardProps) {
 
   const driver = drivers.find(d => d.id === ride.driverId);
   
-  const acceptedOrdersCount = orders.filter(o => o.rideId === ride.id && o.status === 'accepted').length;
-  const availableSeats = ride.seats - acceptedOrdersCount;
-
   const existingOrderForThisRide = useMemo(() => {
     if (!user) return null;
     return orders.find(o => o.rideId === ride.id && o.passengerId === user.uid);
@@ -53,7 +51,7 @@ export function RideCard({ ride, onImageClick }: RideCardProps) {
   }, [user, orders]);
 
 
-  if (!driver || availableSeats <= 0) return null;
+  if (!driver || ride.availableSeats <= 0) return null;
   
   const handleBooking = async () => {
     if (!user) {
@@ -132,7 +130,7 @@ export function RideCard({ ride, onImageClick }: RideCardProps) {
                  )}
                  <div className="flex items-center gap-2">
                     <Armchair className="h-4 w-4 text-primary" />
-                    <span>{availableSeats} {t.seatsAvailable || 'seats available'}</span>
+                    <span>{ride.availableSeats} {t.seatsAvailable || 'seats available'}</span>
                 </div>
             </CardDescription>
           </div>

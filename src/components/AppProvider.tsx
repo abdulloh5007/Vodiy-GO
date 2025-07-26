@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
@@ -242,6 +243,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
     if (status === 'approved') {
         updatePayload.approvedAt = serverTimestamp();
+        updatePayload.availableSeats = rideData.seats; // Initialize available seats
     }
     
     await updateDoc(rideDocRef, updatePayload);
@@ -261,20 +263,61 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }
 
   const updateOrderStatus = async (orderId: string, status: 'accepted' | 'rejected') => {
-      const orderDoc = doc(db, "orders", orderId);
-      await updateDoc(orderDoc, { status });
-  }
+    const orderDocRef = doc(db, "orders", orderId);
+    
+    await runTransaction(db, async (transaction) => {
+        const orderDoc = await transaction.get(orderDocRef);
+        if (!orderDoc.exists()) {
+            throw "Order does not exist!";
+        }
 
-  const addRide = async (rideData: Omit<Ride, 'id' | 'createdAt' | 'status' | 'approvedAt'>) => {
+        const orderData = orderDoc.data() as Order;
+        const rideDocRef = doc(db, "rides", orderData.rideId);
+        const rideDoc = await transaction.get(rideDocRef);
+
+        if (!rideDoc.exists()) {
+            throw "Ride does not exist!";
+        }
+        
+        const rideData = rideDoc.data() as Ride;
+
+        // If a new order is accepted, decrement availableSeats
+        if (orderData.status === 'new' && status === 'accepted') {
+            if (rideData.availableSeats > 0) {
+                transaction.update(rideDocRef, { availableSeats: rideData.availableSeats - 1 });
+            } else {
+                 throw "No available seats to accept order.";
+            }
+        } 
+        // If an accepted order is being rejected, increment availableSeats
+        else if (orderData.status === 'accepted' && status === 'rejected') {
+             if (rideData.availableSeats < rideData.seats) {
+                transaction.update(rideDocRef, { availableSeats: rideData.availableSeats + 1 });
+             }
+        }
+        
+        transaction.update(orderDocRef, { status });
+    });
+  }
+  
+   const updateRideSeats = async (rideId: string, newSeatCount: number) => {
+      const rideDocRef = doc(db, "rides", rideId);
+      await updateDoc(rideDocRef, { availableSeats: newSeatCount });
+   }
+
+
+  const addRide = async (rideData: Omit<Ride, 'id' | 'createdAt' | 'status' | 'approvedAt' | 'availableSeats'>) => {
     if (!user) throw new Error("User not logged in");
     
-    const ridePayload = {
+    const ridePayload: Omit<Ride, 'id'> = {
       ...rideData,
-      id: '',
       createdAt: serverTimestamp(),
       status: 'pending' as const,
-      approvedAt: null
+      approvedAt: null,
+      availableSeats: rideData.seats,
     };
+    
+    const newRideRef = doc(collection(db, "rides"));
 
     if (rideData.promoCode) {
         const promoQuery = query(collection(db, 'promocodes'), where('code', '==', rideData.promoCode));
@@ -302,15 +345,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
                 ...(newUsageCount >= promoData.limit && { status: 'depleted' })
             });
 
-            const newRideRef = doc(collection(db, "rides"));
-            ridePayload.id = newRideRef.id;
-            transaction.set(newRideRef, ridePayload);
+            transaction.set(newRideRef, { id: newRideRef.id, ...ridePayload });
         });
 
     } else {
-        const newRideRef = doc(collection(db, "rides"))
-        ridePayload.id = newRideRef.id;
-        await setDoc(newRideRef, ridePayload);
+        await setDoc(newRideRef, { id: newRideRef.id, ...ridePayload });
     }
 
     await addMessage(user.uid, 'RIDE_CREATED', 'message_ride_created_title', 'message_ride_created_body', { from: rideData.from, to: rideData.to });
@@ -427,7 +466,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       drivers, rides, orders, 
       promoCodes, createPromoCode, checkPromoCode,
       messages,
-      addDriverApplication, updateDriverStatus, deleteDriver, updateRideStatus,
+      addDriverApplication, updateDriverStatus, deleteDriver, updateRideStatus, updateRideSeats,
       addRide, addOrder,
       login, register, logout,
       loading,

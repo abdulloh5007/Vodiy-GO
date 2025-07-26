@@ -1,21 +1,22 @@
 
+
 'use client';
 
 import { useState, useContext, useMemo, useEffect } from 'react';
 import { AppContext } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { ShieldAlert, Loader2, Clock, Info, CheckCircle2, Ticket, Sparkles, Ban } from 'lucide-react';
+import { ShieldAlert, Loader2, Clock, Info, CheckCircle2, Ticket, Sparkles, Ban, Minus, Plus, Armchair } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useRouter } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
-import { PromoCode } from '@/lib/types';
+import { PromoCode, Ride } from '@/lib/types';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const locations = ["Sirdaryo", "Navoiy", "Jizzax", "Xorazm", "Buxoro", "Surxondaryo", "Namangan", "Andijon", "Qashqadaryo", "Samarqand", "Fargʻona", "Toshkent"];
@@ -60,6 +61,93 @@ function CreateRideSkeleton() {
     )
 }
 
+const ActiveRideCard = ({ ride, t, updateRideSeats }: { ride: Ride, t: any, updateRideSeats: (rideId: string, newSeatCount: number) => Promise<void> }) => {
+    const [timeLeft, setTimeLeft] = useState('');
+
+    useEffect(() => {
+        if (!ride.approvedAt) return;
+
+        const interval = setInterval(() => {
+            const approvedDate = ride.approvedAt.toDate();
+            const durationHours = ride.promoCode ? 24 : 12;
+            const expirationDate = new Date(approvedDate.getTime() + durationHours * 60 * 60 * 1000);
+            const now = new Date();
+            const diff = expirationDate.getTime() - now.getTime();
+
+            if (diff <= 0) {
+                setTimeLeft(t.expired || 'Expired');
+                clearInterval(interval);
+                return;
+            }
+
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+            setTimeLeft(`${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`);
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, [ride, t.expired]);
+
+    const handleSeatChange = async (change: number) => {
+        const newSeatCount = ride.availableSeats + change;
+        if (newSeatCount >= 0 && newSeatCount <= ride.seats) {
+            await updateRideSeats(ride.id, newSeatCount);
+        }
+    };
+    
+    const statusMap = {
+        pending: { variant: 'default', label: t.pending || 'Pending' },
+        approved: { variant: 'secondary', label: t.verified || 'Approved' },
+        rejected: { variant: 'destructive', label: t.rejected || 'Rejected' }
+    };
+    const currentStatus = statusMap[ride.status as keyof typeof statusMap] || { variant: 'default', label: ride.status };
+
+    return (
+        <Card className="w-full max-w-lg text-center">
+            <CardHeader className="items-center">
+                {ride.status === 'approved' 
+                    ? <CheckCircle2 className="h-16 w-16 text-green-500" />
+                    : <Info className="h-16 w-16 text-primary" />
+                }
+                <CardTitle className="mt-4">{t.activeRideTitle || "You have an active ride"}</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                <CardDescription>{t.activeRideDesc || "You can only have one active ride at a time. Please wait for it to be completed or contact support."}</CardDescription>
+                <div className="text-left border rounded-lg p-4 space-y-3">
+                    <p><strong>{t.from}:</strong> {ride.from}</p>
+                    <p><strong>{t.to}:</strong> {ride.to}</p>
+                    <p><strong>{t.price}:</strong> {new Intl.NumberFormat('fr-FR').format(ride.price)} UZS</p>
+                    <div><strong>{t.status}:</strong> <Badge variant={currentStatus.variant as any}>{currentStatus.label}</Badge></div>
+                    {ride.status === 'approved' && (
+                        <>
+                        <div className="flex items-center gap-2">
+                            <Clock className="h-4 w-4 text-muted-foreground" />
+                            <strong>{t.time_left || 'Time left'}:</strong>
+                            <span className="font-mono">{timeLeft}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                             <Armchair className="h-4 w-4 text-muted-foreground" />
+                             <strong>{t.availableSeats || 'Available Seats'}:</strong>
+                             <div className="flex items-center gap-2 ml-auto">
+                                <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => handleSeatChange(-1)} disabled={ride.availableSeats <= 0}>
+                                    <Minus className="h-4 w-4"/>
+                                </Button>
+                                <span className="font-bold text-lg w-8 text-center">{ride.availableSeats}</span>
+                                <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => handleSeatChange(1)} disabled={ride.availableSeats >= ride.seats}>
+                                    <Plus className="h-4 w-4"/>
+                                </Button>
+                             </div>
+                        </div>
+                        </>
+                    )}
+                </div>
+            </CardContent>
+        </Card>
+    );
+};
+
 export default function CreateRidePage() {
   const context = useContext(AppContext);
   const { toast } = useToast();
@@ -80,7 +168,7 @@ export default function CreateRidePage() {
     throw new Error('CreateRidePage must be used within an AppProvider');
   }
 
-  const { user, addRide, translations, drivers, loading, rides, checkPromoCode } = context;
+  const { user, addRide, translations, drivers, loading, rides, checkPromoCode, updateRideSeats } = context;
   const t = translations;
 
   const driverProfile = useMemo(() => {
@@ -135,12 +223,6 @@ export default function CreateRidePage() {
 
   const fromLocations = useMemo(() => locations.filter(loc => loc !== to), [to]);
   const toLocations = useMemo(() => locations.filter(loc => loc !== from), [from]);
-
-  useEffect(() => {
-      if (!loading && driverProfile && driverProfile.status !== 'verified') {
-          router.push('/driver/profile/diagnostics');
-      }
-  }, [loading, driverProfile, router]);
   
   if (loading || !t.home || !driverProfile) {
       return <CreateRideSkeleton />;
@@ -152,33 +234,9 @@ export default function CreateRidePage() {
   }
 
   if (existingRide) {
-    const statusMap = {
-        pending: { variant: 'default', label: t.pending || 'Pending' },
-        approved: { variant: 'secondary', label: t.verified || 'Approved' },
-        rejected: { variant: 'destructive', label: t.rejected || 'Rejected' }
-    };
-    const currentStatus = statusMap[existingRide.status as keyof typeof statusMap] || { variant: 'default', label: existingRide.status };
-
     return (
         <div className="container mx-auto py-8 px-4 flex justify-center">
-            <Card className="w-full max-w-lg text-center">
-                <CardHeader className="items-center">
-                    {existingRide.status === 'approved' 
-                        ? <CheckCircle2 className="h-16 w-16 text-green-500" />
-                        : <Info className="h-16 w-16 text-primary" />
-                    }
-                    <CardTitle className="mt-4">{t.activeRideTitle || "You have an active ride"}</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    <CardDescription>{t.activeRideDesc || "You can only have one active ride at a time. Please wait for it to be completed or contact support."}</CardDescription>
-                    <div className="text-left border rounded-lg p-4 space-y-2">
-                        <p><strong>{t.from}:</strong> {existingRide.from}</p>
-                        <p><strong>{t.to}:</strong> {existingRide.to}</p>
-                        <p><strong>{t.price}:</strong> {new Intl.NumberFormat('fr-FR').format(existingRide.price)} UZS</p>
-                        <div><strong>{t.status}:</strong> <Badge variant={currentStatus.variant as any}>{currentStatus.label}</Badge></div>
-                    </div>
-                </CardContent>
-            </Card>
+            <ActiveRideCard ride={existingRide} t={t} updateRideSeats={updateRideSeats} />
         </div>
     )
   }
@@ -225,6 +283,7 @@ export default function CreateRidePage() {
             setPromoCodeInput('');
             setActivatedPromo(null);
         } catch (error: any) {
+             console.error("Ride submission error:", error);
             toast({
                 title: t.ridePublishedError || "Error Publishing Ride",
                 description: t.unknownError,
