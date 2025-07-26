@@ -115,7 +115,7 @@ const DriverCard = ({ driver, onDetailsClick, onImageClick, t }: { driver: Drive
             />
             <div className="space-y-1 flex-grow">
                 <CardTitle className="text-lg">{driver.name}</CardTitle>
-                <CardDescription>{driver.id}</CardDescription>
+                <CardDescription>{driver.phone}</CardDescription>
             </div>
         </CardHeader>
         <CardContent className="p-4 pt-0 space-y-2">
@@ -205,7 +205,7 @@ export default function DriversPage() {
                                 />
                                 <div>
                                     <div className="font-medium">{driver.name}</div>
-                                    <div className="text-sm text-muted-foreground">{driver.id}</div>
+                                    <div className="text-sm text-muted-foreground">{driver.phone}</div>
                                 </div>
                             </div>
                             </TableCell>
