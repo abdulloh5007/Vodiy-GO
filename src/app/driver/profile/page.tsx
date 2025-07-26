@@ -8,7 +8,7 @@ import Image from 'next/image';
 import { AppContext } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, Star, ChevronRight, FileText, LogOut } from 'lucide-react';
+import { Loader2, Star, ChevronRight, FileText, LogOut, History } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Driver } from '@/lib/types';
 
@@ -78,7 +78,7 @@ export default function DriverProfilePage() {
 
     return (
         <div className="container mx-auto py-8 px-4 flex flex-col h-full">
-            <div className="flex-grow space-y-6">
+            <div className="flex-grow space-y-4">
                 <ProfileCard driver={driverProfile} t={t} />
 
                 <Link href="/driver/profile/diagnostics">
@@ -88,6 +88,19 @@ export default function DriverProfilePage() {
                          <div>
                             <p className="font-semibold">{t.diagnostics_title || "Diagnostics"}</p>
                             <p className="text-sm text-muted-foreground">{t.diagnostics_profile_button_desc || "Submit or check your verification status"}</p>
+                         </div>
+                       </div>
+                       <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                    </Button>
+                </Link>
+
+                <Link href="/driver/profile/announcement-history">
+                    <Button variant="outline" className="w-full justify-between h-16 text-left">
+                       <div className="flex items-center gap-4">
+                         <History className="h-6 w-6 text-primary" />
+                         <div>
+                            <p className="font-semibold">{t.announcement_history_title || "Announcement History"}</p>
+                            <p className="text-sm text-muted-foreground">{t.announcement_history_desc || "View your past ride announcements"}</p>
                          </div>
                        </div>
                        <ChevronRight className="h-5 w-5 text-muted-foreground" />

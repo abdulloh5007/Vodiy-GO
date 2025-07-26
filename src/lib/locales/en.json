@@ -309,5 +309,9 @@
     "resubmit_application_button": "Submit Application Again",
     "message_reg_unblocked_title": "Account Unblocked",
     "message_reg_unblocked_body": "Your account has been unblocked by the administrator. You can now submit a new application.",
-    "attempts_left": "You have {count} attempts left."
+    "attempts_left": "You have {count} attempts left.",
+    "announcement_history_title": "Announcement History",
+    "announcement_history_desc": "View your past ride announcements",
+    "announcement_history_desc_long": "Here you can find all your past ride announcements.",
+    "feature_coming_soon": "This feature is currently under development. Stay tuned!"
 }

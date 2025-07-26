@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState, useContext, useMemo, useEffect } from 'react';
@@ -177,7 +176,25 @@ export default function CreateRidePage() {
 
   const existingRide = useMemo(() => {
     if (!user) return null;
-    return rides.find(r => r.driverId === user.uid && (r.status === 'pending' || r.status === 'approved'));
+    return rides.find(r => {
+        if (r.driverId !== user.uid) return false;
+        
+        // A pending ride always blocks creation of a new one.
+        if (r.status === 'pending') {
+            return true;
+        }
+
+        // An approved ride blocks creation only if it has not expired.
+        if (r.status === 'approved' && r.approvedAt) {
+            const now = Date.now();
+            const rideApprovedDate = r.approvedAt.toDate().getTime();
+            const durationHours = r.promoCode ? 24 : 12;
+            const durationMillis = durationHours * 60 * 60 * 1000;
+            return (now - rideApprovedDate) < durationMillis;
+        }
+
+        return false;
+    });
   }, [user, rides]);
 
 

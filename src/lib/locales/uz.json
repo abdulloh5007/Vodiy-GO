@@ -309,5 +309,9 @@
     "resubmit_application_button": "Arizani qayta yuborish",
     "message_reg_unblocked_title": "Hisob blokdan chiqarildi",
     "message_reg_unblocked_body": "Sizning hisobingiz administrator tomonidan blokdan chiqarildi. Endi yangi ariza topshirishingiz mumkin.",
-    "attempts_left": "Sizda {count} ta urinish qoldi."
+    "attempts_left": "Sizda {count} ta urinish qoldi.",
+    "announcement_history_title": "E'lonlar tarixi",
+    "announcement_history_desc": "O'tgan qatnov e'lonlaringizni ko'ring",
+    "announcement_history_desc_long": "Bu yerda siz barcha o'tgan qatnov e'lonlaringizni topishingiz mumkin.",
+    "feature_coming_soon": "Bu xususiyat hozirda ishlab chiqilmoqda. Bizni kuzatib boring!"
 }

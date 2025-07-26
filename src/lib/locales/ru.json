@@ -309,5 +309,9 @@
     "resubmit_application_button": "Подать заявку снова",
     "message_reg_unblocked_title": "Аккаунт разблокирован",
     "message_reg_unblocked_body": "Ваш аккаунт был разблокирован администратором. Теперь вы можете подать новую заявку.",
-    "attempts_left": "У вас осталось {count} попытки."
+    "attempts_left": "У вас осталось {count} попытки.",
+    "announcement_history_title": "История объявлений",
+    "announcement_history_desc": "Просмотр ваших прошлых объявлений о поездках",
+    "announcement_history_desc_long": "Здесь вы можете найти все свои прошлые объявления о поездках.",
+    "feature_coming_soon": "Эта функция в настоящее время находится в разработке. Следите за обновлениями!"
 }
