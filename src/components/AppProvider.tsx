@@ -6,7 +6,7 @@ import { AppContext } from '@/contexts/AppContext';
 import { Driver, Ride, Order, Language, Translations, User, DriverApplicationData, PromoCode, Message } from '@/lib/types';
 import { initialTranslations } from '@/lib/i18n';
 import { db, auth } from '@/lib/firebase';
-import { collection, doc, getDoc, setDoc, onSnapshot, query, orderBy, serverTimestamp, writeBatch, where, getDocs, deleteDoc, updateDoc, runTransaction, arrayUnion } from "firebase/firestore";
+import { collection, doc, getDoc, setDoc, onSnapshot, query, orderBy, serverTimestamp, writeBatch, where, getDocs, deleteDoc, updateDoc, runTransaction, arrayUnion, increment } from "firebase/firestore";
 import { signInWithEmailAndPassword, onAuthStateChanged, signOut, createUserWithEmailAndPassword, User as FirebaseAuthUser } from "firebase/auth";
 import { ImageViewer } from './ImageViewer';
 
@@ -183,29 +183,47 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         carPhotoUrl,
         status: 'pending',
         rating: 0,
-        reviewCount: 0
+        reviewCount: 0,
+        rejectionCount: 0,
     });
     
     await addMessage(user.uid, 'REGISTRATION_PENDING', 'message_reg_pending_title', 'message_reg_pending_body');
   };
 
   const updateDriverStatus = async (driverId: string, status: 'verified' | 'rejected' | 'blocked', reason?: string) => {
-    const driverDoc = doc(db, "drivers", driverId);
+    const driverDocRef = doc(db, "drivers", driverId);
     
     const updateData: any = { status };
     if (reason) {
         updateData.rejectionReason = reason;
     } else if (status === 'verified') {
-        // Clear rejection reason on re-verification/unblocking
         updateData.rejectionReason = '';
+        updateData.rejectionCount = 0; // Reset count on approval/unblocking
     }
+    
+    if (status === 'rejected') {
+        updateData.rejectionCount = increment(1);
+    }
+    
+    await updateDoc(driverDocRef, updateData);
 
-    await setDoc(driverDoc, updateData, { merge: true });
+    // After updating, get the latest data to check rejection count
+    if (status === 'rejected') {
+        const updatedDoc = await getDoc(driverDocRef);
+        const driverData = updatedDoc.data() as Driver;
+        if (driverData.rejectionCount >= 3) {
+            await updateDoc(driverDocRef, { 
+                status: 'blocked',
+                rejectionReason: translations.rejection_limit_exceeded || 'Application attempt limit exceeded.'
+            });
+            await addMessage(driverId, 'REGISTRATION_BLOCKED', 'message_reg_blocked_title', 'message_reg_limit_exceeded_body', { reason: translations.rejection_limit_exceeded || 'Application attempt limit exceeded.' });
+        } else {
+             await addMessage(driverId, 'REGISTRATION_REJECTED', 'message_reg_rejected_title', 'message_reg_rejected_body', { reason: reason || translations.reason_not_specified || "Not specified" });
+        }
+    }
 
     if (status === 'verified') {
         await addMessage(driverId, 'REGISTRATION_APPROVED', 'message_reg_approved_title', 'message_reg_approved_body');
-    } else if (status === 'rejected') {
-        await addMessage(driverId, 'REGISTRATION_REJECTED', 'message_reg_rejected_title', 'message_reg_rejected_body', { reason: reason || translations.reason_not_specified || "Not specified" });
     } else if (status === 'blocked') {
         await addMessage(driverId, 'REGISTRATION_BLOCKED', 'message_reg_blocked_title', 'message_reg_blocked_body', { reason: reason || translations.reason_not_specified || "Not specified" });
     }
@@ -238,8 +256,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const deleteDriver = async (driverId: string) => {
     const driverDoc = doc(db, "drivers", driverId);
     await deleteDoc(driverDoc);
-    const userDoc = doc(db, "users", driverId);
-    await deleteDoc(userDoc);
+    // We don't delete the user from auth, just their driver profile.
+    // They will be forced to re-apply.
   }
 
   const updateOrderStatus = async (orderId: string, status: 'accepted' | 'rejected') => {
@@ -259,7 +277,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     };
 
     if (rideData.promoCode) {
-        // Run as transaction
         const promoQuery = query(collection(db, 'promocodes'), where('code', '==', rideData.promoCode));
         const promoSnapshot = await getDocs(promoQuery);
 
@@ -274,7 +291,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             }
             const promoData = promoDoc.data() as PromoCode;
             
-            // Re-check conditions inside transaction for safety
             if (promoData.status !== 'active' || promoData.expiresAt.toDate() < new Date() || (promoData.usedBy && promoData.usedBy.includes(user.uid))) {
                 throw new Error("promocode/invalid");
             }
@@ -292,7 +308,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         });
 
     } else {
-        // Simple write without transaction
         const newRideRef = doc(collection(db, "rides"))
         ridePayload.id = newRideRef.id;
         await setDoc(newRideRef, ridePayload);
@@ -396,7 +411,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setUser(null);
     if (userRole === 'driver') {
         window.location.href = '/driver/login';
-    } else {
+    } else if (userRole === 'admin') {
+        window.location.href = '/admin/login';
+    }
+     else {
         window.location.href = '/';
     }
   };
@@ -409,7 +427,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       drivers, rides, orders, 
       promoCodes, createPromoCode, checkPromoCode,
       messages,
-      addDriverApplication, updateDriverStatus, deleteDriver, updateOrderStatus, updateRideStatus,
+      addDriverApplication, updateDriverStatus, deleteDriver, updateRideStatus,
       addRide, addOrder,
       login, register, logout,
       loading,

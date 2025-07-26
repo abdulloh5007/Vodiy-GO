@@ -293,5 +293,10 @@
     "message_ride_approved_body": "Ваша поездка из {from} в {to} была одобрена.",
     "message_ride_rejected_title": "Поездка отклонена",
     "message_ride_rejected_body": "Ваша поездка из {from} в {to} была отклонена. Причина: {reason}",
-    "reason_not_specified": "Не указана"
+    "reason_not_specified": "Не указана",
+    "rejection_count": "Количество отказов",
+    "rejection_limit_exceeded": "Превышен лимит попыток подачи заявки.",
+    "message_reg_limit_exceeded_body": "Ваш аккаунт был заблокирован из-за многократных неудачных попыток подачи заявки. Причина: {reason}",
+    "unblock_success_title": "Водитель разблокирован",
+    "unblock_success_desc": "Профиль водителя был удален. Ему нужно будет подать заявку заново."
 }

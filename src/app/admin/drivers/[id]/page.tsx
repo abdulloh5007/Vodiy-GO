@@ -23,6 +23,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { useToast } from '@/hooks/use-toast';
 
 function DriverDetailSkeleton() {
     return (
@@ -99,12 +100,13 @@ export default function DriverDetailPage() {
     const params = useParams();
     const driverId = params.id as string;
     const [isBlockDialogOpen, setIsBlockDialogOpen] = useState(false);
+    const { toast } = useToast();
 
     if (!context) {
         throw new Error('DriverDetailPage must be used within an AppProvider');
     }
 
-    const { drivers, loading, translations: t, setSelectedImage, updateDriverStatus } = context;
+    const { drivers, loading, translations: t, setSelectedImage, updateDriverStatus, deleteDriver } = context;
 
     const driver = drivers.find(d => d.id === driverId);
     
@@ -122,7 +124,13 @@ export default function DriverDetailPage() {
     }
 
     const handleUnblock = async () => {
-        await updateDriverStatus(driver.id, 'verified');
+        // "Unbanning" now means deleting their profile, forcing them to re-apply
+        await deleteDriver(driver.id);
+        toast({
+            title: t.unblock_success_title || "Driver Unblocked",
+            description: t.unblock_success_desc || "The driver's profile has been removed. They will need to re-apply.",
+        })
+        router.push('/admin/drivers');
     }
 
     return (
@@ -201,6 +209,10 @@ export default function DriverDetailPage() {
                                 <p className="text-sm text-muted-foreground">{t.techPassport}</p>
                                 <p className="font-semibold font-mono">{driver.techPassport}</p>
                             </div>
+                        </div>
+                         <div className="flex items-center gap-3">
+                            <p className="text-sm text-muted-foreground">{t.rejection_count || 'Rejection Count'}:</p>
+                            <p className="font-semibold font-mono">{driver.rejectionCount || 0}</p>
                         </div>
                     </div>
                 </CardContent>

@@ -20,6 +20,7 @@ export type Driver = {
   status: 'pending' | 'verified' | 'rejected' | 'blocked';
   rating: number;
   reviewCount: number;
+  rejectionCount: number;
   rejectionReason?: string;
 };
 
@@ -77,4 +78,4 @@ export type Translations = {
   [key: string]: any;
 };
 
-export type DriverApplicationData = Omit<Driver, 'id' | 'status' | 'carPhotoUrl' | 'phone' | 'rating' | 'reviewCount'> & { carPhotoFile: File | null };
+export type DriverApplicationData = Omit<Driver, 'id' | 'status' | 'carPhotoUrl' | 'phone' | 'rating' | 'reviewCount' | 'rejectionCount'> & { carPhotoFile: File | null };

@@ -293,5 +293,10 @@
     "message_ride_approved_body": "Your ride from {from} to {to} has been approved.",
     "message_ride_rejected_title": "Ride Rejected",
     "message_ride_rejected_body": "Your ride from {from} to {to} was rejected. Reason: {reason}",
-    "reason_not_specified": "Not specified"
+    "reason_not_specified": "Not specified",
+    "rejection_count": "Rejection Count",
+    "rejection_limit_exceeded": "Application attempt limit exceeded.",
+    "message_reg_limit_exceeded_body": "Your account has been blocked due to multiple failed application attempts. Reason: {reason}",
+    "unblock_success_title": "Driver Unblocked",
+    "unblock_success_desc": "The driver's profile has been removed. They will need to re-apply."
 }
