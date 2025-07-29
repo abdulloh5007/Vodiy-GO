@@ -36,7 +36,7 @@ export default function RootLayout({
               <main className="flex-1 pt-4 pb-20 md:pb-0">
                 {children}
               </main> 
-              <BottomNav />
+              <BottomNav /> 
             </div>
             <Toaster />
           </AppProvider>
