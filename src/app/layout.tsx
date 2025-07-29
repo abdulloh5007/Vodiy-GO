@@ -35,7 +35,7 @@ export default function RootLayout({
               <Header />
               <main className="flex-1 pt-4 pb-20 md:pb-0">
                 {children}
-              </main>
+              </main> 
               <BottomNav />
             </div>
             <Toaster />
