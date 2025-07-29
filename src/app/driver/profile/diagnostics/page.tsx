@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, ArrowLeft, UploadCloud, X, ArrowRight, CheckCircle2, ShieldX, ShieldAlert, Ban } from 'lucide-react';
+import { Loader2, ArrowLeft, UploadCloud, X, ArrowRight, CheckCircle2, ShieldX, ShieldAlert, Ban, User as UserIcon } from 'lucide-react';
 import { formatCarNumber } from '@/lib/utils';
 import { Progress } from '@/components/ui/progress';
 import Image from 'next/image';
@@ -133,7 +133,7 @@ export default function DriverDiagnosticsPage() {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [passportFrontFile, setPassportFrontFile] = useState<File | null>(null);
-  const [passportBackFile, setPassportBackFile] = useState<File | null>(null);
+  const [selfieFile, setSelfieFile] = useState<File | null>(null);
   
   // Step 2
   const [carModel, setCarModel] = useState('');
@@ -168,7 +168,7 @@ export default function DriverDiagnosticsPage() {
 
   const handleNextStep = () => {
     if (step === 1) {
-      if (!firstName || !lastName || !passportFrontFile || !passportBackFile) {
+      if (!firstName || !lastName || !passportFrontFile || !selfieFile) {
         toast({
           title: t.validationErrorTitle,
           description: t.validationErrorDescStep1,
@@ -207,7 +207,7 @@ export default function DriverDiagnosticsPage() {
       return;
     }
     
-    if (!passportFrontFile || !passportBackFile || !carPhotoFrontFile || !carPhotoBackFile || !carPhotoLeftFile || !carPhotoRightFile) {
+    if (!passportFrontFile || !selfieFile || !carPhotoFrontFile || !carPhotoBackFile || !carPhotoLeftFile || !carPhotoRightFile) {
          toast({
           title: t.validationErrorTitle,
           description: t.allPhotosRequired,
@@ -223,7 +223,7 @@ export default function DriverDiagnosticsPage() {
             carModel, 
             carNumber,
             passportFrontFile,
-            passportBackFile,
+            selfieFile,
             carPhotoFrontFile,
             carPhotoBackFile,
             carPhotoLeftFile,
@@ -305,14 +305,14 @@ export default function DriverDiagnosticsPage() {
                             />
                        </div>
                        <div className="space-y-2">
-                           <Label htmlFor="passport-back">{t.passport_back_side || "Passport (back)"}</Label>
+                           <Label htmlFor="selfie">{t.selfie_photo || "Facial Photo"}</Label>
                            <ImageDropzone 
-                                file={passportBackFile} 
-                                setFile={setPassportBackFile} 
+                                file={selfieFile} 
+                                setFile={setSelfieFile} 
                                 t={t} 
                                 disabled={isSubmitting}
-                                placeholderIcon={<IdCardBack className="w-16 h-16" />}
-                                placeholderText={t.passport_back_side || "Passport (back)"}
+                                placeholderIcon={<UserIcon className="w-16 h-16" />}
+                                placeholderText={t.selfie_photo || "Facial Photo"}
                             />
                        </div>
                     </div>

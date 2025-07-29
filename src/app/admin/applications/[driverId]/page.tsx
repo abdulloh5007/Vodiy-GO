@@ -6,7 +6,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Loader2, ArrowLeft, User, Car, Hash, Shield, Check, X } from 'lucide-react';
+import { Loader2, ArrowLeft, User, Car, Hash, Check, X, ShieldCheck } from 'lucide-react';
 import Image from 'next/image';
 import { RejectionDialog } from '@/components/RejectionDialog';
 
@@ -48,6 +48,22 @@ function ApplicationDetailSkeleton() {
         </div>
     );
 }
+
+const PhotoCard = ({ title, src, onImageClick }: { title: string, src: string, onImageClick: (src: string) => void }) => (
+    <div className="space-y-2">
+        <h3 className="font-semibold">{title}</h3>
+        <div className="relative aspect-video w-full">
+            <Image 
+                src={src} 
+                alt={title}
+                fill
+                className="rounded-lg object-cover cursor-pointer"
+                onClick={() => onImageClick(src)}
+            />
+        </div>
+    </div>
+);
+
 
 export default function ApplicationDetailPage() {
     const context = useContext(AppContext);
@@ -97,19 +113,9 @@ export default function ApplicationDetailPage() {
                         <CardTitle className="font-headline text-2xl">{t.applicationDetails || 'Application Details'}</CardTitle>
                         <CardDescription>{t.reviewApplicationFor || 'Review application for'} {driver.name}</CardDescription>
                     </CardHeader>
-                    <CardContent className="grid md:grid-cols-2 gap-8 pt-6">
-                        <div>
-                            <Image 
-                                src={driver.carPhotoUrl} 
-                                alt={driver.carModel}
-                                width={500}
-                                height={300}
-                                className="rounded-lg object-cover w-full cursor-pointer"
-                                onClick={() => setSelectedImage(driver.carPhotoUrl)}
-                                data-ai-hint="car side"
-                            />
-                        </div>
-                        <div className="space-y-6">
+                    <CardContent className="space-y-8 pt-6">
+                        {/* Driver Info */}
+                        <div className="grid md:grid-cols-3 gap-6">
                             <div className="flex items-center gap-3">
                                 <User className="h-6 w-6 text-muted-foreground"/>
                                 <div>
@@ -131,21 +137,43 @@ export default function ApplicationDetailPage() {
                                     <p className="font-semibold font-mono">{driver.carNumber}</p>
                                 </div>
                             </div>
-                            <div className="flex items-center gap-3">
-                                <Shield className="h-6 w-6 text-muted-foreground"/>
-                                 <div>
-                                    <p className="text-sm text-muted-foreground">{t.passportNumber}</p>
-                                    <p className="font-semibold font-mono">{driver.passport}</p>
-                                </div>
-                            </div>
-                             <div className="flex items-center gap-3">
-                                <Shield className="h-6 w-6 text-muted-foreground"/>
-                                 <div>
-                                    <p className="text-sm text-muted-foreground">{t.techPassport}</p>
-                                    <p className="font-semibold font-mono">{driver.techPassport}</p>
-                                </div>
+                        </div>
+
+                        <hr />
+
+                        {/* Personal Documents */}
+                        <div>
+                            <h3 className="text-lg font-semibold mb-4">{t.personal_documents || 'Personal Documents'}</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <PhotoCard title={t.passport_front_side || 'Passport (front)'} src={driver.passportFrontUrl} onImageClick={setSelectedImage} />
+                                <PhotoCard title={t.selfie_photo || 'Facial Photo'} src={driver.selfieUrl} onImageClick={setSelectedImage} />
                             </div>
                         </div>
+
+                        <hr />
+
+                        {/* Car Photos */}
+                        <div>
+                            <h3 className="text-lg font-semibold mb-4">{t.car_photos || 'Car Photos'}</h3>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                               <PhotoCard title={t.car_photo_front || 'Front View'} src={driver.carPhotoFrontUrl} onImageClick={setSelectedImage} />
+                               <PhotoCard title={t.car_photo_rear || 'Rear View'} src={driver.carPhotoBackUrl} onImageClick={setSelectedImage} />
+                               <PhotoCard title={t.car_photo_side_left || 'Left Side'} src={driver.carPhotoLeftUrl} onImageClick={setSelectedImage} />
+                               <PhotoCard title={t.car_photo_side_right || 'Right Side'} src={driver.carPhotoRightUrl} onImageClick={setSelectedImage} />
+                            </div>
+                        </div>
+                        
+                        <hr />
+                        
+                        {/* Tech Passport */}
+                         <div>
+                            <h3 className="text-lg font-semibold mb-4">{t.techPassport || 'Vehicle Registration Certificate'}</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                               <PhotoCard title={t.tech_passport_front || 'Tech Passport (front)'} src={driver.techPassportFrontUrl} onImageClick={setSelectedImage} />
+                               <PhotoCard title={t.tech_passport_back || 'Tech Passport (back)'} src={driver.techPassportBackUrl} onImageClick={setSelectedImage} />
+                            </div>
+                        </div>
+
                     </CardContent>
                     <CardFooter className="flex justify-end gap-2">
                         <Button variant="destructive" onClick={() => setIsRejectionDialogOpen(true)}>

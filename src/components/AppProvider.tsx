@@ -183,7 +183,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     // Upload all images in parallel
     const [
         passportFrontUrl,
-        passportBackUrl,
+        selfieUrl,
         carPhotoFrontUrl,
         carPhotoBackUrl,
         carPhotoLeftUrl,
@@ -192,7 +192,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         techPassportBackUrl
     ] = await Promise.all([
         uploadImageToImgBB(driverData.passportFrontFile),
-        uploadImageToImgBB(driverData.passportBackFile),
+        uploadImageToImgBB(driverData.selfieFile),
         uploadImageToImgBB(driverData.carPhotoFrontFile),
         uploadImageToImgBB(driverData.carPhotoBackFile),
         uploadImageToImgBB(driverData.carPhotoLeftFile),
@@ -208,7 +208,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         carNumber: driverData.carNumber,
         phone,
         passportFrontUrl,
-        passportBackUrl,
+        selfieUrl,
         carPhotoFrontUrl,
         carPhotoBackUrl,
         carPhotoLeftUrl,
@@ -323,7 +323,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     await deleteDoc(driverDoc);
     // Only send unblocked message if it was a manual action
     await addMessage(driverId, 'REGISTRATION_UNBLOCKED', 'message_reg_unblocked_title', 'message_reg_unblocked_body');
-  }
+  };
 
   const updateOrderStatus = async (orderId: string, status: 'accepted' | 'rejected') => {
     const orderDocRef = doc(db, "orders", orderId);

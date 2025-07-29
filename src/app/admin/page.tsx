@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useContext, useState, useEffect } from 'react';
@@ -68,28 +69,17 @@ function AdminPageSkeleton() {
     )
 }
 
-const ApplicationCard = ({ driver, onImageClick, t, onDetailsClick }: { driver: Driver, onImageClick: (url:string) => void, t: any, onDetailsClick: (id: string) => void }) => {
+const ApplicationCard = ({ driver, t, onDetailsClick }: { driver: Driver, t: any, onDetailsClick: (id: string) => void }) => {
     return (
         <Card>
-            <CardHeader className="p-4">
-                 <div className="flex items-start gap-4">
-                    <Image 
-                        src={driver.carPhotoUrl} 
-                        alt={driver.carModel} 
-                        width={100} 
-                        height={64} 
-                        className="rounded-md object-cover cursor-pointer aspect-video" 
-                        data-ai-hint="car side"
-                        onClick={() => onImageClick(driver.carPhotoUrl)}
-                    />
-                    <div className='space-y-1 flex-grow'>
-                        <CardTitle className="text-lg">{driver.name}</CardTitle>
-                        <CardDescription>{driver.phone}</CardDescription>
-                         <p className="text-sm font-medium pt-1">{driver.carModel} <span className="text-muted-foreground font-mono">({driver.carNumber})</span></p>
-                    </div>
-                     <Badge variant="secondary">{driver.status}</Badge>
-                </div>
+            <CardHeader>
+                <CardTitle className="text-lg">{driver.name}</CardTitle>
+                <CardDescription>{driver.phone}</CardDescription>
             </CardHeader>
+            <CardContent className="space-y-2">
+                 <p className="text-sm font-medium">{driver.carModel} <span className="text-muted-foreground font-mono">({driver.carNumber})</span></p>
+                 <Badge variant="secondary">{driver.status}</Badge>
+            </CardContent>
             <CardFooter className="p-2">
                  <Button variant="outline" className="w-full" onClick={() => onDetailsClick(driver.id)}>
                     {t.viewApplication || 'View Application'}
@@ -172,21 +162,8 @@ export default function AdminPage() {
                           <div className="text-sm text-muted-foreground">{driver.phone}</div>
                         </TableCell>
                         <TableCell>
-                          <div className="flex items-center gap-3">
-                             <Image 
-                                src={driver.carPhotoUrl} 
-                                alt={driver.carModel} 
-                                width={64} 
-                                height={40} 
-                                className="rounded-md object-cover cursor-pointer" 
-                                data-ai-hint="car side"
-                                onClick={() => setSelectedImage(driver.carPhotoUrl)}
-                              />
-                            <div>
-                                <div>{driver.carModel}</div>
-                                <div className="text-sm text-muted-foreground">{driver.carNumber}</div>
-                            </div>
-                          </div>
+                            <div>{driver.carModel}</div>
+                            <div className="text-sm text-muted-foreground">{driver.carNumber}</div>
                         </TableCell>
                         <TableCell>
                           <Badge variant="secondary">{driver.status}</Badge>
@@ -214,7 +191,6 @@ export default function AdminPage() {
                             key={driver.id} 
                             driver={driver}
                             onDetailsClick={handleDetailsClick}
-                            onImageClick={setSelectedImage}
                             t={t}
                         />
                     ))

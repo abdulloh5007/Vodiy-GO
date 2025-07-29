@@ -14,7 +14,7 @@ export type Driver = {
   phone: string;
   
   passportFrontUrl: string;
-  passportBackUrl: string;
+  selfieUrl: string;
   
   carModel: string;
   carNumber: string;
@@ -96,7 +96,7 @@ export type DriverApplicationData = {
     carNumber: string;
     
     passportFrontFile: File;
-    passportBackFile: File;
+    selfieFile: File;
     
     carPhotoFrontFile: File;
     carPhotoBackFile: File;

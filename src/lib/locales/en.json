@@ -155,7 +155,7 @@
     "ride_table_status": "Status",
     "ride_table_actions": "Actions",
     "noPendingRideApplications": "No pending ride applications",
-    "validationErrorDescStep1": "Please enter a valid first name, last name, and upload passport photos.",
+    "validationErrorDescStep1": "Please enter a valid first name, last name, and upload passport & selfie photos.",
     "validationErrorDescStep2": "Please fill all car details and upload all four photos.",
     "validationErrorDescStep3": "Please upload photos of your vehicle registration certificate.",
     "notifications": "Notifications",
@@ -175,7 +175,7 @@
     "diagnostics_desc": "Fill the form to complete your profile.",
     "firstName": "First Name",
     "lastName": "Last Name",
-    "techPassport": "Vehicle Registration Certificate (Tech Passport)",
+    "techPassport": "Vehicle Registration Certificate",
     "diagnostics_complete_title": "Diagnostics Complete",
     "diagnostics_complete_desc": "Your profile is verified. You can now publish and manage rides.",
     "messages_title": "Messages",
@@ -318,14 +318,16 @@
     "create_ride_warning_desc": "Please check the details carefully. You will not be able to change the route or price after submission.",
     "selectSeatsDesc": "Choose the number of seats in your car.",
     "passport_front_side": "Passport (front)",
-    "passport_back_side": "Passport (back)",
+    "selfie_photo": "Facial Photo",
     "car_photo_front": "Front View",
     "car_photo_rear": "Rear View",
     "car_photo_side_left": "Left Side",
     "car_photo_side_right": "Right Side",
     "tech_passport_front": "Tech Passport (front)",
     "tech_passport_back": "Tech Passport (back)",
-    "allPhotosRequired": "All photos are required for submission."
+    "allPhotosRequired": "All photos are required for submission.",
+    "personal_documents": "Personal Documents",
+    "car_photos": "Car Photos"
 }
 
     
