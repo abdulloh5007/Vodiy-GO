@@ -15,7 +15,6 @@ import { formatCarNumber } from '@/lib/utils';
 import { Progress } from '@/components/ui/progress';
 import Image from 'next/image';
 import { Driver } from '@/lib/types';
-import { CarFront, CarRear, CarSide } from '@/components/icons';
 import { IdCardFront, IdCardBack } from '@/components/icons';
 
 
@@ -113,8 +112,7 @@ const ImageDropzone = ({
             ) : (
                 <div className="flex flex-col items-center gap-2 text-muted-foreground">
                     {placeholderIcon || <UploadCloud className="h-10 w-10"/>}
-                    <span className='mt-2'>{placeholderText || t.carPhotoDropzone}</span>
-                    <span className="text-xs">({t.maxFileSize || 'Max size'}: {MAX_FILE_SIZE_KB}KB)</span>
+                    <span className='mt-2 text-sm'>{placeholderText || t.carPhotoDropzone}</span>
                 </div>
             )}
         </div>
@@ -333,11 +331,11 @@ export default function DriverDiagnosticsPage() {
                             <Input id="carNumber" value={carNumber} onChange={handleCarNumberChange} placeholder="e.g., 01 B 123 BB" required disabled={isSubmitting} />
                         </div>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <ImageDropzone file={carPhotoFrontFile} setFile={setCarPhotoFrontFile} t={t} disabled={isSubmitting} placeholderIcon={<CarFront className="w-20 h-20"/>} placeholderText={t.car_photo_front || "Front View"} />
-                        <ImageDropzone file={carPhotoBackFile} setFile={setCarPhotoBackFile} t={t} disabled={isSubmitting} placeholderIcon={<CarRear className="w-20 h-20"/>} placeholderText={t.car_photo_rear || "Rear View"}/>
-                        <ImageDropzone file={carPhotoLeftFile} setFile={setCarPhotoLeftFile} t={t} disabled={isSubmitting} placeholderIcon={<CarSide className="w-20 h-20"/>} placeholderText={t.car_photo_side_left || "Left Side"}/>
-                        <ImageDropzone file={carPhotoRightFile} setFile={setCarPhotoRightFile} t={t} disabled={isSubmitting} placeholderIcon={<CarSide className="w-20 h-20 scale-x-[-1]"/>} placeholderText={t.car_photo_side_right || "Right Side"}/>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <ImageDropzone file={carPhotoFrontFile} setFile={setCarPhotoFrontFile} t={t} disabled={isSubmitting} placeholderIcon={<UploadCloud className="w-12 h-12"/>} placeholderText={t.car_photo_front || "Front View"} />
+                        <ImageDropzone file={carPhotoBackFile} setFile={setCarPhotoBackFile} t={t} disabled={isSubmitting} placeholderIcon={<UploadCloud className="w-12 h-12"/>} placeholderText={t.car_photo_rear || "Rear View"}/>
+                        <ImageDropzone file={carPhotoLeftFile} setFile={setCarPhotoLeftFile} t={t} disabled={isSubmitting} placeholderIcon={<UploadCloud className="w-12 h-12"/>} placeholderText={t.car_photo_side_left || "Left Side"}/>
+                        <ImageDropzone file={carPhotoRightFile} setFile={setCarPhotoRightFile} t={t} disabled={isSubmitting} placeholderIcon={<UploadCloud className="w-12 h-12"/>} placeholderText={t.car_photo_side_right || "Right Side"}/>
                     </div>
                 </div>
             )}
