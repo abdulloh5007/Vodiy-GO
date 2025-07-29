@@ -6,7 +6,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { AppContext } from '@/contexts/AppContext';
 import { Driver, Ride, Order, Language, Translations, User, DriverApplicationData, PromoCode, Message } from '@/lib/types';
 import { initialTranslations } from '@/lib/i18n';
-import { db, auth, imgbbApiKey } from '@/lib/firebase';
+import { db, auth } from '@/lib/firebase';
 import { collection, doc, getDoc, setDoc, onSnapshot, query, orderBy, serverTimestamp, writeBatch, where, getDocs, deleteDoc, updateDoc, runTransaction, arrayUnion, increment } from "firebase/firestore";
 import { signInWithEmailAndPassword, onAuthStateChanged, signOut, createUserWithEmailAndPassword, User as FirebaseAuthUser } from "firebase/auth";
 import { ImageViewer } from './ImageViewer';
@@ -14,8 +14,13 @@ import { ImageViewer } from './ImageViewer';
 const uploadImageToImgBB = async (file: File): Promise<string> => {
     const formData = new FormData();
     formData.append('image', file);
+    const apiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
 
-    const response = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbApiKey}`, {
+    if (!apiKey) {
+      throw new Error("ImgBB API key is not configured.");
+    }
+
+    const response = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
         method: 'POST',
         body: formData,
     });
@@ -514,6 +519,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     </AppContext.Provider>
   );
 }
+
 
 
 
