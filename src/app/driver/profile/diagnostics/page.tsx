@@ -2,7 +2,7 @@
 
 'use client';
 
-import { useState, useContext, useMemo, useEffect } from 'react';
+import { useState, useContext, useMemo, useEffect, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { AppContext } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
@@ -11,16 +11,32 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, ArrowLeft, UploadCloud, X, ArrowRight, CheckCircle2, ShieldX, ShieldAlert, Ban } from 'lucide-react';
-import { formatCarNumber, formatPassportNumber, formatTechPassportNumber } from '@/lib/utils';
+import { formatCarNumber } from '@/lib/utils';
 import { Progress } from '@/components/ui/progress';
 import Image from 'next/image';
 import { Driver } from '@/lib/types';
+import { CarFront, CarRear, CarSide } from '@/components/icons';
+import { IdCardFront, IdCardBack } from '@/components/icons';
 
 
 const MAX_FILE_SIZE_KB = 700;
 const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_KB * 1024;
 
-const ImageDropzone = ({ file, setFile, t, disabled }: { file: File | null, setFile: (file: File | null) => void, t: any, disabled: boolean }) => {
+const ImageDropzone = ({ 
+    file, 
+    setFile, 
+    t, 
+    disabled, 
+    placeholderIcon,
+    placeholderText 
+}: { 
+    file: File | null, 
+    setFile: (file: File | null) => void, 
+    t: any, 
+    disabled: boolean,
+    placeholderIcon?: ReactNode,
+    placeholderText?: string
+}) => {
     const [preview, setPreview] = useState<string | null>(null);
     const { toast } = useToast();
 
@@ -74,20 +90,20 @@ const ImageDropzone = ({ file, setFile, t, disabled }: { file: File | null, setF
 
     return (
         <div 
-            className="relative border-2 border-dashed border-muted-foreground/50 rounded-lg p-4 text-center cursor-pointer hover:border-primary transition-colors data-[disabled=true]:cursor-not-allowed data-[disabled=true]:opacity-50"
+            className="relative border-2 border-dashed border-muted-foreground/50 rounded-lg p-4 text-center cursor-pointer hover:border-primary transition-colors data-[disabled=true]:cursor-not-allowed data-[disabled=true]:opacity-50 aspect-[16/10] flex flex-col items-center justify-center"
             onDragOver={(e) => e.preventDefault()}
             onDrop={handleDrop}
-            onClick={() => !disabled && document.getElementById('file-upload')?.click()}
+            onClick={() => !disabled && document.getElementById(`file-upload-${placeholderText}`)?.click()}
             data-disabled={disabled}
         >
-            <input id="file-upload" type="file" accept="image/*" className="hidden" onChange={handleFileChange} disabled={disabled} />
+            <input id={`file-upload-${placeholderText}`} type="file" accept="image/*" className="hidden" onChange={handleFileChange} disabled={disabled} />
             {preview ? (
                 <>
-                    <Image src={preview} alt="Car preview" width={200} height={120} className="mx-auto rounded-md object-cover" />
+                    <Image src={preview} alt="Preview" layout="fill" className="rounded-md object-cover" />
                     <Button 
                         variant="destructive" 
                         size="icon"
-                        className="absolute top-2 right-2 h-6 w-6"
+                        className="absolute top-2 right-2 h-6 w-6 z-10"
                         onClick={(e) => { e.stopPropagation(); setFile(null); }}
                         disabled={disabled}
                     >
@@ -96,8 +112,8 @@ const ImageDropzone = ({ file, setFile, t, disabled }: { file: File | null, setF
                 </>
             ) : (
                 <div className="flex flex-col items-center gap-2 text-muted-foreground">
-                    <UploadCloud className="h-10 w-10"/>
-                    <span>{t.carPhotoDropzone || 'Drag & drop or click to upload car photo'}</span>
+                    {placeholderIcon || <UploadCloud className="h-10 w-10"/>}
+                    <span className='mt-2'>{placeholderText || t.carPhotoDropzone}</span>
                     <span className="text-xs">({t.maxFileSize || 'Max size'}: {MAX_FILE_SIZE_KB}KB)</span>
                 </div>
             )}
@@ -118,15 +134,20 @@ export default function DriverDiagnosticsPage() {
   // Step 1
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
-  const [passport, setPassport] = useState('');
+  const [passportFrontFile, setPassportFrontFile] = useState<File | null>(null);
+  const [passportBackFile, setPassportBackFile] = useState<File | null>(null);
   
   // Step 2
   const [carModel, setCarModel] = useState('');
   const [carNumber, setCarNumber] = useState('');
-  const [carPhotoFile, setCarPhotoFile] = useState<File | null>(null);
+  const [carPhotoFrontFile, setCarPhotoFrontFile] = useState<File | null>(null);
+  const [carPhotoBackFile, setCarPhotoBackFile] = useState<File | null>(null);
+  const [carPhotoLeftFile, setCarPhotoLeftFile] = useState<File | null>(null);
+  const [carPhotoRightFile, setCarPhotoRightFile] = useState<File | null>(null);
 
   // Step 3
-  const [techPassport, setTechPassport] = useState('');
+  const [techPassportFrontFile, setTechPassportFrontFile] = useState<File | null>(null);
+  const [techPassportBackFile, setTechPassportBackFile] = useState<File | null>(null);
 
 
   if (!context) {
@@ -144,20 +165,12 @@ export default function DriverDiagnosticsPage() {
     const formatted = formatCarNumber(e.target.value);
     setCarNumber(formatted);
   };
-   const handlePassportChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const formatted = formatPassportNumber(e.target.value);
-    setPassport(formatted);
-  };
-   const handleTechPassportChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const formatted = formatTechPassportNumber(e.target.value);
-    setTechPassport(formatted);
-  };
   
   const progress = useMemo(() => (step / TOTAL_STEPS) * 100, [step]);
 
   const handleNextStep = () => {
     if (step === 1) {
-      if (!firstName || !lastName || passport.length < 9) {
+      if (!firstName || !lastName || !passportFrontFile || !passportBackFile) {
         toast({
           title: t.validationErrorTitle,
           description: t.validationErrorDescStep1,
@@ -167,7 +180,7 @@ export default function DriverDiagnosticsPage() {
       }
     }
      if (step === 2) {
-      if (!carModel || !carNumber || !carPhotoFile) {
+      if (!carModel || !carNumber || !carPhotoFrontFile || !carPhotoBackFile || !carPhotoLeftFile || !carPhotoRightFile) {
         toast({
           title: t.validationErrorTitle,
           description: t.validationErrorDescStep2,
@@ -187,7 +200,7 @@ export default function DriverDiagnosticsPage() {
     e.preventDefault();
     if (step !== TOTAL_STEPS) return;
     
-    if (techPassport.length < 9) {
+    if (!techPassportFrontFile || !techPassportBackFile) {
        toast({
           title: t.validationErrorTitle,
           description: t.validationErrorDescStep3,
@@ -196,10 +209,10 @@ export default function DriverDiagnosticsPage() {
       return;
     }
     
-    if (!carPhotoFile) {
+    if (!passportFrontFile || !passportBackFile || !carPhotoFrontFile || !carPhotoBackFile || !carPhotoLeftFile || !carPhotoRightFile) {
          toast({
           title: t.validationErrorTitle,
-          description: t.carPhotoRequired,
+          description: t.allPhotosRequired,
           variant: "destructive",
         });
       return;
@@ -209,11 +222,16 @@ export default function DriverDiagnosticsPage() {
     try {
         await addDriverApplication({ 
             name: `${firstName} ${lastName}`,
-            passport, 
             carModel, 
-            carNumber, 
-            techPassport,
-            carPhotoFile
+            carNumber,
+            passportFrontFile,
+            passportBackFile,
+            carPhotoFrontFile,
+            carPhotoBackFile,
+            carPhotoLeftFile,
+            carPhotoRightFile,
+            techPassportFrontFile,
+            techPassportBackFile
         });
 
         toast({
@@ -221,7 +239,6 @@ export default function DriverDiagnosticsPage() {
             description: t.weWillReviewYourApplication,
         });
         // After submission, the driver profile will exist, and the status page will be shown.
-        // No need to redirect here, the component will re-render with the new status.
         
     } catch(error) {
         console.error("Application submission failed:", error);
@@ -243,12 +260,10 @@ export default function DriverDiagnosticsPage() {
     )
   }
   
-  // If a driver profile exists, show their status instead of the application form
   if (driverProfile) {
     return <DriverStatusPage driverProfile={driverProfile} t={t} deleteDriver={deleteDriver} />
   }
 
-  // If no driver profile, show the application form
   return (
     <div className="container mx-auto py-8 px-4 flex justify-center">
       <Card className="w-full max-w-2xl">
@@ -268,7 +283,7 @@ export default function DriverDiagnosticsPage() {
           <form onSubmit={handleSubmit} className="space-y-6">
             {step === 1 && (
                 <div className="space-y-6 animate-in fade-in">
-                    <CardDescription>{t.step1_title || "Step 1: Personal Information"}</CardDescription>
+                    <CardDescription className="font-semibold text-lg">{t.step1_title || "Step 1: Personal Information"}</CardDescription>
                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label htmlFor="firstName">{t.firstName || 'First Name'}</Label>
@@ -279,35 +294,79 @@ export default function DriverDiagnosticsPage() {
                             <Input id="lastName" value={lastName} onChange={e => setLastName(e.target.value)} required disabled={isSubmitting} />
                         </div>
                     </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="passport">{t.passportNumber || "Passport Number"}</Label>
-                        <Input id="passport" value={passport} onChange={handlePassportChange} placeholder={t.passportPlaceholder || "AA 1234567"} required disabled={isSubmitting} />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                       <div className="space-y-2">
+                           <Label htmlFor="passport-front">{t.passport_front_side || "Passport (front)"}</Label>
+                           <ImageDropzone 
+                                file={passportFrontFile} 
+                                setFile={setPassportFrontFile} 
+                                t={t} 
+                                disabled={isSubmitting} 
+                                placeholderIcon={<IdCardFront className="w-16 h-16" />}
+                                placeholderText={t.passport_front_side || "Passport (front)"}
+                            />
+                       </div>
+                       <div className="space-y-2">
+                           <Label htmlFor="passport-back">{t.passport_back_side || "Passport (back)"}</Label>
+                           <ImageDropzone 
+                                file={passportBackFile} 
+                                setFile={setPassportBackFile} 
+                                t={t} 
+                                disabled={isSubmitting}
+                                placeholderIcon={<IdCardBack className="w-16 h-16" />}
+                                placeholderText={t.passport_back_side || "Passport (back)"}
+                            />
+                       </div>
                     </div>
                 </div>
             )}
             {step === 2 && (
                 <div className="space-y-6 animate-in fade-in">
-                    <CardDescription>{t.step2_title || "Step 2: Car Information"}</CardDescription>
-                    <div className="space-y-2">
-                        <Label htmlFor="carModel">{t.carModel}</Label>
-                        <Input id="carModel" value={carModel} onChange={e => setCarModel(e.target.value)} placeholder={t.carModelPlaceholder} required disabled={isSubmitting} />
+                    <CardDescription className="font-semibold text-lg">{t.step2_title || "Step 2: Car Information"}</CardDescription>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="carModel">{t.carModel}</Label>
+                            <Input id="carModel" value={carModel} onChange={e => setCarModel(e.target.value)} placeholder={t.carModelPlaceholder} required disabled={isSubmitting} />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="carNumber">{t.carNumber}</Label>
+                            <Input id="carNumber" value={carNumber} onChange={handleCarNumberChange} placeholder="e.g., 01 B 123 BB" required disabled={isSubmitting} />
+                        </div>
                     </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="carNumber">{t.carNumber}</Label>
-                        <Input id="carNumber" value={carNumber} onChange={handleCarNumberChange} placeholder="e.g., 01 B 123 BB" required disabled={isSubmitting} />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="carPhotoUrl">{t.carPhotoUrl}</Label>
-                        <ImageDropzone file={carPhotoFile} setFile={setCarPhotoFile} t={t} disabled={isSubmitting} />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <ImageDropzone file={carPhotoFrontFile} setFile={setCarPhotoFrontFile} t={t} disabled={isSubmitting} placeholderIcon={<CarFront className="w-20 h-20"/>} placeholderText={t.car_photo_front || "Front View"} />
+                        <ImageDropzone file={carPhotoBackFile} setFile={setCarPhotoBackFile} t={t} disabled={isSubmitting} placeholderIcon={<CarRear className="w-20 h-20"/>} placeholderText={t.car_photo_rear || "Rear View"}/>
+                        <ImageDropzone file={carPhotoLeftFile} setFile={setCarPhotoLeftFile} t={t} disabled={isSubmitting} placeholderIcon={<CarSide className="w-20 h-20"/>} placeholderText={t.car_photo_side_left || "Left Side"}/>
+                        <ImageDropzone file={carPhotoRightFile} setFile={setCarPhotoRightFile} t={t} disabled={isSubmitting} placeholderIcon={<CarSide className="w-20 h-20 scale-x-[-1]"/>} placeholderText={t.car_photo_side_right || "Right Side"}/>
                     </div>
                 </div>
             )}
              {step === 3 && (
                 <div className="space-y-6 animate-in fade-in">
-                    <CardDescription>{t.step3_title || "Step 3: Car Documents"}</CardDescription>
-                    <div className="space-y-2">
-                        <Label htmlFor="techPassport">{t.techPassport || "Vehicle Registration Certificate (Tech Passport)"}</Label>
-                        <Input id="techPassport" value={techPassport} onChange={handleTechPassportChange} placeholder={t.passportTechPlaceholder || "AAF 1234567"} required disabled={isSubmitting} />
+                    <CardDescription className="font-semibold text-lg">{t.step3_title || "Step 3: Car Documents"}</CardDescription>
+                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                       <div className="space-y-2">
+                           <Label htmlFor="tech-passport-front">{t.tech_passport_front || "Tech Passport (front)"}</Label>
+                           <ImageDropzone 
+                                file={techPassportFrontFile} 
+                                setFile={setTechPassportFrontFile} 
+                                t={t} 
+                                disabled={isSubmitting} 
+                                placeholderIcon={<IdCardFront className="w-16 h-16" />}
+                                placeholderText={t.tech_passport_front || "Tech Passport (front)"}
+                            />
+                       </div>
+                       <div className="space-y-2">
+                           <Label htmlFor="tech-passport-back">{t.tech_passport_back || "Tech Passport (back)"}</Label>
+                           <ImageDropzone 
+                                file={techPassportBackFile} 
+                                setFile={setTechPassportBackFile} 
+                                t={t} 
+                                disabled={isSubmitting}
+                                placeholderIcon={<IdCardBack className="w-16 h-16" />}
+                                placeholderText={t.tech_passport_back || "Tech Passport (back)"}
+                            />
+                       </div>
                     </div>
                 </div>
             )}

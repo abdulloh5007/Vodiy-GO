@@ -1,4 +1,5 @@
 
+
 {
     "home": "Bosh sahifa",
     "login": "Kirish",
@@ -154,9 +155,9 @@
     "ride_table_status": "Holat",
     "ride_table_actions": "Harakatlar",
     "noPendingRideApplications": "Kutilayotgan qatnov arizalari yo'q",
-    "validationErrorDescStep1": "Iltimos, to'g'ri ism, familiya va pasport raqamini kiriting.",
-    "validationErrorDescStep2": "Iltimos, barcha avtomobil ma'lumotlarini to'ldiring va rasm yuklang.",
-    "validationErrorDescStep3": "Iltimos, texnik pasport raqamini to'g'ri kiriting.",
+    "validationErrorDescStep1": "Iltimos, to'g'ri ism, familiya kiriting va pasport rasmlarini yuklang.",
+    "validationErrorDescStep2": "Iltimos, barcha avtomobil ma'lumotlarini to'ldiring va barcha to'rtta rasmni yuklang.",
+    "validationErrorDescStep3": "Iltimos, texnik pasportingizning rasmlarini yuklang.",
     "notifications": "Bildirishnomalar",
     "notifications_desc": "Bu yerda siz so'nggi bildirishnomalaringizni topishingiz mumkin.",
     "no_notifications": "Sizda bildirishnomalar yo'q.",
@@ -316,5 +317,14 @@
     "feature_coming_soon": "Bu xususiyat hozirda ishlab chiqilmoqda. Bizni kuzatib boring!",
     "create_ride_warning_title": "Diqqat!",
     "create_ride_warning_desc": "Iltimos, ma'lumotlarni diqqat bilan tekshiring. Yuborilgandan so'ng marshrut yoki narxni o'zgartira olmaysiz.",
-    "selectSeatsDesc": "Avtomobilingizdagi o'rindiqlar sonini tanlang."
+    "selectSeatsDesc": "Avtomobilingizdagi o'rindiqlar sonini tanlang.",
+    "passport_front_side": "Pasport (old tomoni)",
+    "passport_back_side": "Pasport (orqa tomoni)",
+    "car_photo_front": "Oldindan ko'rinish",
+    "car_photo_rear": "Orqadan ko'rinish",
+    "car_photo_side_left": "Chap tomon",
+    "car_photo_side_right": "O'ng tomon",
+    "tech_passport_front": "Tex. pasport (old tomoni)",
+    "tech_passport_back": "Tex. pasport (orqa tomoni)",
+    "allPhotosRequired": "Arizani topshirish uchun barcha fotosuratlar talab qilinadi."
 }

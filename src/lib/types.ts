@@ -12,11 +12,21 @@ export type Driver = {
   id: string; 
   name: string;
   phone: string;
-  passport: string;
-  techPassport: string;
+  
+  passportFrontUrl: string;
+  passportBackUrl: string;
+  
   carModel: string;
   carNumber: string;
-  carPhotoUrl: string;
+
+  carPhotoFrontUrl: string;
+  carPhotoBackUrl: string;
+  carPhotoLeftUrl: string;
+  carPhotoRightUrl: string;
+
+  techPassportFrontUrl: string;
+  techPassportBackUrl: string;
+  
   status: 'pending' | 'verified' | 'rejected' | 'blocked';
   rating: number;
   reviewCount: number;
@@ -80,5 +90,19 @@ export type Translations = {
   [key: string]: any;
 };
 
-export type DriverApplicationData = Omit<Driver, 'id' | 'status' | 'carPhotoUrl' | 'phone' | 'rating' | 'reviewCount' | 'rejectionCount' | 'rideRejectionCount'> & { carPhotoFile: File | null };
-
+export type DriverApplicationData = {
+    name: string;
+    carModel: string;
+    carNumber: string;
+    
+    passportFrontFile: File;
+    passportBackFile: File;
+    
+    carPhotoFrontFile: File;
+    carPhotoBackFile: File;
+    carPhotoLeftFile: File;
+    carPhotoRightFile: File;
+    
+    techPassportFrontFile: File;
+    techPassportBackFile: File;
+}

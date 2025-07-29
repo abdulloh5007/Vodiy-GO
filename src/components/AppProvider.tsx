@@ -168,10 +168,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     if (!user) {
         throw new Error("User must be logged in to submit an application.");
     }
-    if (!driverData.carPhotoFile) {
-        throw new Error("Car photo is required.");
-    }
-
+    
     const driverDocRef = doc(db, "drivers", user.uid);
     const driverDocSnap = await getDoc(driverDocRef);
 
@@ -183,14 +180,41 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const userDoc = await getDoc(userDocRef);
     const phone = userDoc.data()?.phone || '';
 
-    const carPhotoUrl = await uploadImageToImgBB(driverData.carPhotoFile);
-    const { carPhotoFile, ...driverInfo } = driverData;
+    // Upload all images in parallel
+    const [
+        passportFrontUrl,
+        passportBackUrl,
+        carPhotoFrontUrl,
+        carPhotoBackUrl,
+        carPhotoLeftUrl,
+        carPhotoRightUrl,
+        techPassportFrontUrl,
+        techPassportBackUrl
+    ] = await Promise.all([
+        uploadImageToImgBB(driverData.passportFrontFile),
+        uploadImageToImgBB(driverData.passportBackFile),
+        uploadImageToImgBB(driverData.carPhotoFrontFile),
+        uploadImageToImgBB(driverData.carPhotoBackFile),
+        uploadImageToImgBB(driverData.carPhotoLeftFile),
+        uploadImageToImgBB(driverData.carPhotoRightFile),
+        uploadImageToImgBB(driverData.techPassportFrontFile),
+        uploadImageToImgBB(driverData.techPassportBackFile)
+    ]);
     
     await setDoc(driverDocRef, {
         id: user.uid,
-        ...driverInfo,
+        name: driverData.name,
+        carModel: driverData.carModel,
+        carNumber: driverData.carNumber,
         phone,
-        carPhotoUrl,
+        passportFrontUrl,
+        passportBackUrl,
+        carPhotoFrontUrl,
+        carPhotoBackUrl,
+        carPhotoLeftUrl,
+        carPhotoRightUrl,
+        techPassportFrontUrl,
+        techPassportBackUrl,
         status: 'pending',
         rating: 0,
         reviewCount: 0,
@@ -519,7 +543,3 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     </AppContext.Provider>
   );
 }
-
-
-
-
