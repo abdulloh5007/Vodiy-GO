@@ -244,7 +244,6 @@
     "maxFileSize": "Max size",
     "fileTooLargeTitle": "File is too large",
     "fileTooLargeDesc": "Maximum file size is {size}MB.",
-    "fileTooLargeDescKB": "Maximum file size is {size}KB.",
     "invalidFileTypeTitle": "Invalid file type",
     "invalidFileTypeDesc": "Please upload an image file.",
     "reviewRideApplicationFor": "Review ride application for",
@@ -328,3 +327,5 @@
     "tech_passport_back": "Tech Passport (back)",
     "allPhotosRequired": "All photos are required for submission."
 }
+
+    

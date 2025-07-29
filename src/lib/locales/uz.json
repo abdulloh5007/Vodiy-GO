@@ -244,7 +244,6 @@
     "maxFileSize": "Maks. hajm",
     "fileTooLargeTitle": "Fayl hajmi juda katta",
     "fileTooLargeDesc": "Maksimal fayl hajmi {size}MB.",
-    "fileTooLargeDescKB": "Maksimal fayl hajmi {size}KB.",
     "invalidFileTypeTitle": "Fayl turi noto'g'ri",
     "invalidFileTypeDesc": "Iltimos, rasm faylini yuklang.",
     "reviewRideApplicationFor": "Uchun qatnov arizasini ko'rib chiqish",
@@ -328,3 +327,5 @@
     "tech_passport_back": "Tex. pasport (orqa tomoni)",
     "allPhotosRequired": "Arizani topshirish uchun barcha fotosuratlar talab qilinadi."
 }
+
+    

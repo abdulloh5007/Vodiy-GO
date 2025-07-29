@@ -18,8 +18,8 @@ import { Driver } from '@/lib/types';
 import { IdCardFront, IdCardBack } from '@/components/icons';
 
 
-const MAX_FILE_SIZE_KB = 700;
-const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_KB * 1024;
+const MAX_FILE_SIZE_MB = 32;
+const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
 
 const ImageDropzone = ({ 
     file, 
@@ -58,7 +58,7 @@ const ImageDropzone = ({
             toast({
                 variant: 'destructive',
                 title: t.fileTooLargeTitle || 'File is too large',
-                description: (t.fileTooLargeDescKB || 'Maximum file size is {size}KB.').replace('{size}', MAX_FILE_SIZE_KB.toString()),
+                description: (t.fileTooLargeDesc || 'Maximum file size is {size}MB.').replace('{size}', MAX_FILE_SIZE_MB.toString()),
             });
             return;
         }
@@ -482,3 +482,5 @@ const DriverStatusPage = ({ driverProfile, t, deleteDriver }: { driverProfile: D
         </div>
     )
 }
+
+    

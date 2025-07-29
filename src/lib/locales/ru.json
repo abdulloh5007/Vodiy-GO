@@ -244,7 +244,6 @@
     "maxFileSize": "Макс. размер",
     "fileTooLargeTitle": "Файл слишком большой",
     "fileTooLargeDesc": "Максимальный размер файла — {size}МБ.",
-    "fileTooLargeDescKB": "Максимальный размер файла — {size}КБ.",
     "invalidFileTypeTitle": "Неверный тип файла",
     "invalidFileTypeDesc": "Пожалуйста, загрузите файл изображения.",
     "reviewRideApplicationFor": "Просмотр заявки на поездку для",
@@ -328,3 +327,5 @@
     "tech_passport_back": "Техпаспорт (обратная сторона)",
     "allPhotosRequired": "Для подачи заявки требуются все фотографии."
 }
+
+    
