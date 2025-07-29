@@ -6,25 +6,29 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { AppContext } from '@/contexts/AppContext';
 import { Driver, Ride, Order, Language, Translations, User, DriverApplicationData, PromoCode, Message } from '@/lib/types';
 import { initialTranslations } from '@/lib/i18n';
-import { db, auth } from '@/lib/firebase';
+import { db, auth, imgbbApiKey } from '@/lib/firebase';
 import { collection, doc, getDoc, setDoc, onSnapshot, query, orderBy, serverTimestamp, writeBatch, where, getDocs, deleteDoc, updateDoc, runTransaction, arrayUnion, increment } from "firebase/firestore";
 import { signInWithEmailAndPassword, onAuthStateChanged, signOut, createUserWithEmailAndPassword, User as FirebaseAuthUser } from "firebase/auth";
 import { ImageViewer } from './ImageViewer';
 
-const imageToDataUrl = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            if (typeof reader.result === 'string') {
-                resolve(reader.result);
-            } else {
-                reject(new Error('Failed to convert file to Data URL.'));
-            }
-        };
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
+const uploadImageToImgBB = async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append('image', file);
+
+    const response = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbApiKey}`, {
+        method: 'POST',
+        body: formData,
     });
-}
+
+    const result = await response.json();
+
+    if (result.success) {
+        return result.data.url;
+    } else {
+        throw new Error(result.error?.message || 'Failed to upload image to ImgBB');
+    }
+};
+
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguage] = useState<Language>('en');
@@ -174,7 +178,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const userDoc = await getDoc(userDocRef);
     const phone = userDoc.data()?.phone || '';
 
-    const carPhotoUrl = await imageToDataUrl(driverData.carPhotoFile);
+    const carPhotoUrl = await uploadImageToImgBB(driverData.carPhotoFile);
     const { carPhotoFile, ...driverInfo } = driverData;
     
     await setDoc(driverDocRef, {
@@ -510,5 +514,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     </AppContext.Provider>
   );
 }
+
 
 

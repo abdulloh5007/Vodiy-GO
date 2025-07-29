@@ -13,6 +13,8 @@ const firebaseConfig = {
   appId: "1:505009384076:web:f285d98d0f6dbd6a23a9a9"
 };
 
+export const imgbbApiKey = "01d8a1988f2c9b581579c8fcc5c1cb2e";
+
 // Initialize Firebase
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 const db = getFirestore(app);
