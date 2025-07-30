@@ -12,17 +12,6 @@ import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { Driver } from '@/lib/types';
 import { RejectionDialog } from '@/components/RejectionDialog';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
 import { useToast } from '@/hooks/use-toast';
 
 function DriverDetailSkeleton() {
@@ -59,6 +48,22 @@ function DriverDetailSkeleton() {
         </div>
     );
 }
+
+const PhotoCard = ({ title, src, onImageClick }: { title: string, src: string, onImageClick: (src: string) => void }) => (
+    <div className="space-y-2">
+        <h3 className="font-semibold text-sm">{title}</h3>
+        <div className="relative aspect-video w-full">
+            <Image 
+                src={src} 
+                alt={title}
+                fill
+                className="rounded-lg object-cover cursor-pointer"
+                onClick={() => onImageClick(src)}
+            />
+        </div>
+    </div>
+);
+
 
 const StatusBadge = ({ status, t }: { status: Driver['status'], t: any }) => {
     const statusMap = {
@@ -147,40 +152,14 @@ export default function DriverDetailPage() {
                     <CardTitle className="font-headline text-2xl">{t.driverDetails || 'Driver Details'}</CardTitle>
                     <CardDescription>{t.fullInformationFor || 'Full information for'} {driver.name}</CardDescription>
                 </CardHeader>
-                <CardContent className="grid md:grid-cols-2 gap-8 pt-6">
-                    <div>
-                        <Image 
-                            src={driver.carPhotoUrl} 
-                            alt={driver.carModel}
-                            width={500}
-                            height={300}
-                            className="rounded-lg object-cover w-full cursor-pointer"
-                            onClick={() => setSelectedImage(driver.carPhotoUrl)}
-                            data-ai-hint="car side"
-                        />
-                         {driver.status === 'rejected' && driver.rejectionReason && (
-                            <div className="mt-4 p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
-                                <p className="text-sm font-semibold text-destructive">{t.rejection_reason || 'Rejection Reason'}:</p>
-                                <p className="text-sm text-destructive/80">{driver.rejectionReason}</p>
-                            </div>
-                        )}
-                        {driver.status === 'blocked' && driver.rejectionReason && (
-                             <div className="mt-4 p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
-                                <p className="text-sm font-semibold text-destructive">{t.block_reason || 'Block Reason'}:</p>
-                                <p className="text-sm text-destructive/80">{driver.rejectionReason}</p>
-                            </div>
-                        )}
-                    </div>
-                    <div className="space-y-6">
+                <CardContent className="space-y-8 pt-6">
+                    <div className="grid md:grid-cols-3 gap-6">
                         <div className="flex items-center gap-3">
                             <User className="h-6 w-6 text-muted-foreground"/>
                             <div>
                                 <p className="text-sm text-muted-foreground">{t.applicant}</p>
                                 <p className="font-semibold text-lg">{driver.name}</p>
                             </div>
-                        </div>
-                         <div className="flex items-start gap-3">
-                            <StatusBadge status={driver.status} t={t} />
                         </div>
                         <div className="flex items-center gap-3">
                             <Car className="h-6 w-6 text-muted-foreground"/>
@@ -189,32 +168,56 @@ export default function DriverDetailPage() {
                                 <p className="font-semibold">{driver.carModel}</p>
                             </div>
                         </div>
-                         <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-3">
                             <Hash className="h-6 w-6 text-muted-foreground"/>
                             <div>
                                 <p className="text-sm text-muted-foreground">{t.carNumber}</p>
                                 <p className="font-semibold font-mono">{driver.carNumber}</p>
                             </div>
                         </div>
-                        <div className="flex items-center gap-3">
-                            <Shield className="h-6 w-6 text-muted-foreground"/>
-                             <div>
-                                <p className="text-sm text-muted-foreground">{t.passportNumber}</p>
-                                <p className="font-semibold font-mono">{driver.passport}</p>
-                            </div>
+                    </div>
+                     <div className="flex items-start gap-3">
+                        <StatusBadge status={driver.status} t={t} />
+                    </div>
+                    {(driver.status === 'rejected' || driver.status === 'blocked') && driver.rejectionReason && (
+                        <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
+                            <p className="text-sm font-semibold text-destructive">{driver.status === 'rejected' ? t.rejection_reason : t.block_reason}:</p>
+                            <p className="text-sm text-destructive/80">{driver.rejectionReason}</p>
                         </div>
-                         <div className="flex items-center gap-3">
-                            <Shield className="h-6 w-6 text-muted-foreground"/>
-                             <div>
-                                <p className="text-sm text-muted-foreground">{t.techPassport}</p>
-                                <p className="font-semibold font-mono">{driver.techPassport}</p>
-                            </div>
-                        </div>
-                         <div className="flex items-center gap-3">
-                            <p className="text-sm text-muted-foreground">{t.rejection_count || 'Rejection Count'}:</p>
-                            <p className="font-semibold font-mono">{driver.rejectionCount || 0}</p>
+                    )}
+
+                    <hr />
+
+                    <div>
+                        <h3 className="text-lg font-semibold mb-4">{t.personal_documents || 'Personal Documents'}</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <PhotoCard title={t.passport_front_side || 'Passport (front)'} src={driver.passportFrontUrl} onImageClick={setSelectedImage} />
+                            <PhotoCard title={t.selfie_photo || 'Facial Photo'} src={driver.selfieUrl} onImageClick={setSelectedImage} />
                         </div>
                     </div>
+
+                    <hr />
+
+                    <div>
+                        <h3 className="text-lg font-semibold mb-4">{t.car_photos || 'Car Photos'}</h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <PhotoCard title={t.car_photo_front || 'Front View'} src={driver.carPhotoFrontUrl} onImageClick={setSelectedImage} />
+                            <PhotoCard title={t.car_photo_rear || 'Rear View'} src={driver.carPhotoBackUrl} onImageClick={setSelectedImage} />
+                            <PhotoCard title={t.car_photo_side_left || 'Left Side'} src={driver.carPhotoLeftUrl} onImageClick={setSelectedImage} />
+                            <PhotoCard title={t.car_photo_side_right || 'Right Side'} src={driver.carPhotoRightUrl} onImageClick={setSelectedImage} />
+                        </div>
+                    </div>
+                    
+                    <hr />
+                    
+                    <div>
+                        <h3 className="text-lg font-semibold mb-4">{t.techPassport || 'Vehicle Registration Certificate'}</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <PhotoCard title={t.tech_passport_front || 'Tech Passport (front)'} src={driver.techPassportFrontUrl} onImageClick={setSelectedImage} />
+                            <PhotoCard title={t.tech_passport_back || 'Tech Passport (back)'} src={driver.techPassportBackUrl} onImageClick={setSelectedImage} />
+                        </div>
+                    </div>
+
                 </CardContent>
                 <CardFooter className="flex justify-end gap-2">
                     {driver.status === 'blocked' ? (
@@ -222,9 +225,11 @@ export default function DriverDetailPage() {
                             <CheckCircle2 /> {t.unblock_driver || 'Unblock'}
                         </Button>
                     ) : (
-                        <Button variant="destructive" onClick={() => setIsBlockDialogOpen(true)}>
-                            <Ban /> {t.block_driver || 'Block'}
-                        </Button>
+                        driver.status !== 'verified' && (
+                            <Button variant="destructive" onClick={() => setIsBlockDialogOpen(true)}>
+                                <Ban /> {t.block_driver || 'Block'}
+                            </Button>
+                        )
                     )}
 
                 </CardFooter>

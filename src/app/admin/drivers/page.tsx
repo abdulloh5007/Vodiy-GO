@@ -101,24 +101,13 @@ const StatusBadge = ({ status, t }: { status: Driver['status'], t: any }) => {
     )
 }
 
-const DriverCard = ({ driver, onDetailsClick, onImageClick, t }: { driver: Driver, onDetailsClick: (id: string) => void, onImageClick: (url: string) => void, t: any }) => (
+const DriverCard = ({ driver, onDetailsClick, t }: { driver: Driver, onDetailsClick: (id: string) => void, t: any }) => (
     <Card>
-        <CardHeader className="p-4 flex-row items-start gap-4">
-             <Image 
-                src={driver.carPhotoUrl} 
-                alt={driver.name} 
-                width={80} 
-                height={80} 
-                className="rounded-full object-cover aspect-square cursor-pointer" 
-                data-ai-hint="driver portrait"
-                onClick={() => onImageClick(driver.carPhotoUrl)}
-            />
-            <div className="space-y-1 flex-grow">
-                <CardTitle className="text-lg">{driver.name}</CardTitle>
-                <CardDescription>{driver.phone}</CardDescription>
-            </div>
+        <CardHeader>
+            <CardTitle className="text-lg">{driver.name}</CardTitle>
+            <CardDescription>{driver.phone}</CardDescription>
         </CardHeader>
-        <CardContent className="p-4 pt-0 space-y-2">
+        <CardContent className="space-y-2">
             <p className="text-sm font-medium">{driver.carModel} <span className="text-muted-foreground font-mono">({driver.carNumber})</span></p>
             <StatusBadge status={driver.status} t={t} />
         </CardContent>
@@ -158,6 +147,8 @@ export default function DriversPage() {
   if (loading || !t.home) {
     return <DriversPageSkeleton />;
   }
+  
+  const verifiedDrivers = drivers.filter(d => d.status !== 'pending');
 
   return (
     <div className="container mx-auto py-8 px-4">
@@ -189,19 +180,19 @@ export default function DriversPage() {
                     </TableRow>
                     </TableHeader>
                     <TableBody>
-                    {drivers.length > 0 ? (
-                        drivers.map(driver => (
+                    {verifiedDrivers.length > 0 ? (
+                        verifiedDrivers.map(driver => (
                         <TableRow key={driver.id}>
                             <TableCell>
                             <div className="flex items-center gap-3">
                                 <Image 
-                                    src={driver.carPhotoUrl} 
+                                    src={driver.selfieUrl} 
                                     alt={driver.name} 
                                     width={40} 
                                     height={40} 
                                     className="rounded-full object-cover cursor-pointer" 
                                     data-ai-hint="driver portrait"
-                                    onClick={() => setSelectedImage(driver.carPhotoUrl)}
+                                    onClick={() => setSelectedImage(driver.selfieUrl)}
                                 />
                                 <div>
                                     <div className="font-medium">{driver.name}</div>
@@ -233,13 +224,12 @@ export default function DriversPage() {
               </div>
             </div>
             <div className={cn("grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4", viewMode !== 'card' && 'hidden')}>
-                 {drivers.length > 0 ? (
-                    drivers.map(driver => (
+                 {verifiedDrivers.length > 0 ? (
+                    verifiedDrivers.map(driver => (
                         <DriverCard 
                             key={driver.id} 
                             driver={driver}
                             onDetailsClick={(id) => router.push(`/admin/drivers/${id}`)}
-                            onImageClick={setSelectedImage}
                             t={t}
                         />
                     ))

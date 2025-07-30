@@ -51,7 +51,7 @@ function ApplicationDetailSkeleton() {
 
 const PhotoCard = ({ title, src, onImageClick }: { title: string, src: string, onImageClick: (src: string) => void }) => (
     <div className="space-y-2">
-        <h3 className="font-semibold">{title}</h3>
+        <h3 className="font-semibold text-sm">{title}</h3>
         <div className="relative aspect-video w-full">
             <Image 
                 src={src} 

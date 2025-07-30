@@ -37,7 +37,7 @@ const ProfileCard = ({ driver, t }: { driver: Driver, t: any }) => {
         <Card className="overflow-hidden mb-5">
             <CardContent className="p-4 flex items-center gap-4">
                 <Image
-                    src={driver.carPhotoUrl || 'https://placehold.co/100x100.png'}
+                    src={driver.selfieUrl || 'https://placehold.co/100x100.png'}
                     alt={driver.name}
                     width={80}
                     height={80}
