@@ -13,7 +13,7 @@ export type Driver = {
   name: string;
   phone: string;
   
-  passportFrontUrl: string;
+  passportFrontUrl: string; 
   selfieUrl: string;
   
   carModel: string;
