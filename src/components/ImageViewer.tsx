@@ -1,7 +1,7 @@
 
 'use client';
 
-import { AnimatePresence, motion, useAnimationControls } from 'framer-motion';
+import { AnimatePresence, motion, useAnimation, PanInfo } from 'framer-motion';
 import Image from 'next/image';
 import { Dialog, DialogContent, DialogOverlay, DialogPortal, DialogTitle } from '@/components/ui/dialog';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
@@ -12,67 +12,83 @@ interface ImageViewerProps {
   onOpenChange: (open: boolean) => void;
 }
 
+const MAX_ZOOM = 8;
+const MIN_ZOOM = 1;
+
+
 export function ImageViewer({ imageUrl, onOpenChange }: ImageViewerProps) {
   const isOpen = !!imageUrl;
-  const controls = useAnimationControls();
+  const imageRef = useRef<HTMLImageElement>(null);
+  const controls = useAnimation();
+  
   const [scale, setScale] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
 
-  const resetZoom = useCallback(() => {
-    setScale(1);
+  const resetState = useCallback(() => {
+    setScale(MIN_ZOOM);
     setPosition({ x: 0, y: 0 });
-    controls.start({
-      scale: 1,
-      x: 0,
-      y: 0,
-      transition: { duration: 0.3 }
-    });
+    controls.set({ x: 0, y: 0, scale: MIN_ZOOM });
   }, [controls]);
 
   useEffect(() => {
     if (isOpen) {
-      resetZoom();
+      resetState();
     }
-  }, [isOpen, resetZoom]);
+  }, [isOpen, resetState]);
   
-  const handleWheel = (event: React.WheelEvent) => {
-    if (!event.ctrlKey) return;
+  const handleDragEnd = (_: any, info: PanInfo) => {
+    if (scale === MIN_ZOOM && info.offset.y > 150) {
+      onOpenChange(false);
+    }
+  }
+
+  const handleDoubleClick = (event: React.MouseEvent | React.TouchEvent) => {
     event.preventDefault();
-    const newScale = Math.max(1, Math.min(5, scale - event.deltaY * 0.01));
+    event.stopPropagation();
+    
+    if (scale > MIN_ZOOM) {
+        // Zoom out
+        resetState();
+    } else {
+        // Zoom in to the point of click
+        const target = event.currentTarget as HTMLElement;
+        const rect = target.getBoundingClientRect();
+        
+        let x, y;
+        if ('clientX' in event) { // MouseEvent
+            x = event.clientX - rect.left;
+            y = event.clientY - rect.top;
+        } else { // TouchEvent (use first touch)
+            x = event.touches[0].clientX - rect.left;
+            y = event.touches[0].clientY - rect.top;
+        }
+
+        const newScale = 3;
+        const newX = -(x - rect.width / 2) * (newScale - 1);
+        const newY = -(y - rect.height / 2) * (newScale - 1);
+
+        setScale(newScale);
+        setPosition({ x: newX, y: newY });
+        controls.start({
+            x: newX,
+            y: newY,
+            scale: newScale,
+            transition: { duration: 0.3, ease: 'easeOut' },
+        });
+    }
+  };
+
+  const handleWheel = (event: React.WheelEvent) => {
+    event.preventDefault();
+    const newScale = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, scale - event.deltaY * 0.01));
     setScale(newScale);
     controls.set({ scale: newScale });
-  };
-  
-  const handleDoubleClick = (event: React.MouseEvent | React.TouchEvent) => {
-    if (scale > 1) {
-      resetZoom();
-    } else {
-      const target = event.currentTarget as HTMLElement;
-      const rect = target.getBoundingClientRect();
-      let x, y;
 
-      if ('clientX' in event) { // MouseEvent
-        x = event.clientX - rect.left;
-        y = event.clientY - rect.top;
-      } else { // TouchEvent
-        x = event.touches[0].clientX - rect.left;
-        y = event.touches[0].clientY - rect.top;
-      }
-      
-      const newScale = 2.5;
-      const newX = -(x - rect.width / 2) * newScale;
-      const newY = -(y - rect.height / 2) * newScale;
-      
-      setScale(newScale);
-      setPosition({ x: newX, y: newY });
-      controls.start({
-        scale: newScale,
-        x: newX,
-        y: newY,
-        transition: { duration: 0.3 }
-      });
+    if (newScale === MIN_ZOOM) {
+        resetState();
     }
   };
+
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => {
@@ -99,37 +115,29 @@ export function ImageViewer({ imageUrl, onOpenChange }: ImageViewerProps) {
                          <VisuallyHidden>
                             <DialogTitle>Image Viewer</DialogTitle>
                          </VisuallyHidden>
-                        <motion.div
-                            className="relative w-full h-full flex items-center justify-center"
-                            drag="y"
-                            dragConstraints={{ top: 0, bottom: 0 }}
+
+                         <motion.div
+                            ref={imageRef}
+                            className="relative w-full h-full cursor-grab active:cursor-grabbing"
+                            onDoubleClick={handleDoubleClick}
+                            drag={scale > 1}
+                            dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
                             dragElastic={0.1}
-                            onDragEnd={(_, info) => {
-                                if (info.offset.y > 150 && scale === 1) {
-                                    onOpenChange(false);
-                                }
-                            }}
-                        >
-                            <motion.div
-                                animate={controls}
-                                className="relative w-full h-full flex items-center justify-center"
-                                drag={scale > 1}
-                                dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
-                                dragElastic={0.1}
-                                onDoubleClick={handleDoubleClick}
-                            >
-                                {imageUrl && (
-                                    <Image
-                                        src={imageUrl}
-                                        alt="Fullscreen view" 
-                                        fill
-                                        style={{ objectFit: 'contain' }}
-                                        className="rounded-lg"
-                                        draggable={false}
-                                    />
-                                )}
-                            </motion.div>
-                        </motion.div>
+                            onDragEnd={handleDragEnd}
+                            animate={controls}
+                            style={{ x: position.x, y: position.y, scale }}
+                         >
+                            {imageUrl && (
+                                <Image
+                                    src={imageUrl}
+                                    alt="Fullscreen view" 
+                                    fill
+                                    style={{ objectFit: 'contain' }}
+                                    className="rounded-lg pointer-events-none"
+                                    draggable={false}
+                                />
+                            )}
+                         </motion.div>
                     </DialogContent>
                 </DialogPortal>
             )}
