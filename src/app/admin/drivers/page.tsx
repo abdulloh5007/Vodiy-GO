@@ -186,13 +186,13 @@ export default function DriversPage() {
                             <TableCell>
                             <div className="flex items-center gap-3">
                                 <Image 
-                                    src={driver.selfieUrl} 
+                                    src={driver.selfieUrl || 'https://placehold.co/40x40.png'} 
                                     alt={driver.name} 
                                     width={40} 
                                     height={40} 
                                     className="rounded-full object-cover cursor-pointer" 
                                     data-ai-hint="driver portrait"
-                                    onClick={() => setSelectedImage(driver.selfieUrl)}
+                                    onClick={() => setSelectedImage(driver.selfieUrl || 'https://placehold.co/40x40.png')}
                                 />
                                 <div>
                                     <div className="font-medium">{driver.name}</div>
