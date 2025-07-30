@@ -84,13 +84,13 @@ const RideApplicationCard = ({ ride, driver, onDetailsClick, onImageClick, t }: 
             <CardContent className="space-y-3 pt-3 border-t">
                  <div className="flex items-start gap-4">
                     <Image 
-                        src={driver.carPhotoUrl} 
+                        src={driver.carPhotoFrontUrl} 
                         alt={driver.carModel} 
                         width={100} 
                         height={64} 
                         className="rounded-md object-cover cursor-pointer aspect-video" 
                         data-ai-hint="car side"
-                        onClick={() => onImageClick(driver.carPhotoUrl)}
+                        onClick={() => onImageClick(driver.carPhotoFrontUrl)}
                     />
                     <div className='space-y-1'>
                         <p className="font-semibold">{driver.name}</p>
@@ -194,13 +194,13 @@ export default function RideApplicationsPage() {
                                                 <TableCell>
                                                 <div className="flex items-center gap-3">
                                                     <Image 
-                                                        src={driver.carPhotoUrl} 
+                                                        src={driver.carPhotoFrontUrl} 
                                                         alt={driver.carModel} 
                                                         width={64} 
                                                         height={40} 
                                                         className="rounded-md object-cover cursor-pointer" 
                                                         data-ai-hint="car side"
-                                                        onClick={() => setSelectedImage(driver.carPhotoUrl)}
+                                                        onClick={() => setSelectedImage(driver.carPhotoFrontUrl)}
                                                     />
                                                     <div>
                                                         <div>{driver.carModel}</div>

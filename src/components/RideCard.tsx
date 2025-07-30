@@ -100,12 +100,12 @@ export function RideCard({ ride, onImageClick }: RideCardProps) {
         <CardHeader className="p-0">
           <div className="relative h-48 w-full">
             <Image
-              src={driver.carPhotoUrl}
+              src={driver.carPhotoFrontUrl}
               alt={driver.carModel}
               fill
               className="object-cover cursor-pointer"
               data-ai-hint="car side"
-              onClick={() => onImageClick(driver.carPhotoUrl)}
+              onClick={() => onImageClick(driver.carPhotoFrontUrl)}
             />
              {ride.approvedAt && (
                 <Badge variant="secondary" className="absolute bottom-2 right-2">

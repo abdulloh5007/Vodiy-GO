@@ -101,12 +101,12 @@ export default function RideApplicationDetailPage() {
                     <CardContent className="grid md:grid-cols-2 gap-8 pt-6">
                         <div>
                             <Image 
-                                src={driver.carPhotoUrl} 
+                                src={driver.carPhotoFrontUrl} 
                                 alt={driver.carModel}
                                 width={500}
                                 height={300}
                                 className="rounded-lg object-cover w-full cursor-pointer"
-                                onClick={() => setSelectedImage(driver.carPhotoUrl)}
+                                onClick={() => setSelectedImage(driver.carPhotoFrontUrl)}
                                 data-ai-hint="car side"
                             />
                              {ride.info && <p className="text-sm text-muted-foreground border-t pt-4 mt-4">{ride.info}</p>}
