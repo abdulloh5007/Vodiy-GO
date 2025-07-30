@@ -18,7 +18,7 @@ export type Driver = {
   
   carModel: string;
   carNumber: string;
- 
+
   carPhotoFrontUrl: string;
   carPhotoBackUrl: string;
   carPhotoLeftUrl: string;
