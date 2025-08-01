@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useContext, useMemo, useEffect } from 'react';
+import { useContext, useMemo, useEffect, useState } from 'react';
 import { AppContext } from '@/contexts/AppContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -10,8 +10,10 @@ import { Badge } from '@/components/ui/badge';
 import { Order, Ride, Driver } from '@/lib/types';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { format } from 'date-fns';
+import { format, Locale } from 'date-fns';
 import { enUS, ru, uz } from 'date-fns/locale';
+import { cn } from '@/lib/utils';
+
 
 function MyOrdersSkeleton() {
     return (
@@ -24,12 +26,17 @@ function MyOrdersSkeleton() {
                 {[...Array(3)].map((_, i) => (
                     <Card key={i}>
                         <CardHeader>
-                            <Skeleton className="h-6 w-3/4 mb-2" />
-                            <Skeleton className="h-4 w-1/2" />
+                            <Skeleton className="h-48 w-full rounded-md mb-2" />
+                            <div className="grid grid-cols-4 gap-2">
+                                <Skeleton className="h-12 w-full rounded" />
+                                <Skeleton className="h-12 w-full rounded" />
+                                <Skeleton className="h-12 w-full rounded" />
+                                <Skeleton className="h-12 w-full rounded" />
+                            </div>
                         </CardHeader>
-                        <CardContent className="space-y-4">
+                        <CardContent className="space-y-4 pt-4">
+                             <Skeleton className="h-6 w-3/4 mb-2" />
                             <div className="flex items-center gap-4">
-                                <Skeleton className="h-16 w-16 rounded-full" />
                                 <div className="space-y-2">
                                     <Skeleton className="h-4 w-24" />
                                     <Skeleton className="h-4 w-32" />
@@ -56,7 +63,16 @@ const OrderStatusBadge = ({ status, t }: { status: Order['status'], t: any }) =>
 }
 
 
-const OrderCard = ({ order, ride, driver, t, getLocale }: { order: Order, ride?: Ride, driver?: Driver, t: any, getLocale: () => Locale }) => {
+const OrderCard = ({ order, ride, driver, t, getLocale, setSelectedImage }: { order: Order, ride?: Ride, driver?: Driver, t: any, getLocale: () => Locale, setSelectedImage: (url: string) => void }) => {
+    
+    const [mainImageUrl, setMainImageUrl] = useState(driver?.carPhotoFrontUrl || 'https://placehold.co/600x400.png');
+    
+    useEffect(() => {
+        if(driver?.carPhotoFrontUrl) {
+            setMainImageUrl(driver.carPhotoFrontUrl);
+        }
+    }, [driver]);
+
     if (!ride || !driver) {
         return (
             <Card>
@@ -66,22 +82,63 @@ const OrderCard = ({ order, ride, driver, t, getLocale }: { order: Order, ride?:
             </Card>
         );
     }
+    
+    const carImages = [
+        { src: driver.carPhotoFrontUrl, hint: "car front" },
+        { src: driver.carPhotoBackUrl, hint: "car rear" },
+        { src: driver.carPhotoLeftUrl, hint: "car side" },
+        { src: driver.carPhotoRightUrl, hint: "car side" }
+    ];
+
     return (
-        <Card>
-            <CardHeader>
+        <Card className="flex flex-col">
+            <CardHeader className="p-2">
+                <div 
+                    className="relative aspect-video w-full rounded-md overflow-hidden cursor-pointer"
+                    onClick={() => setSelectedImage(mainImageUrl)}
+                >
+                     <Image
+                        src={mainImageUrl}
+                        alt="Main car view"
+                        fill
+                        className="object-cover transition-transform duration-300 hover:scale-105"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    />
+                </div>
+                <div className="grid grid-cols-4 gap-2 mt-2">
+                    {carImages.map((img, index) => (
+                        <div 
+                            key={index}
+                            className={cn(
+                                "relative aspect-video w-full rounded-sm overflow-hidden cursor-pointer border-2",
+                                mainImageUrl === img.src ? "border-primary" : "border-transparent"
+                            )}
+                            onClick={() => setMainImageUrl(img.src)}
+                        >
+                            <Image
+                                src={img.src}
+                                alt={`Car view ${index + 1}`}
+                                fill
+                                className="object-cover"
+                                sizes="25vw"
+                                data-ai-hint={img.hint}
+                            />
+                        </div>
+                    ))}
+                </div>
+            </CardHeader>
+            <CardContent className="space-y-3 p-4 flex-grow">
                 <CardTitle className='flex items-center gap-2 text-lg'>{ride.from} &rarr; {ride.to}</CardTitle>
                 <CardDescription className='flex items-center gap-1 text-sm'>
                     <Clock className="h-4 w-4" />
                     {order.createdAt ? format(order.createdAt.seconds * 1000, 'PPP, HH:mm', { locale: getLocale() }) : t.loading }
                 </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 pt-2">
                     <Image
-                        src={driver.carPhotoUrl || 'https://placehold.co/64x64.png'}
+                        src={driver.selfieUrl || 'https://placehold.co/64x64.png'}
                         alt={driver.name}
-                        width={64}
-                        height={64}
+                        width={48}
+                        height={48}
                         className="rounded-full object-cover aspect-square"
                         data-ai-hint="driver portrait"
                     />
@@ -107,7 +164,7 @@ export default function PassengerOrdersPage() {
         throw new Error('PassengerOrdersPage must be used within an AppProvider');
     }
 
-    const { user, rides, orders, drivers, loading, translations: t, language } = context;
+    const { user, rides, orders, drivers, loading, translations: t, language, setSelectedImage } = context;
 
     const myOrders = useMemo(() => {
         if (!user) return [];
@@ -145,7 +202,15 @@ export default function PassengerOrdersPage() {
                         const ride = rides.find(r => r.id === order.rideId);
                         const driver = ride ? drivers.find(d => d.id === ride.driverId) : undefined;
                         return (
-                            <OrderCard key={order.id} order={order} ride={ride} driver={driver} t={t} getLocale={getLocale}/>
+                            <OrderCard 
+                                key={order.id} 
+                                order={order} 
+                                ride={ride} 
+                                driver={driver} 
+                                t={t} 
+                                getLocale={getLocale} 
+                                setSelectedImage={setSelectedImage}
+                            />
                         )
                     })}
                  </div>
