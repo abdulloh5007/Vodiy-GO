@@ -493,14 +493,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       throw new Error("registration/phone-exists");
     }
 
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
     const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
 
     const newRequest: Omit<UserRegistrationRequest, 'id'> = {
       name,
       phone,
-      hashedPassword,
       verificationCode,
       status: 'pending',
       createdAt: serverTimestamp(),
@@ -528,10 +525,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const requestData = requestDoc.data() as UserRegistrationRequest;
     
     // We use a fake email for Firebase Auth, as we are phone-based.
-    const fakeEmail = `${phone}@vodiygo.app`;
+    const fakeEmail = `${phone.replace(/\D/g, '')}@vodiygo.app`;
     
-    // Note: We cannot "login with hash", so we create a new user. The admin flow ensures this is safe.
-    // In a real-world scenario with a custom backend, you'd use the stored hash. Here we use the code as a temp password.
+    // We use the verification code as a temporary password to create the user.
+    // In a real production app, you might force a password reset on first login.
     const userCredential = await createUserWithEmailAndPassword(auth, fakeEmail, `P@ssw0rd${code}`);
     const firebaseUser = userCredential.user;
 
@@ -547,6 +544,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
     // Clean up the request
     await deleteDoc(doc(db, "userRegistrationRequests", requestDoc.id));
+    
+    // Automatically log in the user after successful verification
+    await signInWithEmailAndPassword(auth, fakeEmail, `P@ssw0rd${code}`);
 
     return firebaseUser;
   };

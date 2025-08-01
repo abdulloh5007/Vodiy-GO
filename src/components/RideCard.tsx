@@ -166,9 +166,9 @@ export function RideCard({ ride, onImageClick }: RideCardProps) {
               <DialogTitle>{t.register_passenger_title || 'Register as Passenger'}</DialogTitle>
               <DialogDescription>{t.register_passenger_desc || 'Create an account to book rides.'}</DialogDescription>
           </DialogHeader>
-          <AuthForm onAuthSuccess={() => {
+          <AuthForm onAuthSuccess={(phone) => {
               setIsAuthModalOpen(false);
-              router.push(`/verify-user?phone=${encodeURIComponent(sessionStorage.getItem('pending_verification_phone') || '')}`);
+              router.push(`/verify-user?phone=${encodeURIComponent(phone)}`);
           }} />
         </DialogContent>
       </Dialog>
@@ -177,7 +177,7 @@ export function RideCard({ ride, onImageClick }: RideCardProps) {
 }
 
 
-function AuthForm({ onAuthSuccess }: { onAuthSuccess: () => void }) {
+function AuthForm({ onAuthSuccess }: { onAuthSuccess: (phone: string) => void }) {
     const context = useContext(AppContext);
     const { toast } = useToast();
     const router = useRouter();
@@ -205,11 +205,13 @@ function AuthForm({ onAuthSuccess }: { onAuthSuccess: () => void }) {
                 setIsSubmitting(false);
                 return;
             }
-            // Store phone in session storage to retrieve on verification page
-            sessionStorage.setItem('pending_verification_phone', phone);
             await requestUserRegistration(name, phone, password);
-            toast({ title: t.registration_request_sent_title || "Request Sent!", description: t.registration_request_sent_desc || "Your registration request has been sent. Please wait for the admin to provide a verification code." });
-            onAuthSuccess();
+            toast({ 
+                title: t.registration_request_sent_title || "Request Sent!", 
+                description: (t.registration_request_sent_desc || "Admin will send a code to {phone} via SMS.").replace('{phone}', phone),
+                duration: 10000 
+            });
+            onAuthSuccess(phone);
         } catch (error: any) {
             let errorMessage = t.unknownError;
              if (error.message.startsWith('registration/')) {

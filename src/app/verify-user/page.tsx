@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useContext, useEffect, useRef } from 'react';
+import { useState, useContext, useEffect, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { AppContext } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
@@ -9,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from 'lucide-react';
 import { CustomOtpInput } from '@/components/CustomOtpInput';
 
-export default function VerifyUserPage() {
+function VerifyUserComponent() {
   const context = useContext(AppContext);
   const { toast } = useToast();
   const router = useRouter();
@@ -88,7 +88,9 @@ export default function VerifyUserPage() {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="font-headline text-2xl">{t.verify_account_title || "Verify Your Account"}</CardTitle>
-          <CardDescription>{t.verify_account_desc || "Enter the 6-digit code sent by the administrator."}</CardDescription>
+          <CardDescription>
+            {(t.verify_account_desc || "Enter the 6-digit code sent by the administrator to {phone}.").replace('{phone}', phone)}
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-8">
@@ -108,4 +110,13 @@ export default function VerifyUserPage() {
       </Card>
     </div>
   );
+}
+
+
+export default function VerifyUserPage() {
+    return (
+        <Suspense fallback={<div className="flex h-screen w-full items-center justify-center"><Loader2 className="h-12 w-12 animate-spin text-primary" /></div>}>
+            <VerifyUserComponent />
+        </Suspense>
+    )
 }

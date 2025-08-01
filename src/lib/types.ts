@@ -88,7 +88,6 @@ export type UserRegistrationRequest = {
     id: string;
     name: string;
     phone: string;
-    hashedPassword?: string; // Stored on server, not sent to client
     verificationCode: string;
     status: 'pending';
     createdAt: any;
