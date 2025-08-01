@@ -35,7 +35,7 @@ export function Header() {
     )
   }
 
-  const { translations, user, logout, loading, drivers, rides, orders } = context;
+  const { translations, user, logout, loading, drivers, rides, userRegistrationRequests } = context;
   const t = translations;
   
   const driverProfile = useMemo(() => {
@@ -53,6 +53,12 @@ export function Header() {
     return drivers.filter(d => d.status === 'pending').length;
   }, [user, drivers]);
   
+  const newUserApplicationsCount = useMemo(() => {
+     if (user?.role !== 'admin') return 0;
+    return userRegistrationRequests.length;
+  }, [user, userRegistrationRequests]);
+
+
   const handleLogout = async () => {
     setIsSheetOpen(false);
     await logout();
@@ -68,8 +74,9 @@ export function Header() {
   }
 
   const adminLinks = [
-    { href: '/admin', label: t.registrationApplications, icon: UserCog, badge: newDriverApplicationsCount },
+    { href: '/admin', label: t.registrationApplications, icon: FileText, badge: newDriverApplicationsCount },
     { href: '/admin/ride-applications', label: t.rideApplications, icon: PackageCheck, badge: newRideApplicationsCount },
+    { href: '/admin/user-applications', label: t.user_applications_title || 'User Applications', icon: UserCog, badge: newUserApplicationsCount },
     { href: '/admin/drivers', label: t.drivers_title || 'Drivers', icon: Car },
     { href: '/admin/users', label: t.users_title || 'Users', icon: Users },
     { href: '/admin/promocodes', label: t.promo_codes_title || 'Promo Codes', icon: Ticket },
@@ -84,7 +91,7 @@ export function Header() {
      <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
       <SheetTrigger asChild>
         <Button variant="ghost" size="icon" className="relative">
-           {(newDriverApplicationsCount + newRideApplicationsCount > 0) && <Badge variant="destructive" className="absolute top-1 right-1 h-3 w-3 p-0 animate-pulse" />}
+           {(newDriverApplicationsCount + newRideApplicationsCount + newUserApplicationsCount > 0) && <Badge variant="destructive" className="absolute top-1 right-1 h-3 w-3 p-0 animate-pulse" />}
           <Menu className="h-6 w-6" />
         </Button>
       </SheetTrigger>

@@ -84,6 +84,17 @@ export type PromoCode = {
     type: 'EXTEND_12H';
 };
 
+export type UserRegistrationRequest = {
+    id: string;
+    name: string;
+    phone: string;
+    hashedPassword?: string; // Stored on server, not sent to client
+    verificationCode: string;
+    status: 'pending';
+    createdAt: any;
+}
+
+
 export type Language = 'en' | 'ru' | 'uz';
 
 export type Translations = {

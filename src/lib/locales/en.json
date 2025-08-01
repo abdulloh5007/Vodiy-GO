@@ -1,5 +1,4 @@
 
-
 {
     "home": "Home",
     "login": "Login",
@@ -46,7 +45,7 @@
     "updateApplication": "Update Application",
     "applicationSubmitted": "Application Submitted!",
     "weWillReviewYourApplication": "We will review your application and get back to you soon.",
-    "registrationApplications": "Registration Applications",
+    "registrationApplications": "Driver Applications",
     "noPendingApplications": "No pending applications at the moment.",
     "applicant": "Applicant",
     "status": "Status",
@@ -68,7 +67,7 @@
     "validationErrorTitle": "Validation Error",
     "validationErrorDesc": "Please enter email and password.",
     "validationErrorDescBooking": "Please fill in all required fields.",
-    "validationErrorDescRegister": "Please enter a valid name, email, phone and a password of at least 6 characters.",
+    "validationErrorDescRegister": "Please enter a valid name, phone and a password of at least 6 characters.",
     "loginSuccessTitle": "Login Successful",
     "registrationSuccessTitle": "Registration Successful",
     "redirecting": "Redirecting...",
@@ -327,7 +326,24 @@
     "tech_passport_back": "Tech Passport (back)",
     "allPhotosRequired": "All photos are required for submission.",
     "personal_documents": "Personal Documents",
-    "car_photos": "Car Photos"
+    "car_photos": "Car Photos",
+    "register_passenger_title": "Register as Passenger",
+    "register_passenger_desc": "Create an account to book rides.",
+    "registration_request_sent_title": "Request Sent!",
+    "registration_request_sent_desc": "Your registration request has been sent. Please wait for the admin to provide a verification code.",
+    "registration_phone-exists": "A user with this phone number has already requested registration.",
+    "verify_account_title": "Verify Your Account",
+    "verify_account_desc": "Enter the 6-digit code sent by the administrator.",
+    "verify_button": "Verify & Register",
+    "verify_code_length_error": "Please enter the 6-digit code.",
+    "verification_not-found": "Registration request not found. Please try registering again.",
+    "verification_invalid-code": "The code you entered is incorrect. Please try again.",
+    "user_applications_title": "User Applications",
+    "user_applications_desc": "Pending user registration requests.",
+    "no_user_applications": "No pending user applications.",
+    "applicant_name": "Name",
+    "applicant_phone": "Phone",
+    "verification_code": "Verification Code",
+    "code_copied_desc": "Verification code {code} copied to clipboard.",
+    "delete_request_confirm_desc": "This will permanently delete the registration request."
 }
-
-    

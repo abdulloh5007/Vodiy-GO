@@ -1,5 +1,4 @@
 
-
 {
     "home": "Bosh sahifa",
     "login": "Kirish",
@@ -46,7 +45,7 @@
     "updateApplication": "Arizani yangilash",
     "applicationSubmitted": "Ariza yuborildi!",
     "weWillReviewYourApplication": "Arizangizni ko'rib chiqib, tez orada siz bilan bog'lanamiz.",
-    "registrationApplications": "Ro'yxatdan o'tish arizalari",
+    "registrationApplications": "Haydovchi arizalari",
     "noPendingApplications": "Hozirda kutilayotgan arizalar yo'q.",
     "applicant": "Ariza beruvchi",
     "status": "Holati",
@@ -68,7 +67,7 @@
     "validationErrorTitle": "Validatsiya xatosi",
     "validationErrorDesc": "Iltimos, email va parolni kiriting.",
     "validationErrorDescBooking": "Iltimos, barcha kerakli maydonlarni to'ldiring.",
-    "validationErrorDescRegister": "Iltimos, to'g'ri ism, email, telefon raqam va kamida 6 belgidan iborat parolni kiriting.",
+    "validationErrorDescRegister": "Iltimos, to'g'ri ism, telefon raqam va kamida 6 belgidan iborat parolni kiriting.",
     "loginSuccessTitle": "Muvaffaqiyatli kirish",
     "registrationSuccessTitle": "Muvaffaqiyatli ro'yxatdan o'tish",
     "redirecting": "Yo'naltirilmoqda...",
@@ -327,7 +326,24 @@
     "tech_passport_back": "Tex. pasport (orqa tomoni)",
     "allPhotosRequired": "Arizani topshirish uchun barcha fotosuratlar talab qilinadi.",
     "personal_documents": "Shaxsiy hujjatlar",
-    "car_photos": "Avtomobil rasmlari"
+    "car_photos": "Avtomobil rasmlari",
+    "register_passenger_title": "Yo'lovchi sifatida ro'yxatdan o'tish",
+    "register_passenger_desc": "Qatnovlarni band qilish uchun hisob yarating.",
+    "registration_request_sent_title": "So'rov yuborildi!",
+    "registration_request_sent_desc": "Ro'yxatdan o'tish so'rovingiz yuborildi. Iltimos, administrator tasdiqlash kodini taqdim etishini kuting.",
+    "registration_phone-exists": "Ushbu telefon raqami bilan foydalanuvchi allaqachon ro'yxatdan o'tishni so'ragan.",
+    "verify_account_title": "Hisobingizni tasdiqlang",
+    "verify_account_desc": "Administrator tomonidan yuborilgan 6 xonali kodni kiriting.",
+    "verify_button": "Tasdiqlash va ro'yxatdan o'tish",
+    "verify_code_length_error": "Iltimos, 6 xonali kodni kiriting.",
+    "verification_not-found": "Ro'yxatdan o'tish so'rovi topilmadi. Iltimos, qaytadan ro'yxatdan o'tishga harakat qiling.",
+    "verification_invalid-code": "Siz kiritgan kod noto'g'ri. Iltimos, qayta urinib ko'ring.",
+    "user_applications_title": "Foydalanuvchi arizalari",
+    "user_applications_desc": "Kutilayotgan foydalanuvchi ro'yxatdan o'tish so'rovlari.",
+    "no_user_applications": "Kutilayotgan foydalanuvchi arizalari yo'q.",
+    "applicant_name": "Ism",
+    "applicant_phone": "Telefon",
+    "verification_code": "Tasdiqlash kodi",
+    "code_copied_desc": "Tasdiqlash kodi {code} vaqtinchalik xotiraga nusxalandi.",
+    "delete_request_confirm_desc": "Bu harakat ro'yxatdan o'tish so'rovini butunlay o'chirib tashlaydi."
 }
-
-    

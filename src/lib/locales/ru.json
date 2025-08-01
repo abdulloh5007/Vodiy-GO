@@ -1,5 +1,4 @@
 
-
 {
     "home": "Главная",
     "login": "Вход",
@@ -46,7 +45,7 @@
     "updateApplication": "Обновить заявку",
     "applicationSubmitted": "Заявка отправлена!",
     "weWillReviewYourApplication": "Мы рассмотрим вашу заявку и скоро свяжемся с вами.",
-    "registrationApplications": "Заявки на регистрацию",
+    "registrationApplications": "Заявки на регистрацию (Водители)",
     "noPendingApplications": "На данный момент нет ожидающих заявок.",
     "applicant": "Кандидат",
     "status": "Статус",
@@ -68,7 +67,7 @@
     "validationErrorTitle": "Ошибка валидации",
     "validationErrorDesc": "Пожалуйста, введите почту и пароль.",
     "validationErrorDescBooking": "Пожалуйста, заполните все обязательные поля.",
-    "validationErrorDescRegister": "Пожалуйста, введите действительные имя, почту, телефон и пароль не менее 6 символов.",
+    "validationErrorDescRegister": "Пожалуйста, введите действительные имя, телефон и пароль не менее 6 символов.",
     "loginSuccessTitle": "Вход выполнен успешно",
     "registrationSuccessTitle": "Регистрация прошла успешно",
     "redirecting": "Перенаправление...",
@@ -327,7 +326,24 @@
     "tech_passport_back": "Техпаспорт (обратная сторона)",
     "allPhotosRequired": "Для подачи заявки требуются все фотографии.",
     "personal_documents": "Личные документы",
-    "car_photos": "Фотографии машины"
+    "car_photos": "Фотографии машины",
+    "register_passenger_title": "Регистрация пассажира",
+    "register_passenger_desc": "Создайте аккаунт, чтобы бронировать поездки.",
+    "registration_request_sent_title": "Запрос отправлен!",
+    "registration_request_sent_desc": "Ваш запрос на регистрацию отправлен. Пожалуйста, дождитесь, пока администратор предоставит код подтверждения.",
+    "registration_phone-exists": "Пользователь с таким номером телефона уже запросил регистрацию.",
+    "verify_account_title": "Подтвердите свой аккаунт",
+    "verify_account_desc": "Введите 6-значный код, отправленный администратором.",
+    "verify_button": "Подтвердить и зарегистрироваться",
+    "verify_code_length_error": "Пожалуйста, введите 6-значный код.",
+    "verification_not-found": "Запрос на регистрацию не найден. Пожалуйста, попробуйте зарегистрироваться снова.",
+    "verification_invalid-code": "Введенный вами код неверен. Пожалуйста, попробуйте еще раз.",
+    "user_applications_title": "Заявки пользователей",
+    "user_applications_desc": "Ожидающие запросы на регистрацию пользователей.",
+    "no_user_applications": "Нет ожидающих заявок от пользователей.",
+    "applicant_name": "Имя",
+    "applicant_phone": "Телефон",
+    "verification_code": "Код подтверждения",
+    "code_copied_desc": "Код подтверждения {code} скопирован в буфер обмена.",
+    "delete_request_confirm_desc": "Это действие навсегда удалит запрос на регистрацию."
 }
-
-    

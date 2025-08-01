@@ -3,7 +3,7 @@
 'use client';
 
 import React from 'react';
-import { Driver, Ride, Order, Language, Translations, User, DriverApplicationData, PromoCode, Message } from '@/lib/types';
+import { Driver, Ride, Order, Language, Translations, User, DriverApplicationData, PromoCode, Message, UserRegistrationRequest } from '@/lib/types';
 import { User as FirebaseAuthUser } from 'firebase/auth';
 
 interface AppContextType {
@@ -17,6 +17,8 @@ interface AppContextType {
   orders: Order[];
   promoCodes: PromoCode[];
   messages: Message[];
+  userRegistrationRequests: UserRegistrationRequest[];
+  deleteUserRegistrationRequest: (id: string) => Promise<void>;
   createPromoCode: (limit: number, validityHours: number) => Promise<void>;
   checkPromoCode: (code: string, driverId: string) => Promise<PromoCode>;
   addDriverApplication: (driver: DriverApplicationData) => Promise<void>;
@@ -28,7 +30,8 @@ interface AppContextType {
   addRide: (ride: Omit<Ride, 'id' | 'createdAt' | 'status' | 'approvedAt' | 'availableSeats'>) => void;
   addOrder: (order: Omit<Order, 'id' | 'status' | 'createdAt'>) => void;
   login: (email: string, password: string, role?: 'admin' | 'driver' | 'passenger') => Promise<FirebaseAuthUser>;
-  register: (email: string, password: string, name: string, role: 'passenger' | 'driver', phone?: string) => Promise<FirebaseAuthUser>;
+  requestUserRegistration: (name: string, phone: string, password: string) => Promise<void>;
+  verifyUser: (phone: string, code: string) => Promise<FirebaseAuthUser>;
   logout: () => void;
   loading: boolean;
   selectedImage: string | null;
@@ -36,4 +39,3 @@ interface AppContextType {
 }
 
 export const AppContext = React.createContext<AppContextType | null>(null);
-
