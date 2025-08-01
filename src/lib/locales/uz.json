@@ -345,5 +345,7 @@
     "applicant_phone": "Telefon",
     "verification_code": "Tasdiqlash kodi",
     "code_copied_desc": "Tasdiqlash kodi {code} vaqtinchalik xotiraga nusxalandi.",
-    "delete_request_confirm_desc": "Bu harakat ro'yxatdan o'tish so'rovini butunlay o'chirib tashlaydi."
+    "delete_request_confirm_desc": "Bu harakat ro'yxatdan o'tish so'rovini butunlay o'chirib tashlaydi.",
+    "backToProfile": "Profilga qaytish"
 }
+

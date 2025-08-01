@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, ArrowLeft, UploadCloud, X, ArrowRight, CheckCircle2, ShieldX, ShieldAlert, Ban, User as UserIcon } from 'lucide-react';
+import { Loader2, ArrowLeft, UploadCloud, X, ArrowRight, CheckCircle2, ShieldX, ShieldAlert, Ban, User as UserIcon, FileText, Car, FileBadge } from 'lucide-react';
 import { formatCarNumber } from '@/lib/utils';
 import { Progress } from '@/components/ui/progress';
 import Image from 'next/image';
@@ -396,7 +396,8 @@ export default function DriverDiagnosticsPage() {
 
 
 const DriverStatusPage = ({ driverProfile, t, deleteDriver }: { driverProfile: Driver, t: any, deleteDriver: (id: string) => Promise<void>}) => {
-    
+    const router = useRouter();
+
     const getStatusContent = () => {
         const remainingAttempts = 3 - driverProfile.rejectionCount;
 
@@ -410,12 +411,33 @@ const DriverStatusPage = ({ driverProfile, t, deleteDriver }: { driverProfile: D
                     actionButton: null,
                 };
             case 'verified':
+                const completedSteps = [
+                    { title: t.step1_title || "Step 1: Personal Information", icon: FileText },
+                    { title: t.step2_title || "Step 2: Car Information", icon: Car },
+                    { title: t.step3_title || "Step 3: Car Documents", icon: FileBadge },
+                    { title: t.statusPage_verified_title || "Application Verified!", icon: ShieldCheck },
+                ];
                 return {
                      icon: <CheckCircle2 className="h-16 w-16 text-green-500" />,
                      title: t.diagnostics_complete_title || "Diagnostics Complete",
                      description: t.diagnostics_complete_desc || "Your profile is verified. You can now publish and manage rides.",
                      rejectionReason: null,
-                     actionButton: null,
+                     actionButton: (
+                        <div className="w-full space-y-3">
+                           <div className="space-y-2">
+                            {completedSteps.map((step, index) => (
+                                <Button key={index} variant="secondary" className="w-full justify-start cursor-default" disabled>
+                                    <CheckCircle2 className="mr-2 h-5 w-5 text-green-500"/>
+                                    <span>{step.title}</span>
+                                </Button>
+                            ))}
+                           </div>
+                           <Button className="w-full" onClick={() => router.push('/driver/profile')}>
+                                <ArrowLeft className="mr-2 h-4 w-4"/>
+                                {t.backToProfile || 'Back to Profile'}
+                            </Button>
+                        </div>
+                     )
                 };
             case 'rejected':
                 return {
@@ -484,3 +506,4 @@ const DriverStatusPage = ({ driverProfile, t, deleteDriver }: { driverProfile: D
 }
 
     
+

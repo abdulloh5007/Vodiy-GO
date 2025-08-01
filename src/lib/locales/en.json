@@ -345,5 +345,7 @@
     "applicant_phone": "Phone",
     "verification_code": "Verification Code",
     "code_copied_desc": "Verification code {code} copied to clipboard.",
-    "delete_request_confirm_desc": "This will permanently delete the registration request."
+    "delete_request_confirm_desc": "This will permanently delete the registration request.",
+    "backToProfile": "Back to Profile"
 }
+

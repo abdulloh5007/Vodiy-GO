@@ -345,5 +345,7 @@
     "applicant_phone": "Телефон",
     "verification_code": "Код подтверждения",
     "code_copied_desc": "Код подтверждения {code} скопирован в буфер обмена.",
-    "delete_request_confirm_desc": "Это действие навсегда удалит запрос на регистрацию."
+    "delete_request_confirm_desc": "Это действие навсегда удалит запрос на регистрацию.",
+    "backToProfile": "Вернуться в профиль"
 }
+
