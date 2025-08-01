@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, ArrowLeft, UploadCloud, X, ArrowRight, CheckCircle2, ShieldX, ShieldAlert, Ban, User as UserIcon, FileText, Car, FileBadge } from 'lucide-react';
+import { Loader2, ArrowLeft, UploadCloud, X, ArrowRight, CheckCircle2, ShieldX, ShieldAlert, Ban, User as UserIcon, FileText, Car, FileBadge, ShieldCheck } from 'lucide-react';
 import { formatCarNumber } from '@/lib/utils';
 import { Progress } from '@/components/ui/progress';
 import Image from 'next/image';
@@ -506,4 +506,5 @@ const DriverStatusPage = ({ driverProfile, t, deleteDriver }: { driverProfile: D
 }
 
     
+
 
