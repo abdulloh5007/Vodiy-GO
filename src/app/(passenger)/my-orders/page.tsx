@@ -78,7 +78,7 @@ const OrderCard = ({ order, ride, driver, t, getLocale }: { order: Order, ride?:
             <CardContent className="space-y-3">
                 <div className="flex items-center gap-3">
                     <Image
-                        src={driver.carPhotoUrl}
+                        src={driver.carPhotoUrl || 'https://placehold.co/64x64.png'}
                         alt={driver.name}
                         width={64}
                         height={64}
