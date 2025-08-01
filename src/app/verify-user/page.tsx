@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useContext, useEffect, useRef } from 'react';
@@ -6,15 +5,9 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { AppContext } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from 'lucide-react';
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSlot,
-} from "@/components/ui/input-otp"
+import { CustomOtpInput } from '@/components/CustomOtpInput';
 
 export default function VerifyUserPage() {
   const context = useContext(AppContext);
@@ -100,16 +93,11 @@ export default function VerifyUserPage() {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-8">
             <div className="space-y-2 flex flex-col items-center">
-                <InputOTP maxLength={6} value={code} onChange={(value) => setCode(value)}>
-                    <InputOTPGroup>
-                        <InputOTPSlot index={0} />
-                        <InputOTPSlot index={1} />
-                        <InputOTPSlot index={2} />
-                        <InputOTPSlot index={3} />
-                        <InputOTPSlot index={4} />
-                        <InputOTPSlot index={5} />
-                    </InputOTPGroup>
-                </InputOTP>
+                <CustomOtpInput
+                    value={code}
+                    onChange={setCode}
+                    numInputs={6}
+                />
             </div>
             <Button type="submit" className="w-full" disabled={isSubmitting || code.length < 6}>
                 {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
