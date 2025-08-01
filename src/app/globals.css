@@ -2,6 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Styles for input-otp to prevent autofill issues */
+[data-input-otp] {
+  letter-spacing: normal !important;
+  font-family: monospace !important;
+}
+[data-input-otp]:autofill {
+  background: transparent !important;
+  color: transparent !important;
+  border-color: transparent !important;
+  opacity: 0 !important;
+  box-shadow: none !important;
+  -webkit-box-shadow: none !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
 body {
   font-family: 'PT Sans', sans-serif;
 }

@@ -18,6 +18,7 @@ const InputOTP = React.forwardRef<
       containerClassName
     )}
     className={cn("disabled:cursor-not-allowed", className)}
+    unstable_styles_injection={false}
     {...props}
   />
 ))
