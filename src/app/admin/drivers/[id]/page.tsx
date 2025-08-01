@@ -74,7 +74,7 @@ const StatusBadge = ({ status, t }: { status: Driver['status'], t: any }) => {
         },
         pending: {
             label: t.pending || "Pending",
-            icon: <BadgeAlert className="h-5 w-5 mr-2 text-yellow-500"/>,
+            icon: <BadgeAlert className="h-5 w-5 mr-2 text-yellow-500"/>, 
             variant: "default"
         },
         rejected: {
