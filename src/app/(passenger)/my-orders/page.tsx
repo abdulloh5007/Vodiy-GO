@@ -25,16 +25,10 @@ function MyOrdersSkeleton() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {[...Array(3)].map((_, i) => (
                     <Card key={i}>
-                        <CardHeader>
-                            <Skeleton className="h-48 w-full rounded-md mb-2" />
-                            <div className="grid grid-cols-4 gap-2">
-                                <Skeleton className="h-12 w-full rounded" />
-                                <Skeleton className="h-12 w-full rounded" />
-                                <Skeleton className="h-12 w-full rounded" />
-                                <Skeleton className="h-12 w-full rounded" />
-                            </div>
+                        <CardHeader className="p-0">
+                           <Skeleton className="h-48 w-full" />
                         </CardHeader>
-                        <CardContent className="space-y-4 pt-4">
+                        <CardContent className="space-y-4 pt-4 p-4">
                              <Skeleton className="h-6 w-3/4 mb-2" />
                             <div className="flex items-center gap-4">
                                 <div className="space-y-2">
@@ -65,14 +59,6 @@ const OrderStatusBadge = ({ status, t }: { status: Order['status'], t: any }) =>
 
 const OrderCard = ({ order, ride, driver, t, getLocale, setSelectedImage }: { order: Order, ride?: Ride, driver?: Driver, t: any, getLocale: () => Locale, setSelectedImage: (url: string) => void }) => {
     
-    const [mainImageUrl, setMainImageUrl] = useState(driver?.carPhotoFrontUrl || 'https://placehold.co/600x400.png');
-    
-    useEffect(() => {
-        if(driver?.carPhotoFrontUrl) {
-            setMainImageUrl(driver.carPhotoFrontUrl);
-        }
-    }, [driver]);
-
     if (!ride || !driver) {
         return (
             <Card>
@@ -83,48 +69,23 @@ const OrderCard = ({ order, ride, driver, t, getLocale, setSelectedImage }: { or
         );
     }
     
-    const carImages = [
-        { src: driver.carPhotoFrontUrl, hint: "car front" },
-        { src: driver.carPhotoBackUrl, hint: "car rear" },
-        { src: driver.carPhotoLeftUrl, hint: "car side" },
-        { src: driver.carPhotoRightUrl, hint: "car side" }
-    ];
+    const mainImageUrl = driver.carPhotoFrontUrl || 'https://placehold.co/600x400.png';
 
     return (
         <Card className="flex flex-col">
-            <CardHeader className="p-2">
+            <CardHeader className="p-0">
                 <div 
-                    className="relative aspect-video w-full rounded-md overflow-hidden cursor-pointer"
+                    className="relative aspect-video w-full rounded-t-lg overflow-hidden cursor-pointer"
                     onClick={() => setSelectedImage(mainImageUrl)}
                 >
                      <Image
                         src={mainImageUrl}
-                        alt="Main car view"
+                        alt="Car front view"
                         fill
                         className="object-cover transition-transform duration-300 hover:scale-105"
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        data-ai-hint="car front"
                     />
-                </div>
-                <div className="grid grid-cols-4 gap-2 mt-2">
-                    {carImages.map((img, index) => (
-                        <div 
-                            key={index}
-                            className={cn(
-                                "relative aspect-video w-full rounded-sm overflow-hidden cursor-pointer border-2",
-                                mainImageUrl === img.src ? "border-primary" : "border-transparent"
-                            )}
-                            onClick={() => setMainImageUrl(img.src)}
-                        >
-                            <Image
-                                src={img.src}
-                                alt={`Car view ${index + 1}`}
-                                fill
-                                className="object-cover"
-                                sizes="25vw"
-                                data-ai-hint={img.hint}
-                            />
-                        </div>
-                    ))}
                 </div>
             </CardHeader>
             <CardContent className="space-y-3 p-4 flex-grow">
@@ -133,19 +94,9 @@ const OrderCard = ({ order, ride, driver, t, getLocale, setSelectedImage }: { or
                     <Clock className="h-4 w-4" />
                     {order.createdAt ? format(order.createdAt.seconds * 1000, 'PPP, HH:mm', { locale: getLocale() }) : t.loading }
                 </CardDescription>
-                <div className="flex items-center gap-3 pt-2">
-                    <Image
-                        src={driver.selfieUrl || 'https://placehold.co/64x64.png'}
-                        alt={driver.name}
-                        width={48}
-                        height={48}
-                        className="rounded-full object-cover aspect-square"
-                        data-ai-hint="driver portrait"
-                    />
-                    <div>
-                        <p className="font-semibold flex items-center gap-2"><User className="h-4 w-4 text-muted-foreground" />{driver.name}</p>
-                        <p className="text-sm text-muted-foreground flex items-center gap-2"><Car className="h-4 w-4" />{driver.carModel}</p>
-                    </div>
+                <div className="space-y-1 pt-2">
+                    <p className="font-semibold flex items-center gap-2"><User className="h-4 w-4 text-muted-foreground" />{driver.name}</p>
+                    <p className="text-sm text-muted-foreground flex items-center gap-2"><Car className="h-4 w-4" />{driver.carModel}</p>
                 </div>
                  <div className="pt-3">
                     <OrderStatusBadge status={order.status} t={t} />
