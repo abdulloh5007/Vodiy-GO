@@ -68,14 +68,14 @@
     "validationErrorTitle": "Validatsiya xatosi",
     "validationErrorDesc": "Iltimos, email va parolni kiriting.",
     "validationErrorDescBooking": "Iltimos, barcha kerakli maydonlarni to'ldiring.",
-    "validationErrorDescRegister": "Iltimos, to'g'ri ism, telefon raqam va kamida 6 belgidan iborat parolni kiriting.",
+    "validationErrorDescRegister": "Iltimos, to'g'ri ism va telefon raqamini kiriting.",
     "loginSuccessTitle": "Muvaffaqiyatli kirish",
     "registrationSuccessTitle": "Muvaffaqiyatli ro'yxatdan o'tish",
     "redirecting": "Yo'naltirilmoqda...",
     "redirectingToApplication": "Ariza shakliga yo'naltirilmoqda...",
     "loginFailedTitle": "Kirishda xatolik",
     "registrationFailedTitle": "Ro'yxatdan o'tishda xatolik",
-    "errorInvalidCredential": "Noto'g'ri email yoki parol.",
+    "errorInvalidCredential": "Noto'g'ri telefon raqam yoki parol.",
     "errorEmailInUse": "Bu email allaqachon ishlatilgan.",
     "errorWeakPassword": "Parol kamida 6 belgidan iborat bo'lishi kerak.",
     "unknownAuthError": "Kutilmagan autentifikatsiya xatosi yuz berdi.",
@@ -330,6 +330,8 @@
     "car_photos": "Avtomobil rasmlari",
     "register_passenger_title": "Yo'lovchi sifatida ro'yxatdan o'tish",
     "register_passenger_desc": "Qatnovlarni band qilish uchun hisob yarating.",
+    "login_passenger_title": "Yo'lovchi sifatida kirish",
+    "login_passenger_desc": "Kirish uchun hisob ma'lumotlaringizni kiriting.",
     "registration_request_sent_title": "So'rov yuborildi!",
     "registration_request_sent_desc": "Ro'yxatdan o'tish so'rovingiz yuborildi. Administrator {phone} raqamiga SMS orqali tasdiqlash kodini yuboradi.",
     "registration_phone-exists": "Ushbu telefon raqami bilan foydalanuvchi allaqachon ro'yxatdan o'tishni so'ragan.",
@@ -349,5 +351,6 @@
     "delete_request_confirm_desc": "Bu harakat ro'yxatdan o'tish so'rovini butunlay o'chirib tashlaydi.",
     "backToProfile": "Profilga qaytish"
 }
+
 
 

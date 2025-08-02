@@ -68,14 +68,14 @@
     "validationErrorTitle": "Validation Error",
     "validationErrorDesc": "Please enter email and password.",
     "validationErrorDescBooking": "Please fill in all required fields.",
-    "validationErrorDescRegister": "Please enter a valid name, phone and a password of at least 6 characters.",
+    "validationErrorDescRegister": "Please enter a valid name and phone number.",
     "loginSuccessTitle": "Login Successful",
     "registrationSuccessTitle": "Registration Successful",
     "redirecting": "Redirecting...",
     "redirectingToApplication": "Redirecting to the application form...",
     "loginFailedTitle": "Login Failed",
     "registrationFailedTitle": "Registration Failed",
-    "errorInvalidCredential": "Incorrect email or password.",
+    "errorInvalidCredential": "Incorrect phone number or password.",
     "errorEmailInUse": "This email is already in use.",
     "errorWeakPassword": "Password should be at least 6 characters.",
     "unknownAuthError": "An unexpected authentication error occurred.",
@@ -330,6 +330,8 @@
     "car_photos": "Car Photos",
     "register_passenger_title": "Register as Passenger",
     "register_passenger_desc": "Create an account to book rides.",
+    "login_passenger_title": "Login as Passenger",
+    "login_passenger_desc": "Enter your credentials to log in.",
     "registration_request_sent_title": "Request Sent!",
     "registration_request_sent_desc": "Your registration request has been sent. The admin will send a verification code to {phone} via SMS.",
     "registration_phone-exists": "A user with this phone number has already requested registration.",
@@ -349,5 +351,6 @@
     "delete_request_confirm_desc": "This will permanently delete the registration request.",
     "backToProfile": "Back to Profile"
 }
+
 
 

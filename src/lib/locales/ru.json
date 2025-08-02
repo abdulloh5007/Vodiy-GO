@@ -68,14 +68,14 @@
     "validationErrorTitle": "Ошибка валидации",
     "validationErrorDesc": "Пожалуйста, введите почту и пароль.",
     "validationErrorDescBooking": "Пожалуйста, заполните все обязательные поля.",
-    "validationErrorDescRegister": "Пожалуйста, введите действительные имя, телефон и пароль не менее 6 символов.",
+    "validationErrorDescRegister": "Пожалуйста, введите действительные имя и номер телефона.",
     "loginSuccessTitle": "Вход выполнен успешно",
     "registrationSuccessTitle": "Регистрация прошла успешно",
     "redirecting": "Перенаправление...",
     "redirectingToApplication": "Перенаправляем на форму заявки...",
     "loginFailedTitle": "Ошибка входа",
     "registrationFailedTitle": "Ошибка регистрации",
-    "errorInvalidCredential": "Неправильная почта или пароль.",
+    "errorInvalidCredential": "Неправильный номер телефона или пароль.",
     "errorEmailInUse": "Эта почта уже используется.",
     "errorWeakPassword": "Пароль должен содержать не менее 6 символов.",
     "unknownAuthError": "Произошла непредвиденная ошибка аутентификации.",
@@ -330,6 +330,8 @@
     "car_photos": "Фотографии машины",
     "register_passenger_title": "Регистрация пассажира",
     "register_passenger_desc": "Создайте аккаунт, чтобы бронировать поездки.",
+    "login_passenger_title": "Вход для пассажира",
+    "login_passenger_desc": "Введите свои учетные данные для входа.",
     "registration_request_sent_title": "Запрос отправлен!",
     "registration_request_sent_desc": "Ваш запрос на регистрацию отправлен. Администратор отправит код подтверждения на номер {phone} по СМС.",
     "registration_phone-exists": "Пользователь с таким номером телефона уже запросил регистрацию.",
@@ -349,5 +351,6 @@
     "delete_request_confirm_desc": "Это действие навсегда удалит запрос на регистрацию.",
     "backToProfile": "Вернуться в профиль"
 }
+
 
 

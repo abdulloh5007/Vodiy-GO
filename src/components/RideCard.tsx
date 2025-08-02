@@ -19,6 +19,9 @@ import { formatDistanceToNow } from 'date-fns';
 import { ru, uz } from 'date-fns/locale';
 import { Badge } from '@/components/ui/badge';
 import { User as FirebaseAuthUser } from 'firebase/auth';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { FirebaseError } from 'firebase/app';
+
 
 interface RideCardProps {
   ride: Ride;
@@ -162,13 +165,13 @@ export function RideCard({ ride, onImageClick }: RideCardProps) {
       
       <Dialog open={isAuthModalOpen} onOpenChange={setIsAuthModalOpen}>
         <DialogContent>
-          <DialogHeader className="mb-4">
-              <DialogTitle>{t.register_passenger_title || 'Register as Passenger'}</DialogTitle>
-              <DialogDescription>{t.register_passenger_desc || 'Create an account to book rides.'}</DialogDescription>
-          </DialogHeader>
-          <AuthForm onAuthSuccess={(phone) => {
+          <AuthTabs onAuthSuccess={(phone?: string) => {
               setIsAuthModalOpen(false);
-              router.push(`/verify-user?phone=${encodeURIComponent(phone)}`);
+              if (phone) {
+                 router.push(`/verify-user?phone=${encodeURIComponent(phone)}`);
+              } else {
+                 router.refresh();
+              }
           }} />
         </DialogContent>
       </Dialog>
@@ -177,16 +180,42 @@ export function RideCard({ ride, onImageClick }: RideCardProps) {
 }
 
 
-function AuthForm({ onAuthSuccess }: { onAuthSuccess: (phone: string) => void }) {
+function AuthTabs({ onAuthSuccess }: { onAuthSuccess: (phone?: string) => void }) {
+    const context = useContext(AppContext);
+    if (!context) return null;
+    const { translations: t } = context;
+
+    return (
+        <Tabs defaultValue="register" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="register">{t.register}</TabsTrigger>
+                <TabsTrigger value="login">{t.login}</TabsTrigger>
+            </TabsList>
+            <TabsContent value="register">
+                <DialogHeader className="mb-4 text-left">
+                    <DialogTitle>{t.register_passenger_title || 'Register as Passenger'}</DialogTitle>
+                    <DialogDescription>{t.register_passenger_desc || 'Create an account to book rides.'}</DialogDescription>
+                </DialogHeader>
+                <RegisterForm onAuthSuccess={onAuthSuccess} />
+            </TabsContent>
+            <TabsContent value="login">
+                <DialogHeader className="mb-4 text-left">
+                    <DialogTitle>{t.login_passenger_title || 'Login as Passenger'}</DialogTitle>
+                    <DialogDescription>{t.login_passenger_desc || 'Enter your credentials to log in.'}</DialogDescription>
+                </DialogHeader>
+                <LoginForm onAuthSuccess={onAuthSuccess} />
+            </TabsContent>
+        </Tabs>
+    );
+}
+
+function RegisterForm({ onAuthSuccess }: { onAuthSuccess: (phone: string) => void }) {
     const context = useContext(AppContext);
     const { toast } = useToast();
-    const router = useRouter();
-
-    const [password, setPassword] = useState('');
+    
     const [name, setName] = useState('');
     const [phone, setPhone] = useState('+998');
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
     if (!context) return null;
     const { translations: t, requestUserRegistration } = context;
@@ -200,12 +229,12 @@ function AuthForm({ onAuthSuccess }: { onAuthSuccess: (phone: string) => void })
         e.preventDefault();
         setIsSubmitting(true);
         try {
-            if (!name || password.length < 6 || phone.replace(/\D/g, '').length !== 12) {
+            if (!name || phone.replace(/\D/g, '').length !== 12) {
                 toast({ title: t.validationErrorTitle, description: t.validationErrorDescRegister, variant: "destructive" });
                 setIsSubmitting(false);
                 return;
             }
-            await requestUserRegistration(name, phone, password);
+            await requestUserRegistration(name, phone);
             toast({ 
                 title: t.registration_request_sent_title || "Request Sent!", 
                 description: (t.registration_request_sent_desc || "Admin will send a code to {phone} via SMS.").replace('{phone}', phone),
@@ -233,11 +262,72 @@ function AuthForm({ onAuthSuccess }: { onAuthSuccess: (phone: string) => void })
                 <Label htmlFor="register-phone">{t.yourPhone}</Label>
                 <Input id="register-phone" type="tel" value={phone} onChange={handlePhoneChange} required disabled={isSubmitting}/>
             </div>
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+                {isSubmitting ? <Loader2 className="animate-spin" /> : t.register}
+            </Button>
+        </form>
+    );
+}
+
+
+function LoginForm({ onAuthSuccess }: { onAuthSuccess: () => void }) {
+    const context = useContext(AppContext);
+    const { toast } = useToast();
+    
+    const [phone, setPhone] = useState('+998');
+    const [password, setPassword] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+
+    if (!context) return null;
+    const { translations: t, loginWithPhone } = context;
+
+    const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const formatted = formatPhoneNumber(e.target.value);
+        setPhone(formatted);
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsSubmitting(true);
+        try {
+            await loginWithPhone(phone, password, 'passenger');
+            toast({ title: t.loginSuccessTitle });
+            onAuthSuccess();
+        } catch (error: any) {
+            let errorMessage = t.unknownError;
+            if (error instanceof FirebaseError || error.message.startsWith('auth/')) {
+                switch (error.code || error.message) {
+                    case 'auth/invalid-credential':
+                    case 'auth/wrong-password':
+                    case 'auth/user-not-found':
+                    case 'auth/phone-not-found':
+                        errorMessage = t.errorInvalidCredential;
+                        break;
+                    case 'auth/unauthorized-role':
+                        errorMessage = t.unauthorizedAccess;
+                        break;
+                    default:
+                        errorMessage = t.unknownAuthError;
+                }
+            }
+            toast({ title: t.loginFailedTitle, description: errorMessage, variant: "destructive" });
+        } finally {
+            setIsSubmitting(false);
+        }
+    }
+
+    return (
+        <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-                <Label htmlFor="register-password">{t.password}</Label>
+                <Label htmlFor="login-phone">{t.yourPhone}</Label>
+                <Input id="login-phone" type="tel" value={phone} onChange={handlePhoneChange} required disabled={isSubmitting}/>
+            </div>
+            <div className="space-y-2">
+                <Label htmlFor="login-password">{t.password}</Label>
                 <div className="relative">
                     <Input 
-                      id="register-password" 
+                      id="login-password" 
                       type={isPasswordVisible ? "text" : "password"} 
                       value={password} 
                       onChange={e => setPassword(e.target.value)} 
@@ -256,8 +346,9 @@ function AuthForm({ onAuthSuccess }: { onAuthSuccess: (phone: string) => void })
                 </div>
             </div>
             <Button type="submit" className="w-full" disabled={isSubmitting}>
-                {isSubmitting ? <Loader2 className="animate-spin" /> : t.register}
+                {isSubmitting ? <Loader2 className="animate-spin" /> : t.login}
             </Button>
         </form>
     );
 }
+

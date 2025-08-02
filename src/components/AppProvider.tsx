@@ -485,7 +485,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }
 
   // --- New User Registration Flow ---
-  const requestUserRegistration = async (name: string, phone: string, password: string) => {
+  const requestUserRegistration = async (name: string, phone: string) => {
     const requestsRef = collection(db, 'userRegistrationRequests');
     const q = query(requestsRef, where("phone", "==", phone));
     const querySnapshot = await getDocs(q);
@@ -528,7 +528,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const fakeEmail = `${phone.replace(/\D/g, '')}@vodiygo.app`;
     
     // We use the verification code as a temporary password to create the user.
-    // In a real production app, you might force a password reset on first login.
     const userCredential = await createUserWithEmailAndPassword(auth, fakeEmail, `P@ssw0rd${code}`);
     const firebaseUser = userCredential.user;
 
@@ -577,6 +576,25 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       return firebaseUser;
   };
   
+  const loginWithPhone = async (phone: string, password: string, role?: 'admin' | 'driver' | 'passenger'):Promise<FirebaseAuthUser> => {
+      const usersRef = collection(db, 'users');
+      const q = query(usersRef, where("phone", "==", phone));
+      const querySnapshot = await getDocs(q);
+
+      if (querySnapshot.empty) {
+          throw new Error('auth/phone-not-found');
+      }
+      
+      const userDoc = querySnapshot.docs[0];
+      const userData = userDoc.data() as User;
+      
+      if (!userData.email) {
+          throw new Error('auth/email-not-found');
+      }
+
+      return await login(userData.email, password, role);
+  };
+  
   const logout = async () => {
     const userRole = user?.role;
     const isDriverPage = window.location.pathname.startsWith('/driver');
@@ -606,6 +624,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       addDriverApplication, updateDriverStatus, deleteDriver, updateRideStatus, updateRideSeats,
       addRide, addOrder,
       login, 
+      loginWithPhone,
       requestUserRegistration,
       verifyUser,
       logout,
