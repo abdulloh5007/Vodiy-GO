@@ -426,7 +426,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     await addMessage(user.uid, 'RIDE_CREATED', 'message_ride_created_title', 'message_ride_created_body', { from: rideData.from, to: rideData.to });
   };
 
-  const addOrder = async (orderData: Omit<Order, 'id' | 'status' | 'createdAt' | 'passengerId'> & { passengerId: string }) => {
+  const addOrder = async (orderData: Omit<Order, 'id' | 'status' | 'createdAt'>) => {
     const newOrderRef = doc(collection(db, "orders"))
     await setDoc(newOrderRef, {
       ...orderData,
@@ -580,7 +580,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   };
   
   const logout = async () => {
-    const userRole = user?.role;
     const isDriverPage = window.location.pathname.startsWith('/driver');
     const isAdminPage = window.location.pathname.startsWith('/admin');
 

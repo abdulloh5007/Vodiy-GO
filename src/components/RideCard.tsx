@@ -21,7 +21,6 @@ import { Badge } from '@/components/ui/badge';
 import { User as FirebaseAuthUser } from 'firebase/auth';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FirebaseError } from 'firebase/app';
-import bcrypt from 'bcryptjs';
 
 
 interface RideCardProps {
@@ -287,7 +286,7 @@ function LoginForm({ onAuthSuccess }: { onAuthSuccess: () => void }) {
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
     if (!context) return null;
-    const { translations: t, login, loginWithPhone } = context;
+    const { translations: t, loginWithPhone } = context;
 
     const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const formatted = formatPhoneNumber(e.target.value);
@@ -309,7 +308,7 @@ function LoginForm({ onAuthSuccess }: { onAuthSuccess: () => void }) {
                     case 'auth/invalid-credential':
                     case 'auth/wrong-password':
                     case 'auth/user-not-found':
-                    case 'auth/phone-not-found':
+                    case 'auth/invalid-email': // happens if phone number is not yet in auth
                         errorMessage = t.errorInvalidCredential;
                         break;
                     case 'auth/unauthorized-role':
