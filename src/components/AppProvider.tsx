@@ -484,8 +484,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     return promoData;
   }
 
-  // --- New User Registration Flow ---
-  const requestUserRegistration = async (name: string, phone: string, hashedPassword?: string) => {
+  const requestUserRegistration = async (name: string, phone: string, password?: string) => {
     const requestsRef = collection(db, 'userRegistrationRequests');
     const q = query(requestsRef, where("phone", "==", phone));
     const querySnapshot = await getDocs(q);
@@ -494,12 +493,18 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
 
     const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+    
+    let hashedPassword = '';
+    if (password) {
+      const salt = bcrypt.genSaltSync(10);
+      hashedPassword = bcrypt.hashSync(password, salt);
+    }
 
-    const newRequest: Omit<UserRegistrationRequest, 'id'> = {
+    const newRequest: Omit<UserRegistrationRequest, 'id' | 'password'> & {hashedPassword: string} = {
       name,
       phone,
       verificationCode,
-      hashedPassword: hashedPassword || '',
+      hashedPassword: hashedPassword,
       status: 'pending',
       createdAt: serverTimestamp(),
     };
@@ -523,15 +528,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
 
     const requestDoc = querySnapshot.docs[0];
-    const requestData = requestDoc.data() as UserRegistrationRequest;
+    const requestData = requestDoc.data() as UserRegistrationRequest & { hashedPassword?: string };
     
-    // We use a fake email for Firebase Auth, as we are phone-based.
     const fakeEmail = `${phone.replace(/\D/g, '')}@vodiygo.app`;
     
-    // We use the hashed password to create the user.
-    // This is NOT ideal as we are creating user on the client side with a password.
-    // This is a simplified approach for this specific app flow.
-    const userCredential = await createUserWithEmailAndPassword(auth, fakeEmail, `P@ssw0rd${code}`);
+    if (!requestData.password) {
+        throw new Error("verification/password-not-set");
+    }
+    
+    const userCredential = await createUserWithEmailAndPassword(auth, fakeEmail, requestData.password);
     const firebaseUser = userCredential.user;
 
     const userDocRef = doc(db, "users", firebaseUser.uid);
@@ -541,15 +546,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         name: requestData.name, 
         role: 'passenger', 
         phone: requestData.phone,
-        ...(requestData.hashedPassword && { password: requestData.hashedPassword }),
+        password: requestData.password, 
     };
     await setDoc(userDocRef, newUser);
 
-    // Clean up the request
     await deleteDoc(doc(db, "userRegistrationRequests", requestDoc.id));
     
-    // Automatically log in the user after successful verification
-    await signInWithEmailAndPassword(auth, fakeEmail, `P@ssw0rd${code}`);
+    await signInWithEmailAndPassword(auth, fakeEmail, requestData.password);
 
     return firebaseUser;
   };
@@ -560,42 +563,22 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
 
   const login = async (email: string, password: string, role?: 'admin' | 'driver' | 'passenger'):Promise<FirebaseAuthUser> => {
-      const usersRef = collection(db, 'users');
-      const q = query(usersRef, where("email", "==", email));
-      const querySnapshot = await getDocs(q);
-      
-      if (querySnapshot.empty) {
-        throw new Error('auth/user-not-found');
-      }
-      
-      const userDoc = querySnapshot.docs[0];
-      const userData = userDoc.data() as User;
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const userDocRef = doc(db, 'users', userCredential.user.uid);
+    const userDocSnap = await getDoc(userDocRef);
 
-      if (role && userData.role !== role) {
-        throw new Error('auth/unauthorized-role');
-      }
+    if (!userDocSnap.exists()) {
+      await signOut(auth);
+      throw new Error('auth/no-user-record');
+    }
 
-      if (!userData.password) {
-        // Fallback for users created before password system
-        return signInWithEmailAndPassword(auth, email, password);
-      }
-
-      const isMatch = await bcrypt.compare(password, userData.password);
-
-      if (!isMatch) {
-        throw new Error('auth/invalid-credential');
-      }
-      
-      // We still need to sign in with Firebase Auth, but we can't use the hashed password.
-      // So we sign in with the real password against a temporary session, or just trust our check.
-      // For simplicity, we assume if bcrypt check passes, we can proceed.
-      // But Firebase Auth needs a real sign in. This is a complex flow.
-      // The best way is to use a custom token, but that requires a server.
-      // Let's use the standard Firebase sign-in and let it handle password checks.
-      
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-
-      return userCredential.user;
+    const userData = userDocSnap.data() as User;
+    if (role && userData.role !== role) {
+      await signOut(auth);
+      throw new Error('auth/unauthorized-role');
+    }
+    
+    return userCredential.user;
   };
   
   const loginWithPhone = async (phone: string, password: string, role?: 'admin' | 'driver' | 'passenger'):Promise<FirebaseAuthUser> => {
@@ -625,22 +608,20 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const firebaseUser = userCredential.user;
 
     const userDocRef = doc(db, 'users', firebaseUser.uid);
-    const salt = bcrypt.genSaltSync(10);
-    const hashedPassword = bcrypt.hashSync(password, salt);
-
+    
     const newUser: User = {
         uid: firebaseUser.uid,
         email: firebaseUser.email,
         role: role,
         name: name,
         phone: phone,
-        password: hashedPassword,
+        password: password,
     };
     await setDoc(userDocRef, newUser);
 
     setUser(newUser);
     return firebaseUser;
-  }
+  };
 
   return (
     <AppContext.Provider value={{ 

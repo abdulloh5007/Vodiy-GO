@@ -236,11 +236,8 @@ function RegisterForm({ onAuthSuccess }: { onAuthSuccess: (phone: string) => voi
                 setIsSubmitting(false);
                 return;
             }
-            // Hash password before sending
-            const salt = bcrypt.genSaltSync(10);
-            const hashedPassword = bcrypt.hashSync(password, salt);
             
-            await requestUserRegistration(name, phone, hashedPassword);
+            await requestUserRegistration(name, phone, password);
             toast({ 
                 title: t.registration_request_sent_title || "Request Sent!", 
                 description: (t.registration_request_sent_desc || "Admin will send a code to {phone} via SMS.").replace('{phone}', phone),
@@ -290,7 +287,7 @@ function LoginForm({ onAuthSuccess }: { onAuthSuccess: () => void }) {
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
     if (!context) return null;
-    const { translations: t, loginWithPhone } = context;
+    const { translations: t, login, loginWithPhone } = context;
 
     const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const formatted = formatPhoneNumber(e.target.value);

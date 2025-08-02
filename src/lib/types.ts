@@ -90,7 +90,7 @@ export type UserRegistrationRequest = {
     name: string;
     phone: string;
     verificationCode: string;
-    hashedPassword?: string;
+    password?: string;
     status: 'pending';
     createdAt: any;
 }
