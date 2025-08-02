@@ -21,9 +21,14 @@ export const PinLockContext = createContext<PinLockContextType | null>(null);
 export function PinLockProvider({ children }: { children: ReactNode }) {
     const [pin, setPin] = useLocalStorage<string | null>('admin-pin', null);
     const [pinLength, setPinLength] = useLocalStorage<4 | 6>('admin-pin-length', 4);
-    const [autoLockTime, setAutoLockTime] = useLocalStorage<number>('admin-autolock-time', 300000); // Default 5 minutes
+    const [autoLockTime, setAutoLockTime] = useLocalStorage<number>('admin-autolock-time', 120000); // Default 2 minutes
     const [isLocked, setIsLocked] = useState(!!pin);
     const [lastActivity, setLastActivity] = useLocalStorage<number>('admin-last-activity', Date.now());
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
 
     const handleUnlock = useCallback(() => {
         setIsLocked(false);
@@ -70,6 +75,10 @@ export function PinLockProvider({ children }: { children: ReactNode }) {
         }
     }, [pin, pinLength, setPin]);
 
+    if (!isMounted) {
+        return null; // Or a loading spinner, but null is fine for avoiding hydration errors.
+    }
+
     return (
         <PinLockContext.Provider value={{
             pin,
@@ -93,4 +102,3 @@ export function PinLockProvider({ children }: { children: ReactNode }) {
         </PinLockContext.Provider>
     );
 }
-
