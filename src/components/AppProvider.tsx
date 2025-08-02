@@ -10,7 +10,6 @@ import { db, auth } from '@/lib/firebase';
 import { collection, doc, getDoc, setDoc, onSnapshot, query, orderBy, serverTimestamp, writeBatch, where, getDocs, deleteDoc, updateDoc, runTransaction, arrayUnion, increment, addDoc, createUserWithEmailAndPassword as createUserWithEmailAndPasswordAdmin } from "firebase/firestore";
 import { signInWithEmailAndPassword, onAuthStateChanged, signOut, createUserWithEmailAndPassword, User as FirebaseAuthUser } from "firebase/auth";
 import { ImageViewer } from './ImageViewer';
-import bcrypt from 'bcryptjs';
 
 const uploadImageToImgBB = async (file: File): Promise<string> => {
     const formData = new FormData();
@@ -494,17 +493,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
     const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
     
-    let hashedPassword = '';
-    if (password) {
-      const salt = bcrypt.genSaltSync(10);
-      hashedPassword = bcrypt.hashSync(password, salt);
-    }
-
-    const newRequest: Omit<UserRegistrationRequest, 'id' | 'password'> & {hashedPassword: string} = {
+    const newRequest: Omit<UserRegistrationRequest, 'id'> = {
       name,
       phone,
       verificationCode,
-      hashedPassword: hashedPassword,
+      password: password,
       status: 'pending',
       createdAt: serverTimestamp(),
     };
@@ -528,7 +521,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
 
     const requestDoc = querySnapshot.docs[0];
-    const requestData = requestDoc.data() as UserRegistrationRequest & { hashedPassword?: string };
+    const requestData = requestDoc.data() as UserRegistrationRequest;
     
     const fakeEmail = `${phone.replace(/\D/g, '')}@vodiygo.app`;
     
