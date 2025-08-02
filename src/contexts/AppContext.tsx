@@ -25,6 +25,7 @@ interface AppContextType {
   updateDriverStatus: (driverId: string, status: 'verified' | 'rejected' | 'blocked', reason?: string) => Promise<void>;
   deleteDriver: (driverId: string) => Promise<void>;
   updateRideStatus: (rideId: string, status: 'approved' | 'rejected', reason?: string) => Promise<void>;
+  deleteRide: (rideId: string) => Promise<void>;
   updateOrderStatus: (orderId: string, status: 'accepted' | 'rejected') => void;
   updateRideSeats: (rideId: string, newSeatCount: number) => Promise<void>;
   addRide: (ride: Omit<Ride, 'id' | 'createdAt' | 'status' | 'approvedAt' | 'availableSeats'>) => void;

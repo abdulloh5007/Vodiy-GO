@@ -10,6 +10,7 @@ import { db, auth } from '@/lib/firebase';
 import { collection, doc, getDoc, setDoc, onSnapshot, query, orderBy, serverTimestamp, writeBatch, where, getDocs, deleteDoc, updateDoc, runTransaction, arrayUnion, increment, addDoc, createUserWithEmailAndPassword as createUserWithEmailAndPasswordAdmin } from "firebase/firestore";
 import { signInWithEmailAndPassword, onAuthStateChanged, signOut, createUserWithEmailAndPassword, User as FirebaseAuthUser } from "firebase/auth";
 import { ImageViewer } from './ImageViewer';
+import { PinLockProvider } from '@/contexts/PinLockContext';
 
 const uploadImageToImgBB = async (file: File): Promise<string> => {
     const formData = new FormData();
@@ -80,6 +81,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       const ridesData = snapshot.docs
         .map(doc => ({ id: doc.id, ...doc.data() } as Ride))
         .filter(ride => {
+            // Keep all rides for admin, but filter for drivers/passengers
+             if (user?.role === 'admin') return true;
+
             if (ride.status === 'pending' || ride.status === 'rejected') {
                 return true;
             }
@@ -143,7 +147,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       unsubscribePromoCodes();
       unsubscribeUserRequests();
     };
-  }, []);
+  }, [user?.role]); // Re-run if user role changes to apply filtering correctly
   
   // Effect to subscribe to messages for the current user
   useEffect(() => {
@@ -324,6 +328,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
              await addMessage(rideData.driverId, 'RIDE_REJECTED', 'message_ride_rejected_body_with_attempts', 'message_ride_rejected_body', { from: rideData.from, to: rideData.to, reason: reason || translations.reason_not_specified || "Not specified", attempts: remainingAttempts.toString() });
         }
     }
+  }
+
+  const deleteRide = async (rideId: string) => {
+      const rideDocRef = doc(db, "rides", rideId);
+      await deleteDoc(rideDocRef);
   }
 
   const deleteDriver = async (driverId: string) => {
@@ -624,7 +633,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       promoCodes, createPromoCode, checkPromoCode,
       messages,
       userRegistrationRequests, deleteUserRegistrationRequest,
-      addDriverApplication, updateDriverStatus, deleteDriver, updateRideStatus, updateRideSeats,
+      addDriverApplication, updateDriverStatus, deleteDriver, 
+      updateRideStatus, deleteRide,
+      updateRideSeats,
       addRide, addOrder,
       login, 
       loginWithPhone,
@@ -635,7 +646,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       loading,
       selectedImage, setSelectedImage
     }}>
-      {children}
+      <PinLockProvider>
+        {children}
+      </PinLockProvider>
       <ImageViewer imageUrl={selectedImage} onOpenChange={(open) => !open && setSelectedImage(null)} />
     </AppContext.Provider>
   );

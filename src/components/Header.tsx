@@ -76,10 +76,12 @@ export function Header() {
   const adminLinks = [
     { href: '/admin', label: t.registrationApplications, icon: FileText, badge: newDriverApplicationsCount },
     { href: '/admin/ride-applications', label: t.rideApplications, icon: PackageCheck, badge: newRideApplicationsCount },
+    { href: '/admin/approved-rides', label: t.approved_rides_title || 'Approved Rides', icon: ShieldCheck },
     { href: '/admin/user-applications', label: t.user_applications_title || 'User Applications', icon: UserCog, badge: newUserApplicationsCount },
     { href: '/admin/drivers', label: t.drivers_title || 'Drivers', icon: Car },
     { href: '/admin/users', label: t.users_title || 'Users', icon: Users },
     { href: '/admin/promocodes', label: t.promo_codes_title || 'Promo Codes', icon: Ticket },
+    { href: '/admin/settings', label: t.settings_title || 'Settings', icon: Settings },
   ];
 
   const passengerLinks = [
@@ -99,7 +101,7 @@ export function Header() {
         <SheetHeader>
           <SheetTitle>{user?.name || user?.email}</SheetTitle>
         </SheetHeader>
-        <div className="flex-grow py-4">
+        <div className="flex-grow py-4 overflow-y-auto">
             <div className='flex flex-col gap-4'>
               <div className="grid grid-cols-2 gap-2">
                   {adminLinks.map(link => {

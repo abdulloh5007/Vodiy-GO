@@ -1,10 +1,12 @@
 
+
 'use client';
 
 import { useContext, useEffect } from 'react';
 import { AppContext } from '@/contexts/AppContext';
 import { usePathname, useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
+import { PinLockProvider } from '@/contexts/PinLockContext';
 
 export default function AdminLayout({
   children,
@@ -53,7 +55,7 @@ export default function AdminLayout({
 
   // Если пользователь - админ, или если это страница логина, показываем контент
   if (user?.role === 'admin' || isLoginPage) {
-     return <>{children}</>;
+     return <PinLockProvider>{children}</PinLockProvider>;
   }
   
   // В противном случае (не админ и не страница логина) показываем загрузчик, пока происходит редирект
