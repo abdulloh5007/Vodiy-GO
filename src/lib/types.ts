@@ -6,6 +6,7 @@ export type User = {
   role: 'passenger' | 'driver' | 'admin';
   name?: string;
   phone?: string;
+  password?: string;
 };
 
 export type Driver = {
@@ -89,6 +90,7 @@ export type UserRegistrationRequest = {
     name: string;
     phone: string;
     verificationCode: string;
+    hashedPassword?: string;
     status: 'pending';
     createdAt: any;
 }

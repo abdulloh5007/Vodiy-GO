@@ -31,8 +31,9 @@ interface AppContextType {
   addOrder: (order: Omit<Order, 'id' | 'status' | 'createdAt'>) => void;
   login: (email: string, password: string, role?: 'admin' | 'driver' | 'passenger') => Promise<FirebaseAuthUser>;
   loginWithPhone: (phone: string, password: string, role?: 'admin' | 'driver' | 'passenger') => Promise<FirebaseAuthUser>;
-  requestUserRegistration: (name: string, phone: string) => Promise<void>;
+  requestUserRegistration: (name: string, phone: string, hashedPassword?: string) => Promise<void>;
   verifyUser: (phone: string, code: string) => Promise<FirebaseAuthUser>;
+  register: (email: string, password: string, name: string, role: 'driver' | 'passenger', phone: string) => Promise<FirebaseAuthUser>;
   logout: () => void;
   loading: boolean;
   selectedImage: string | null;

@@ -21,6 +21,7 @@ import { Badge } from '@/components/ui/badge';
 import { User as FirebaseAuthUser } from 'firebase/auth';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FirebaseError } from 'firebase/app';
+import bcrypt from 'bcryptjs';
 
 
 interface RideCardProps {
@@ -215,6 +216,7 @@ function RegisterForm({ onAuthSuccess }: { onAuthSuccess: (phone: string) => voi
     
     const [name, setName] = useState('');
     const [phone, setPhone] = useState('+998');
+    const [password, setPassword] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     if (!context) return null;
@@ -229,12 +231,16 @@ function RegisterForm({ onAuthSuccess }: { onAuthSuccess: (phone: string) => voi
         e.preventDefault();
         setIsSubmitting(true);
         try {
-            if (!name || phone.replace(/\D/g, '').length !== 12) {
+            if (!name || phone.replace(/\D/g, '').length !== 12 || password.length < 6) {
                 toast({ title: t.validationErrorTitle, description: t.validationErrorDescRegister, variant: "destructive" });
                 setIsSubmitting(false);
                 return;
             }
-            await requestUserRegistration(name, phone);
+            // Hash password before sending
+            const salt = bcrypt.genSaltSync(10);
+            const hashedPassword = bcrypt.hashSync(password, salt);
+            
+            await requestUserRegistration(name, phone, hashedPassword);
             toast({ 
                 title: t.registration_request_sent_title || "Request Sent!", 
                 description: (t.registration_request_sent_desc || "Admin will send a code to {phone} via SMS.").replace('{phone}', phone),
@@ -261,6 +267,10 @@ function RegisterForm({ onAuthSuccess }: { onAuthSuccess: (phone: string) => voi
             <div className="space-y-2">
                 <Label htmlFor="register-phone">{t.yourPhone}</Label>
                 <Input id="register-phone" type="tel" value={phone} onChange={handlePhoneChange} required disabled={isSubmitting}/>
+            </div>
+             <div className="space-y-2">
+                <Label htmlFor="register-password">{t.password}</Label>
+                <Input id="register-password" type="password" value={password} onChange={e => setPassword(e.target.value)} required disabled={isSubmitting}/>
             </div>
             <Button type="submit" className="w-full" disabled={isSubmitting}>
                 {isSubmitting ? <Loader2 className="animate-spin" /> : t.register}
@@ -297,7 +307,8 @@ function LoginForm({ onAuthSuccess }: { onAuthSuccess: () => void }) {
         } catch (error: any) {
             let errorMessage = t.unknownError;
             if (error instanceof FirebaseError || error.message.startsWith('auth/')) {
-                switch (error.code || error.message) {
+                const errorCode = error.code || error.message;
+                 switch (errorCode) {
                     case 'auth/invalid-credential':
                     case 'auth/wrong-password':
                     case 'auth/user-not-found':
@@ -308,6 +319,7 @@ function LoginForm({ onAuthSuccess }: { onAuthSuccess: () => void }) {
                         errorMessage = t.unauthorizedAccess;
                         break;
                     default:
+                        console.error("Login error:", error);
                         errorMessage = t.unknownAuthError;
                 }
             }
@@ -351,4 +363,3 @@ function LoginForm({ onAuthSuccess }: { onAuthSuccess: () => void }) {
         </form>
     );
 }
-

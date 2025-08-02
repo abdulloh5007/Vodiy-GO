@@ -42,7 +42,7 @@ export default function DriverRegisterPage() {
     if (!name || !email || password.length < 6 || phone.replace(/\D/g, '').length !== 12) {
       toast({
         title: t.validationErrorTitle,
-        description: t.validationErrorDescStep1 || "Please enter a valid name, email, phone and a password of at least 6 characters.",
+        description: t.validationErrorDescRegister || "Please enter a valid name, email, phone and a password of at least 6 characters.",
         variant: "destructive",
       });
       return;
