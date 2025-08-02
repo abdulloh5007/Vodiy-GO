@@ -11,8 +11,9 @@ import { KeyRound, Timer, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { PinLockContext } from '@/contexts/PinLockContext';
 import { AppContext } from '@/contexts/AppContext';
+import { AdminPanelWrapper } from '@/components/AdminPanelWrapper';
 
-export default function SettingsPage() {
+function SettingsPageContent() {
     const pinLockContext = useContext(PinLockContext);
     const appContext = useContext(AppContext);
     const { toast } = useToast();
@@ -121,4 +122,12 @@ export default function SettingsPage() {
             </Card>
         </div>
     );
+}
+
+export default function SettingsPage() {
+    return (
+        <AdminPanelWrapper>
+            <SettingsPageContent />
+        </AdminPanelWrapper>
+    )
 }

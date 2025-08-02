@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useContext, useState, useEffect } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { AppContext } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
@@ -23,92 +23,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { AdminPanelWrapper } from '@/components/AdminPanelWrapper';
 
-function ApplicationsSkeleton() {
-    return (
-        <div className="container mx-auto py-8 px-4">
-            <Card>
-                <CardHeader>
-                    <Skeleton className="h-8 w-1/2" />
-                    <Skeleton className="h-5 w-1/3" />
-                </CardHeader>
-                <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead><Skeleton className="h-5 w-24" /></TableHead>
-                        <TableHead><Skeleton className="h-5 w-32" /></TableHead>
-                        <TableHead><Skeleton className="h-5 w-28" /></TableHead>
-                        <TableHead className="text-right"><Skeleton className="h-5 w-20" /></TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {[...Array(3)].map((_, i) => (
-                           <TableRow key={i}>
-                                <TableCell>
-                                    <Skeleton className="h-5 w-full" />
-                                </TableCell>
-                                <TableCell>
-                                    <Skeleton className="h-5 w-full" />
-                                </TableCell>
-                                <TableCell>
-                                    <Skeleton className="h-5 w-full" />
-                                </TableCell>
-                                <TableCell className="text-right">
-                                    <Skeleton className="h-8 w-8 rounded-md" />
-                                </TableCell>
-                           </TableRow>
-                        ))}
-                    </TableBody>
-                  </Table>
-                </CardContent>
-            </Card>
-        </div>
-    )
-}
-
-const ApplicationCard = ({ request, onDelete, onCopy, t }: { request: UserRegistrationRequest, onDelete: (id: string) => void, onCopy: (text: string) => void, t: any }) => (
-    <Card>
-        <CardHeader>
-            <CardTitle>{request.name}</CardTitle>
-            <CardDescription>{request.phone}</CardDescription>
-        </CardHeader>
-        <CardContent>
-            <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                <span className="font-mono text-2xl tracking-widest">{request.verificationCode}</span>
-                <Button variant="ghost" size="icon" onClick={() => onCopy(request.verificationCode)}>
-                    <Copy className="h-5 w-5" />
-                </Button>
-            </div>
-        </CardContent>
-        <CardFooter className="p-2">
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button variant="destructive" className="w-full">
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    {t.delete_button || "Delete"}
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>{t.delete_driver_confirm_title || "Are you sure?"}</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    {t.delete_request_confirm_desc || "This will permanently delete the registration request."}
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>{t.cancel_button || "Cancel"}</AlertDialogCancel>
-                  <AlertDialogAction onClick={() => onDelete(request.id)} className="bg-destructive hover:bg-destructive/90">
-                    {t.delete_button || "Delete"}
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-        </CardFooter>
-    </Card>
-)
-
-export default function UserApplicationsPage() {
+function UserApplicationsPageContent() {
   const context = useContext(AppContext);
   const router = useRouter();
   const [viewMode, setViewMode] = useState<'table' | 'card'>('table');
@@ -235,4 +152,96 @@ export default function UserApplicationsPage() {
       </Card>
     </div>
   );
+}
+
+function ApplicationsSkeleton() {
+    return (
+        <div className="container mx-auto py-8 px-4">
+            <Card>
+                <CardHeader>
+                    <Skeleton className="h-8 w-1/2" />
+                    <Skeleton className="h-5 w-1/3" />
+                </CardHeader>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead><Skeleton className="h-5 w-24" /></TableHead>
+                        <TableHead><Skeleton className="h-5 w-32" /></TableHead>
+                        <TableHead><Skeleton className="h-5 w-28" /></TableHead>
+                        <TableHead className="text-right"><Skeleton className="h-5 w-20" /></TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {[...Array(3)].map((_, i) => (
+                           <TableRow key={i}>
+                                <TableCell>
+                                    <Skeleton className="h-5 w-full" />
+                                </TableCell>
+                                <TableCell>
+                                    <Skeleton className="h-5 w-full" />
+                                </TableCell>
+                                <TableCell>
+                                    <Skeleton className="h-5 w-full" />
+                                </TableCell>
+                                <TableCell className="text-right">
+                                    <Skeleton className="h-8 w-8 rounded-md" />
+                                </TableCell>
+                           </TableRow>
+                        ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+            </Card>
+        </div>
+    )
+}
+
+const ApplicationCard = ({ request, onDelete, onCopy, t }: { request: UserRegistrationRequest, onDelete: (id: string) => void, onCopy: (text: string) => void, t: any }) => (
+    <Card>
+        <CardHeader>
+            <CardTitle>{request.name}</CardTitle>
+            <CardDescription>{request.phone}</CardDescription>
+        </CardHeader>
+        <CardContent>
+            <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                <span className="font-mono text-2xl tracking-widest">{request.verificationCode}</span>
+                <Button variant="ghost" size="icon" onClick={() => onCopy(request.verificationCode)}>
+                    <Copy className="h-5 w-5" />
+                </Button>
+            </div>
+        </CardContent>
+        <CardFooter className="p-2">
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive" className="w-full">
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    {t.delete_button || "Delete"}
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>{t.delete_driver_confirm_title || "Are you sure?"}</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    {t.delete_request_confirm_desc || "This will permanently delete the registration request."}
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>{t.cancel_button || "Cancel"}</AlertDialogCancel>
+                  <AlertDialogAction onClick={() => onDelete(request.id)} className="bg-destructive hover:bg-destructive/90">
+                    {t.delete_button || "Delete"}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+        </CardFooter>
+    </Card>
+)
+
+export default function UserApplicationsPage() {
+    return (
+        <AdminPanelWrapper>
+            <UserApplicationsPageContent />
+        </AdminPanelWrapper>
+    )
 }

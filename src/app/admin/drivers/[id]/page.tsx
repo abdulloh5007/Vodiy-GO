@@ -13,93 +13,9 @@ import { Badge } from '@/components/ui/badge';
 import { Driver } from '@/lib/types';
 import { RejectionDialog } from '@/components/RejectionDialog';
 import { useToast } from '@/hooks/use-toast';
+import { AdminPanelWrapper } from '@/components/AdminPanelWrapper';
 
-function DriverDetailSkeleton() {
-    return (
-        <div className="container mx-auto py-8 px-4">
-            <div className="mb-4">
-                 <Skeleton className="h-10 w-24" />
-            </div>
-            <Card>
-                <CardHeader>
-                    <Skeleton className="h-8 w-48" />
-                    <Skeleton className="h-5 w-64" />
-                </CardHeader>
-                <CardContent className="grid md:grid-cols-2 gap-8">
-                    <div>
-                         <Skeleton className="h-64 w-full" />
-                    </div>
-                    <div className="space-y-6">
-                        <div className="space-y-2">
-                            <Skeleton className="h-5 w-24" />
-                            <Skeleton className="h-6 w-full" />
-                        </div>
-                         <div className="space-y-2">
-                            <Skeleton className="h-5 w-24" />
-                            <Skeleton className="h-6 w-16" />
-                        </div>
-                        <div className="space-y-2">
-                             <Skeleton className="h-5 w-24" />
-                            <Skeleton className="h-6 w-full" />
-                        </div>
-                    </div>
-                </CardContent>
-            </Card>
-        </div>
-    );
-}
-
-const PhotoCard = ({ title, src, onImageClick }: { title: string, src: string, onImageClick: (src: string) => void }) => (
-    <div className="space-y-2">
-        <h3 className="font-semibold text-sm">{title}</h3>
-        <div className="relative aspect-video w-full">
-            <Image 
-                src={src} 
-                alt={title}
-                fill
-                className="rounded-lg object-cover cursor-pointer"
-                onClick={() => onImageClick(src)}
-            />
-        </div>
-    </div>
-);
-
-
-const StatusBadge = ({ status, t }: { status: Driver['status'], t: any }) => {
-    const statusMap = {
-        verified: {
-            label: t.verified || "Verified",
-            icon: <BadgeCheck className="h-5 w-5 mr-2 text-green-500"/>,
-            variant: "secondary"
-        },
-        pending: {
-            label: t.pending || "Pending",
-            icon: <BadgeAlert className="h-5 w-5 mr-2 text-yellow-500"/>, 
-            variant: "default"
-        },
-        rejected: {
-            label: t.rejected || "Rejected",
-            icon: <BadgeX className="h-5 w-5 mr-2 text-red-500"/>,
-            variant: "destructive"
-        },
-        blocked: {
-            label: t.blocked || "Blocked",
-            icon: <Ban className="h-5 w-5 mr-2 text-red-500" />,
-            variant: "destructive"
-        }
-    }
-    const current = statusMap[status];
-
-    if (!current) return null;
-
-    return (
-        <Badge variant={current.variant as any} className="text-base py-2 px-4">
-            {current.icon} {current.label}
-        </Badge>
-    )
-}
-
-export default function DriverDetailPage() {
+function DriverDetailPageContent() {
     const context = useContext(AppContext);
     const router = useRouter();
     const params = useParams();
@@ -245,4 +161,97 @@ export default function DriverDetailPage() {
         />
         </>
     );
+}
+
+function DriverDetailSkeleton() {
+    return (
+        <div className="container mx-auto py-8 px-4">
+            <div className="mb-4">
+                 <Skeleton className="h-10 w-24" />
+            </div>
+            <Card>
+                <CardHeader>
+                    <Skeleton className="h-8 w-48" />
+                    <Skeleton className="h-5 w-64" />
+                </CardHeader>
+                <CardContent className="grid md:grid-cols-2 gap-8">
+                    <div>
+                         <Skeleton className="h-64 w-full" />
+                    </div>
+                    <div className="space-y-6">
+                        <div className="space-y-2">
+                            <Skeleton className="h-5 w-24" />
+                            <Skeleton className="h-6 w-full" />
+                        </div>
+                         <div className="space-y-2">
+                            <Skeleton className="h-5 w-24" />
+                            <Skeleton className="h-6 w-16" />
+                        </div>
+                        <div className="space-y-2">
+                             <Skeleton className="h-5 w-24" />
+                            <Skeleton className="h-6 w-full" />
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+        </div>
+    );
+}
+
+const PhotoCard = ({ title, src, onImageClick }: { title: string, src: string, onImageClick: (src: string) => void }) => (
+    <div className="space-y-2">
+        <h3 className="font-semibold text-sm">{title}</h3>
+        <div className="relative aspect-video w-full">
+            <Image 
+                src={src} 
+                alt={title}
+                fill
+                className="rounded-lg object-cover cursor-pointer"
+                onClick={() => onImageClick(src)}
+            />
+        </div>
+    </div>
+);
+
+
+const StatusBadge = ({ status, t }: { status: Driver['status'], t: any }) => {
+    const statusMap = {
+        verified: {
+            label: t.verified || "Verified",
+            icon: <BadgeCheck className="h-5 w-5 mr-2 text-green-500"/>,
+            variant: "secondary"
+        },
+        pending: {
+            label: t.pending || "Pending",
+            icon: <BadgeAlert className="h-5 w-5 mr-2 text-yellow-500"/>, 
+            variant: "default"
+        },
+        rejected: {
+            label: t.rejected || "Rejected",
+            icon: <BadgeX className="h-5 w-5 mr-2 text-red-500"/>,
+            variant: "destructive"
+        },
+        blocked: {
+            label: t.blocked || "Blocked",
+            icon: <Ban className="h-5 w-5 mr-2 text-red-500" />,
+            variant: "destructive"
+        }
+    }
+    const current = statusMap[status];
+
+    if (!current) return null;
+
+    return (
+        <Badge variant={current.variant as any} className="text-base py-2 px-4">
+            {current.icon} {current.label}
+        </Badge>
+    )
+}
+
+export default function DriverDetailPage() {
+    return (
+        <AdminPanelWrapper>
+            <DriverDetailPageContent />
+        </AdminPanelWrapper>
+    )
 }

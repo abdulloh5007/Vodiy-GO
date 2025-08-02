@@ -11,43 +11,9 @@ import { Loader2, ArrowLeft, User, Car, Hash, Shield, Check, X, MapPin, Clock, T
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { RejectionDialog } from '@/components/RejectionDialog';
+import { AdminPanelWrapper } from '@/components/AdminPanelWrapper';
 
-function RideDetailSkeleton() {
-    return (
-        <div className="container mx-auto py-8 px-4">
-            <div className="mb-4">
-                 <Skeleton className="h-10 w-24" />
-            </div>
-            <Card>
-                <CardHeader>
-                    <Skeleton className="h-8 w-48" />
-                    <Skeleton className="h-5 w-64" />
-                </CardHeader>
-                <CardContent className="grid md:grid-cols-2 gap-8">
-                    <div>
-                         <Skeleton className="h-64 w-full" />
-                    </div>
-                    <div className="space-y-6">
-                        <div className="space-y-2">
-                            <Skeleton className="h-5 w-24" />
-                            <Skeleton className="h-6 w-full" />
-                        </div>
-                        <div className="space-y-2">
-                             <Skeleton className="h-5 w-24" />
-                            <Skeleton className="h-6 w-full" />
-                        </div>
-                    </div>
-                </CardContent>
-                <CardFooter className="flex justify-end gap-2">
-                    <Skeleton className="h-10 w-24" />
-                    <Skeleton className="h-10 w-24" />
-                </CardFooter>
-            </Card>
-        </div>
-    );
-}
-
-export default function RideApplicationDetailPage() {
+function RideApplicationDetailPageContent() {
     const context = useContext(AppContext);
     const router = useRouter();
     const params = useParams();
@@ -180,4 +146,47 @@ export default function RideApplicationDetailPage() {
             />
         </>
     );
+}
+
+function RideDetailSkeleton() {
+    return (
+        <div className="container mx-auto py-8 px-4">
+            <div className="mb-4">
+                 <Skeleton className="h-10 w-24" />
+            </div>
+            <Card>
+                <CardHeader>
+                    <Skeleton className="h-8 w-48" />
+                    <Skeleton className="h-5 w-64" />
+                </CardHeader>
+                <CardContent className="grid md:grid-cols-2 gap-8">
+                    <div>
+                         <Skeleton className="h-64 w-full" />
+                    </div>
+                    <div className="space-y-6">
+                        <div className="space-y-2">
+                            <Skeleton className="h-5 w-24" />
+                            <Skeleton className="h-6 w-full" />
+                        </div>
+                        <div className="space-y-2">
+                             <Skeleton className="h-5 w-24" />
+                            <Skeleton className="h-6 w-full" />
+                        </div>
+                    </div>
+                </CardContent>
+                <CardFooter className="flex justify-end gap-2">
+                    <Skeleton className="h-10 w-24" />
+                    <Skeleton className="h-10 w-24" />
+                </CardFooter>
+            </Card>
+        </div>
+    );
+}
+
+export default function RideApplicationDetailPage() {
+    return (
+        <AdminPanelWrapper>
+            <RideApplicationDetailPageContent />
+        </AdminPanelWrapper>
+    )
 }

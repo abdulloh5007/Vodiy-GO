@@ -13,114 +13,10 @@ import Image from 'next/image';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Driver } from '@/lib/types';
 import { cn } from '@/lib/utils';
+import { AdminPanelWrapper } from '@/components/AdminPanelWrapper';
 
 
-function DriversPageSkeleton() {
-    return (
-        <div className="container mx-auto py-8 px-4">
-            <Card>
-                <CardHeader>
-                    <Skeleton className="h-8 w-1/2" />
-                    <Skeleton className="h-5 w-1/3" />
-                </CardHeader>
-                <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead><Skeleton className="h-5 w-20" /></TableHead>
-                        <TableHead><Skeleton className="h-5 w-24" /></TableHead>
-                        <TableHead><Skeleton className="h-5 w-16" /></TableHead>
-                        <TableHead className="text-right"><Skeleton className="h-5 w-20" /></TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {[...Array(5)].map((_, i) => (
-                           <TableRow key={i}>
-                                <TableCell>
-                                    <div className="flex items-center gap-3">
-                                        <Skeleton className="h-10 w-10 rounded-full" />
-                                        <div>
-                                            <Skeleton className="h-5 w-24 mb-2" />
-                                            <Skeleton className="h-4 w-32" />
-                                        </div>
-                                    </div>
-                                </TableCell>
-                                <TableCell>
-                                    <Skeleton className="h-5 w-28 mb-2" />
-                                    <Skeleton className="h-4 w-20" />
-                                </TableCell>
-                                <TableCell>
-                                    <Skeleton className="h-6 w-20 rounded-full" />
-                                </TableCell>
-                                <TableCell className="text-right">
-                                    <Skeleton className="h-8 w-8 rounded-md" />
-                                </TableCell>
-                           </TableRow>
-                        ))}
-                    </TableBody>
-                  </Table>
-                </CardContent>
-            </Card>
-        </div>
-    )
-}
-
-const StatusBadge = ({ status, t }: { status: Driver['status'], t: any }) => {
-    const statusMap: { [key in Driver['status']]: { label: string, icon: React.ReactNode, variant: "default" | "secondary" | "destructive" | "outline" } } = {
-        verified: {
-            label: t.verified || "Verified",
-            icon: <BadgeCheck className="h-4 w-4 mr-1"/>,
-            variant: "secondary"
-        },
-        pending: {
-            label: t.pending || "Pending",
-            icon: <BadgeAlert className="h-4 w-4 mr-1"/>,
-            variant: "default"
-        },
-        rejected: {
-            label: t.rejected || "Rejected",
-            icon: <BadgeX className="h-4 w-4 mr-1"/>,
-            variant: "destructive"
-        },
-        blocked: {
-            label: t.blocked || "Blocked",
-            icon: <Ban className="h-4 w-4 mr-1" />,
-            variant: "destructive"
-        }
-    }
-    const current = statusMap[status];
-
-    if (!current) {
-        return <Badge variant="outline">{status}</Badge>
-    }
-
-    return (
-        <Badge variant={current.variant as any} className="flex items-center w-fit">
-            {current.icon} {current.label}
-        </Badge>
-    )
-}
-
-const DriverCard = ({ driver, onDetailsClick, t }: { driver: Driver, onDetailsClick: (id: string) => void, t: any }) => (
-    <Card>
-        <CardHeader>
-            <CardTitle className="text-lg">{driver.name}</CardTitle>
-            <CardDescription>{driver.phone}</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-2">
-            <p className="text-sm font-medium">{driver.carModel} <span className="text-muted-foreground font-mono">({driver.carNumber})</span></p>
-            <StatusBadge status={driver.status} t={t} />
-        </CardContent>
-        <CardFooter className="p-2">
-            <Button variant="outline" className="w-full" onClick={() => onDetailsClick(driver.id)}>
-                {t.details || 'Details'} <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-        </CardFooter>
-    </Card>
-)
-
-
-export default function DriversPage() {
+function DriversPageContent() {
   const context = useContext(AppContext);
   const router = useRouter();
   const [viewMode, setViewMode] = useState<'table' | 'card'>('table');
@@ -243,4 +139,117 @@ export default function DriversPage() {
       </Card>
     </div>
   );
+}
+
+function DriversPageSkeleton() {
+    return (
+        <div className="container mx-auto py-8 px-4">
+            <Card>
+                <CardHeader>
+                    <Skeleton className="h-8 w-1/2" />
+                    <Skeleton className="h-5 w-1/3" />
+                </CardHeader>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead><Skeleton className="h-5 w-20" /></TableHead>
+                        <TableHead><Skeleton className="h-5 w-24" /></TableHead>
+                        <TableHead><Skeleton className="h-5 w-16" /></TableHead>
+                        <TableHead className="text-right"><Skeleton className="h-5 w-20" /></TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {[...Array(5)].map((_, i) => (
+                           <TableRow key={i}>
+                                <TableCell>
+                                    <div className="flex items-center gap-3">
+                                        <Skeleton className="h-10 w-10 rounded-full" />
+                                        <div>
+                                            <Skeleton className="h-5 w-24 mb-2" />
+                                            <Skeleton className="h-4 w-32" />
+                                        </div>
+                                    </div>
+                                </TableCell>
+                                <TableCell>
+                                    <Skeleton className="h-5 w-28 mb-2" />
+                                    <Skeleton className="h-4 w-20" />
+                                </TableCell>
+                                <TableCell>
+                                    <Skeleton className="h-6 w-20 rounded-full" />
+                                </TableCell>
+                                <TableCell className="text-right">
+                                    <Skeleton className="h-8 w-8 rounded-md" />
+                                </TableCell>
+                           </TableRow>
+                        ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+            </Card>
+        </div>
+    )
+}
+
+const StatusBadge = ({ status, t }: { status: Driver['status'], t: any }) => {
+    const statusMap: { [key in Driver['status']]: { label: string, icon: React.ReactNode, variant: "default" | "secondary" | "destructive" | "outline" } } = {
+        verified: {
+            label: t.verified || "Verified",
+            icon: <BadgeCheck className="h-4 w-4 mr-1"/>,
+            variant: "secondary"
+        },
+        pending: {
+            label: t.pending || "Pending",
+            icon: <BadgeAlert className="h-4 w-4 mr-1"/>,
+            variant: "default"
+        },
+        rejected: {
+            label: t.rejected || "Rejected",
+            icon: <BadgeX className="h-4 w-4 mr-1"/>,
+            variant: "destructive"
+        },
+        blocked: {
+            label: t.blocked || "Blocked",
+            icon: <Ban className="h-4 w-4 mr-1" />,
+            variant: "destructive"
+        }
+    }
+    const current = statusMap[status];
+
+    if (!current) {
+        return <Badge variant="outline">{status}</Badge>
+    }
+
+    return (
+        <Badge variant={current.variant as any} className="flex items-center w-fit">
+            {current.icon} {current.label}
+        </Badge>
+    )
+}
+
+const DriverCard = ({ driver, onDetailsClick, t }: { driver: Driver, onDetailsClick: (id: string) => void, t: any }) => (
+    <Card>
+        <CardHeader>
+            <CardTitle className="text-lg">{driver.name}</CardTitle>
+            <CardDescription>{driver.phone}</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-2">
+            <p className="text-sm font-medium">{driver.carModel} <span className="text-muted-foreground font-mono">({driver.carNumber})</span></p>
+            <StatusBadge status={driver.status} t={t} />
+        </CardContent>
+        <CardFooter className="p-2">
+            <Button variant="outline" className="w-full" onClick={() => onDetailsClick(driver.id)}>
+                {t.details || 'Details'} <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+        </CardFooter>
+    </Card>
+)
+
+
+export default function DriversPage() {
+  return (
+    <AdminPanelWrapper>
+        <DriversPageContent />
+    </AdminPanelWrapper>
+  )
 }

@@ -14,83 +14,10 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { Driver } from '@/lib/types';
 import { useRouter } from 'next/navigation';
+import { AdminPanelWrapper } from '@/components/AdminPanelWrapper';
 
 
-function AdminPageSkeleton() {
-    return (
-        <div className="container mx-auto py-8 px-4">
-            <Card>
-                <CardHeader>
-                    <Skeleton className="h-8 w-1/2" />
-                    <Skeleton className="h-5 w-1/3" />
-                </CardHeader>
-                <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead><Skeleton className="h-5 w-20" /></TableHead>
-                        <TableHead><Skeleton className="h-5 w-24" /></TableHead>
-                        <TableHead><Skeleton className="h-5 w-16" /></TableHead>
-                        <TableHead className="text-right"><Skeleton className="h-5 w-20" /></TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {[...Array(3)].map((_, i) => (
-                           <TableRow key={i}>
-                                <TableCell>
-                                    <Skeleton className="h-5 w-24 mb-2" />
-                                    <Skeleton className="h-4 w-32" />
-                                </TableCell>
-                                <TableCell>
-                                    <div className="flex items-center gap-3">
-                                        <Skeleton className="h-10 w-16 rounded-md" />
-                                        <div>
-                                            <Skeleton className="h-5 w-28 mb-2" />
-                                            <Skeleton className="h-4 w-20" />
-                                        </div>
-                                    </div>
-                                </TableCell>
-                                <TableCell>
-                                    <Skeleton className="h-6 w-16 rounded-full" />
-                                </TableCell>
-                                <TableCell className="text-right">
-                                    <div className="flex justify-end gap-2">
-                                        <Skeleton className="h-8 w-8 rounded-md" />
-                                        <Skeleton className="h-8 w-8 rounded-md" />
-                                    </div>
-                                </TableCell>
-                           </TableRow>
-                        ))}
-                    </TableBody>
-                  </Table>
-                </CardContent>
-            </Card>
-        </div>
-    )
-}
-
-const ApplicationCard = ({ driver, t, onDetailsClick }: { driver: Driver, t: any, onDetailsClick: (id: string) => void }) => {
-    return (
-        <Card>
-            <CardHeader>
-                <CardTitle className="text-lg">{driver.name}</CardTitle>
-                <CardDescription>{driver.phone}</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-2">
-                 <p className="text-sm font-medium">{driver.carModel} <span className="text-muted-foreground font-mono">({driver.carNumber})</span></p>
-                 <Badge variant="secondary">{driver.status}</Badge>
-            </CardContent>
-            <CardFooter className="p-2">
-                 <Button variant="outline" className="w-full" onClick={() => onDetailsClick(driver.id)}>
-                    {t.viewApplication || 'View Application'}
-                 </Button>
-            </CardFooter>
-        </Card>
-    );
-};
-
-
-export default function AdminPage() {
+function AdminPageContent() {
   const context = useContext(AppContext);
   const [viewMode, setViewMode] = useState<'table' | 'card'>('table');
   const router = useRouter();
@@ -204,4 +131,87 @@ export default function AdminPage() {
       </Card>
     </div>
   );
+}
+
+
+function AdminPageSkeleton() {
+    return (
+        <div className="container mx-auto py-8 px-4">
+            <Card>
+                <CardHeader>
+                    <Skeleton className="h-8 w-1/2" />
+                    <Skeleton className="h-5 w-1/3" />
+                </CardHeader>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead><Skeleton className="h-5 w-20" /></TableHead>
+                        <TableHead><Skeleton className="h-5 w-24" /></TableHead>
+                        <TableHead><Skeleton className="h-5 w-16" /></TableHead>
+                        <TableHead className="text-right"><Skeleton className="h-5 w-20" /></TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {[...Array(3)].map((_, i) => (
+                           <TableRow key={i}>
+                                <TableCell>
+                                    <Skeleton className="h-5 w-24 mb-2" />
+                                    <Skeleton className="h-4 w-32" />
+                                </TableCell>
+                                <TableCell>
+                                    <div className="flex items-center gap-3">
+                                        <Skeleton className="h-10 w-16 rounded-md" />
+                                        <div>
+                                            <Skeleton className="h-5 w-28 mb-2" />
+                                            <Skeleton className="h-4 w-20" />
+                                        </div>
+                                    </div>
+                                </TableCell>
+                                <TableCell>
+                                    <Skeleton className="h-6 w-16 rounded-full" />
+                                </TableCell>
+                                <TableCell className="text-right">
+                                    <div className="flex justify-end gap-2">
+                                        <Skeleton className="h-8 w-8 rounded-md" />
+                                        <Skeleton className="h-8 w-8 rounded-md" />
+                                    </div>
+                                </TableCell>
+                           </TableRow>
+                        ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+            </Card>
+        </div>
+    )
+}
+
+const ApplicationCard = ({ driver, t, onDetailsClick }: { driver: Driver, t: any, onDetailsClick: (id: string) => void }) => {
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle className="text-lg">{driver.name}</CardTitle>
+                <CardDescription>{driver.phone}</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-2">
+                 <p className="text-sm font-medium">{driver.carModel} <span className="text-muted-foreground font-mono">({driver.carNumber})</span></p>
+                 <Badge variant="secondary">{driver.status}</Badge>
+            </CardContent>
+            <CardFooter className="p-2">
+                 <Button variant="outline" className="w-full" onClick={() => onDetailsClick(driver.id)}>
+                    {t.viewApplication || 'View Application'}
+                 </Button>
+            </CardFooter>
+        </Card>
+    );
+};
+
+
+export default function AdminPage() {
+    return (
+        <AdminPanelWrapper>
+            <AdminPageContent />
+        </AdminPanelWrapper>
+    )
 }

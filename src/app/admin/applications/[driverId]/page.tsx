@@ -9,63 +9,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Loader2, ArrowLeft, User, Car, Hash, Check, X, ShieldCheck } from 'lucide-react';
 import Image from 'next/image';
 import { RejectionDialog } from '@/components/RejectionDialog';
+import { AdminPanelWrapper } from '@/components/AdminPanelWrapper';
 
-function ApplicationDetailSkeleton() {
-    return (
-        <div className="container mx-auto py-8 px-4">
-            <div className="mb-4">
-                 <Skeleton className="h-10 w-24" />
-            </div>
-            <Card>
-                <CardHeader>
-                    <Skeleton className="h-8 w-48" />
-                    <Skeleton className="h-5 w-64" />
-                </CardHeader>
-                <CardContent className="grid md:grid-cols-2 gap-8">
-                    <div>
-                         <Skeleton className="h-64 w-full" />
-                    </div>
-                    <div className="space-y-6">
-                        <div className="space-y-2">
-                            <Skeleton className="h-5 w-24" />
-                            <Skeleton className="h-6 w-full" />
-                        </div>
-                        <div className="space-y-2">
-                             <Skeleton className="h-5 w-24" />
-                            <Skeleton className="h-6 w-full" />
-                        </div>
-                        <div className="space-y-2">
-                            <Skeleton className="h-5 w-24" />
-                            <Skeleton className="h-6 w-full" />
-                        </div>
-                    </div>
-                </CardContent>
-                <CardFooter className="flex justify-end gap-2">
-                    <Skeleton className="h-10 w-24" />
-                    <Skeleton className="h-10 w-24" />
-                </CardFooter>
-            </Card>
-        </div>
-    );
-}
-
-const PhotoCard = ({ title, src, onImageClick }: { title: string, src: string, onImageClick: (src: string) => void }) => (
-    <div className="space-y-2">
-        <h3 className="font-semibold text-sm">{title}</h3>
-        <div className="relative aspect-video w-full">
-            <Image 
-                src={src} 
-                alt={title}
-                fill
-                className="rounded-lg object-cover cursor-pointer"
-                onClick={() => onImageClick(src)}
-            />
-        </div>
-    </div>
-);
-
-
-export default function ApplicationDetailPage() {
+function ApplicationDetailPageContent() {
     const context = useContext(AppContext);
     const router = useRouter();
     const params = useParams();
@@ -193,4 +139,67 @@ export default function ApplicationDetailPage() {
             />
         </>
     );
+}
+
+function ApplicationDetailSkeleton() {
+    return (
+        <div className="container mx-auto py-8 px-4">
+            <div className="mb-4">
+                 <Skeleton className="h-10 w-24" />
+            </div>
+            <Card>
+                <CardHeader>
+                    <Skeleton className="h-8 w-48" />
+                    <Skeleton className="h-5 w-64" />
+                </CardHeader>
+                <CardContent className="grid md:grid-cols-2 gap-8">
+                    <div>
+                         <Skeleton className="h-64 w-full" />
+                    </div>
+                    <div className="space-y-6">
+                        <div className="space-y-2">
+                            <Skeleton className="h-5 w-24" />
+                            <Skeleton className="h-6 w-full" />
+                        </div>
+                        <div className="space-y-2">
+                             <Skeleton className="h-5 w-24" />
+                            <Skeleton className="h-6 w-full" />
+                        </div>
+                        <div className="space-y-2">
+                            <Skeleton className="h-5 w-24" />
+                            <Skeleton className="h-6 w-full" />
+                        </div>
+                    </div>
+                </CardContent>
+                <CardFooter className="flex justify-end gap-2">
+                    <Skeleton className="h-10 w-24" />
+                    <Skeleton className="h-10 w-24" />
+                </CardFooter>
+            </Card>
+        </div>
+    );
+}
+
+const PhotoCard = ({ title, src, onImageClick }: { title: string, src: string, onImageClick: (src: string) => void }) => (
+    <div className="space-y-2">
+        <h3 className="font-semibold text-sm">{title}</h3>
+        <div className="relative aspect-video w-full">
+            <Image 
+                src={src} 
+                alt={title}
+                fill
+                className="rounded-lg object-cover cursor-pointer"
+                onClick={() => onImageClick(src)}
+            />
+        </div>
+    </div>
+);
+
+
+export default function ApplicationDetailPage() {
+    return (
+        <AdminPanelWrapper>
+            <ApplicationDetailPageContent />
+        </AdminPanelWrapper>
+    )
 }

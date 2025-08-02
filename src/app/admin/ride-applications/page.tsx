@@ -13,104 +13,10 @@ import Image from 'next/image';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { Ride, Driver } from '@/lib/types';
+import { AdminPanelWrapper } from '@/components/AdminPanelWrapper';
 
 
-function RideApplicationsSkeleton() {
-    return (
-        <div className="container mx-auto py-8 px-4">
-            <Card>
-                <CardHeader>
-                    <Skeleton className="h-8 w-1/2" />
-                    <Skeleton className="h-5 w-1/3" />
-                </CardHeader>
-                <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead><Skeleton className="h-5 w-20" /></TableHead>
-                        <TableHead><Skeleton className="h-5 w-24" /></TableHead>
-                        <TableHead><Skeleton className="h-5 w-32" /></TableHead>
-                        <TableHead><Skeleton className="h-5 w-16" /></TableHead>
-                        <TableHead className="text-right"><Skeleton className="h-5 w-20" /></TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {[...Array(3)].map((_, i) => (
-                           <TableRow key={i}>
-                                <TableCell>
-                                    <Skeleton className="h-5 w-24 mb-2" />
-                                    <Skeleton className="h-4 w-32" />
-                                </TableCell>
-                                <TableCell>
-                                    <div className="flex items-center gap-3">
-                                        <Skeleton className="h-10 w-16 rounded-md" />
-                                        <div>
-                                            <Skeleton className="h-5 w-28 mb-2" />
-                                            <Skeleton className="h-4 w-20" />
-                                        </div>
-                                    </div>
-                                </TableCell>
-                                <TableCell>
-                                    <Skeleton className="h-5 w-full" />
-                                </TableCell>
-                                <TableCell>
-                                    <Skeleton className="h-6 w-16 rounded-full" />
-                                </TableCell>
-                                <TableCell className="text-right">
-                                    <div className="flex justify-end gap-2">
-                                        <Skeleton className="h-8 w-8 rounded-md" />
-                                        <Skeleton className="h-8 w-8 rounded-md" />
-                                    </div>
-                                </TableCell>
-                           </TableRow>
-                        ))}
-                    </TableBody>
-                  </Table>
-                </CardContent>
-            </Card>
-        </div>
-    )
-}
-
-const RideApplicationCard = ({ ride, driver, onDetailsClick, onImageClick, t }: { ride: Ride, driver?: Driver, onDetailsClick: (id: string) => void, onImageClick: (url: string) => void, t: any }) => {
-    if (!driver) return null;
-
-    return (
-        <Card>
-            <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2">{ride.from} &rarr; {ride.to}</CardTitle>
-                <CardDescription className='flex items-center gap-1'><Clock className="h-4 w-4" />{ride.time || 'N/A'}</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3 pt-3 border-t">
-                 <div className="flex items-start gap-4">
-                    <Image 
-                        src={driver.carPhotoFrontUrl} 
-                        alt={driver.carModel} 
-                        width={100} 
-                        height={64} 
-                        className="rounded-md object-cover cursor-pointer aspect-video" 
-                        data-ai-hint="car side"
-                        onClick={() => onImageClick(driver.carPhotoFrontUrl)}
-                    />
-                    <div className='space-y-1'>
-                        <p className="font-semibold">{driver.name}</p>
-                        <p className="text-sm text-muted-foreground">{driver.carModel} ({driver.carNumber})</p>
-                        <p className="text-sm font-bold">{new Intl.NumberFormat('fr-FR').format(ride.price)} UZS</p>
-                    </div>
-                </div>
-                {ride.promoCode && <Badge variant="outline" className='flex items-center gap-1.5 w-fit'><Ticket className='h-4 w-4 text-green-500'/> {ride.promoCode}</Badge>}
-            </CardContent>
-            <CardFooter className="p-2">
-                 <Button variant="outline" className="w-full" onClick={() => onDetailsClick(ride.id)}>
-                    {t.details || 'Details'} <ArrowRight className="ml-2 h-4 w-4" />
-                 </Button>
-            </CardFooter>
-        </Card>
-    );
-};
-
-
-export default function RideApplicationsPage() {
+function RideApplicationsPageContent() {
   const context = useContext(AppContext);
   const router = useRouter();
   const [viewMode, setViewMode] = useState<'table' | 'card'>('table');
@@ -251,4 +157,107 @@ export default function RideApplicationsPage() {
       </Card>
     </div>
   );
+}
+
+function RideApplicationsSkeleton() {
+    return (
+        <div className="container mx-auto py-8 px-4">
+            <Card>
+                <CardHeader>
+                    <Skeleton className="h-8 w-1/2" />
+                    <Skeleton className="h-5 w-1/3" />
+                </CardHeader>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead><Skeleton className="h-5 w-20" /></TableHead>
+                        <TableHead><Skeleton className="h-5 w-24" /></TableHead>
+                        <TableHead><Skeleton className="h-5 w-32" /></TableHead>
+                        <TableHead><Skeleton className="h-5 w-16" /></TableHead>
+                        <TableHead className="text-right"><Skeleton className="h-5 w-20" /></TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {[...Array(3)].map((_, i) => (
+                           <TableRow key={i}>
+                                <TableCell>
+                                    <Skeleton className="h-5 w-24 mb-2" />
+                                    <Skeleton className="h-4 w-32" />
+                                </TableCell>
+                                <TableCell>
+                                    <div className="flex items-center gap-3">
+                                        <Skeleton className="h-10 w-16 rounded-md" />
+                                        <div>
+                                            <Skeleton className="h-5 w-28 mb-2" />
+                                            <Skeleton className="h-4 w-20" />
+                                        </div>
+                                    </div>
+                                </TableCell>
+                                <TableCell>
+                                    <Skeleton className="h-5 w-full" />
+                                </TableCell>
+                                <TableCell>
+                                    <Skeleton className="h-6 w-16 rounded-full" />
+                                </TableCell>
+                                <TableCell className="text-right">
+                                    <div className="flex justify-end gap-2">
+                                        <Skeleton className="h-8 w-8 rounded-md" />
+                                        <Skeleton className="h-8 w-8 rounded-md" />
+                                    </div>
+                                </TableCell>
+                           </TableRow>
+                        ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+            </Card>
+        </div>
+    )
+}
+
+const RideApplicationCard = ({ ride, driver, onDetailsClick, onImageClick, t }: { ride: Ride, driver?: Driver, onDetailsClick: (id: string) => void, onImageClick: (url: string) => void, t: any }) => {
+    if (!driver) return null;
+
+    return (
+        <Card>
+            <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2">{ride.from} &rarr; {ride.to}</CardTitle>
+                <CardDescription className='flex items-center gap-1'><Clock className="h-4 w-4" />{ride.time || 'N/A'}</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3 pt-3 border-t">
+                 <div className="flex items-start gap-4">
+                    <Image 
+                        src={driver.carPhotoFrontUrl} 
+                        alt={driver.carModel} 
+                        width={100} 
+                        height={64} 
+                        className="rounded-md object-cover cursor-pointer aspect-video" 
+                        data-ai-hint="car side"
+                        onClick={() => onImageClick(driver.carPhotoFrontUrl)}
+                    />
+                    <div className='space-y-1'>
+                        <p className="font-semibold">{driver.name}</p>
+                        <p className="text-sm text-muted-foreground">{driver.carModel} ({driver.carNumber})</p>
+                        <p className="text-sm font-bold">{new Intl.NumberFormat('fr-FR').format(ride.price)} UZS</p>
+                    </div>
+                </div>
+                {ride.promoCode && <Badge variant="outline" className='flex items-center gap-1.5 w-fit'><Ticket className='h-4 w-4 text-green-500'/> {ride.promoCode}</Badge>}
+            </CardContent>
+            <CardFooter className="p-2">
+                 <Button variant="outline" className="w-full" onClick={() => onDetailsClick(ride.id)}>
+                    {t.details || 'Details'} <ArrowRight className="ml-2 h-4 w-4" />
+                 </Button>
+            </CardFooter>
+        </Card>
+    );
+};
+
+
+export default function RideApplicationsPage() {
+  return (
+    <AdminPanelWrapper>
+        <RideApplicationsPageContent />
+    </AdminPanelWrapper>
+  )
 }

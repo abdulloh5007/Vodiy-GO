@@ -12,78 +12,10 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 import { User as UserType } from '@/lib/types';
+import { AdminPanelWrapper } from '@/components/AdminPanelWrapper';
 
 
-function UsersPageSkeleton() {
-    return (
-        <div className="container mx-auto py-8 px-4">
-            <Card>
-                <CardHeader>
-                    <Skeleton className="h-8 w-1/2" />
-                    <Skeleton className="h-5 w-1/3" />
-                </CardHeader>
-                <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead><Skeleton className="h-5 w-32" /></TableHead>
-                        <TableHead><Skeleton className="h-5 w-48" /></TableHead>
-                        <TableHead><Skeleton className="h-5 w-24" /></TableHead>
-                        <TableHead className="text-right"><Skeleton className="h-5 w-20" /></TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {[...Array(5)].map((_, i) => (
-                           <TableRow key={i}>
-                                <TableCell>
-                                     <div className="flex items-center gap-3">
-                                        <Skeleton className="h-10 w-10 rounded-full" />
-                                        <Skeleton className="h-5 w-32" />
-                                    </div>
-                                </TableCell>
-                                <TableCell>
-                                    <Skeleton className="h-5 w-full" />
-                                </TableCell>
-                                <TableCell>
-                                    <Skeleton className="h-5 w-full" />
-                                </TableCell>
-                                <TableCell className="text-right">
-                                    <Skeleton className="h-8 w-8 rounded-md" />
-                                </TableCell>
-                           </TableRow>
-                        ))}
-                    </TableBody>
-                  </Table>
-                </CardContent>
-            </Card>
-        </div>
-    )
-}
-
-const UserCard = ({ user, onDetailsClick, t }: { user: UserType, onDetailsClick: (id: string) => void, t: any }) => (
-     <Card>
-        <CardHeader className="p-4 flex-row items-center gap-4">
-            <Avatar className="h-16 w-16">
-                <AvatarImage src={`https://placehold.co/100x100.png`} alt={user.name} data-ai-hint="user portrait" />
-                <AvatarFallback>{user.name ? user.name.charAt(0) : 'U'}</AvatarFallback>
-            </Avatar>
-            <div className="space-y-1">
-                <CardTitle className="text-lg">{user.name || 'N/A'}</CardTitle>
-                <CardDescription>{user.email}</CardDescription>
-            </div>
-        </CardHeader>
-        <CardContent className="p-4 pt-0">
-             <p className="text-sm text-muted-foreground">{t.user_phone || 'Phone'}: {user.phone || t.notSpecified || 'Not specified'}</p>
-        </CardContent>
-        <CardFooter className="p-2">
-             <Button variant="outline" className="w-full" onClick={() => onDetailsClick(user.uid)}>
-                {t.details || 'Details'} <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-        </CardFooter>
-    </Card>
-)
-
-export default function UsersPage() {
+function UsersPageContent() {
   const context = useContext(AppContext);
   const router = useRouter();
   const [viewMode, setViewMode] = useState<'table' | 'card'>('table');
@@ -197,4 +129,81 @@ export default function UsersPage() {
       </Card>
     </div>
   );
+}
+
+function UsersPageSkeleton() {
+    return (
+        <div className="container mx-auto py-8 px-4">
+            <Card>
+                <CardHeader>
+                    <Skeleton className="h-8 w-1/2" />
+                    <Skeleton className="h-5 w-1/3" />
+                </CardHeader>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead><Skeleton className="h-5 w-32" /></TableHead>
+                        <TableHead><Skeleton className="h-5 w-48" /></TableHead>
+                        <TableHead><Skeleton className="h-5 w-24" /></TableHead>
+                        <TableHead className="text-right"><Skeleton className="h-5 w-20" /></TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {[...Array(5)].map((_, i) => (
+                           <TableRow key={i}>
+                                <TableCell>
+                                     <div className="flex items-center gap-3">
+                                        <Skeleton className="h-10 w-10 rounded-full" />
+                                        <Skeleton className="h-5 w-32" />
+                                    </div>
+                                </TableCell>
+                                <TableCell>
+                                    <Skeleton className="h-5 w-full" />
+                                </TableCell>
+                                <TableCell>
+                                    <Skeleton className="h-5 w-full" />
+                                </TableCell>
+                                <TableCell className="text-right">
+                                    <Skeleton className="h-8 w-8 rounded-md" />
+                                </TableCell>
+                           </TableRow>
+                        ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+            </Card>
+        </div>
+    )
+}
+
+const UserCard = ({ user, onDetailsClick, t }: { user: UserType, onDetailsClick: (id: string) => void, t: any }) => (
+     <Card>
+        <CardHeader className="p-4 flex-row items-center gap-4">
+            <Avatar className="h-16 w-16">
+                <AvatarImage src={`https://placehold.co/100x100.png`} alt={user.name} data-ai-hint="user portrait" />
+                <AvatarFallback>{user.name ? user.name.charAt(0) : 'U'}</AvatarFallback>
+            </Avatar>
+            <div className="space-y-1">
+                <CardTitle className="text-lg">{user.name || 'N/A'}</CardTitle>
+                <CardDescription>{user.email}</CardDescription>
+            </div>
+        </CardHeader>
+        <CardContent className="p-4 pt-0">
+             <p className="text-sm text-muted-foreground">{t.user_phone || 'Phone'}: {user.phone || t.notSpecified || 'Not specified'}</p>
+        </CardContent>
+        <CardFooter className="p-2">
+             <Button variant="outline" className="w-full" onClick={() => onDetailsClick(user.uid)}>
+                {t.details || 'Details'} <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+        </CardFooter>
+    </Card>
+)
+
+export default function UsersPage() {
+    return (
+        <AdminPanelWrapper>
+            <UsersPageContent />
+        </AdminPanelWrapper>
+    )
 }

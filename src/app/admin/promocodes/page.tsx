@@ -17,55 +17,10 @@ import { PromoCode } from '@/lib/types';
 import { format } from 'date-fns';
 import { enUS, ru, uz } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
+import { AdminPanelWrapper } from '@/components/AdminPanelWrapper';
 
 
-const getStatusBadge = (code: PromoCode, t: any) => {
-    const now = new Date();
-    let status = code.status;
-    if (status === 'active' && code.expiresAt.toDate() < now) {
-        status = 'expired';
-    }
-
-    switch (status) {
-        case 'active':
-            return <Badge variant="secondary"><CheckCircle className="h-4 w-4 mr-1 text-green-500" />{t.promo_status_active || 'Active'}</Badge>;
-        case 'depleted':
-            return <Badge variant="destructive"><XCircle className="h-4 w-4 mr-1" />{t.promo_status_depleted || 'Depleted'}</Badge>;
-        case 'expired':
-            return <Badge variant="outline"><AlertCircle className="h-4 w-4 mr-1" />{t.promo_status_expired || 'Expired'}</Badge>;
-        default:
-            return <Badge>{status}</Badge>
-    }
-}
-
-const PromoCodeCard = ({ code, t, getLocale }: { code: PromoCode, t: any, getLocale: () => Locale }) => {
-    const { toast } = useToast();
-    const handleCopy = () => {
-        navigator.clipboard.writeText(code.code);
-        toast({ title: t.promo_code_copied_title || "Copied!", description: (t.promo_code_copied_desc || 'Promo code {code} copied to clipboard.').replace('{code}', code.code) });
-    };
-
-    return (
-        <Card>
-            <CardHeader className="flex-row items-start justify-between">
-                <div>
-                    <CardTitle className="font-mono font-bold text-2xl tracking-wider">{code.code}</CardTitle>
-                    <CardDescription>{t.promo_table_usage}: {code.usageCount} / {code.limit}</CardDescription>
-                </div>
-                <Button variant="ghost" size="icon" onClick={handleCopy}>
-                    <Copy className="h-5 w-5" />
-                </Button>
-            </CardHeader>
-            <CardContent className="space-y-3">
-                <div>{getStatusBadge(code, t)}</div>
-                <p className="text-xs text-muted-foreground">{t.promo_table_expires}: {format(code.expiresAt.toDate(), 'PPP, HH:mm', { locale: getLocale() })}</p>
-            </CardContent>
-        </Card>
-    )
-};
-
-
-export default function PromoCodesPage() {
+function PromoCodesPageContent() {
     const context = useContext(AppContext);
     const { toast } = useToast();
 
@@ -249,4 +204,58 @@ export default function PromoCodesPage() {
             </Tabs>
         </div>
     );
+}
+
+const getStatusBadge = (code: PromoCode, t: any) => {
+    const now = new Date();
+    let status = code.status;
+    if (status === 'active' && code.expiresAt.toDate() < now) {
+        status = 'expired';
+    }
+
+    switch (status) {
+        case 'active':
+            return <Badge variant="secondary"><CheckCircle className="h-4 w-4 mr-1 text-green-500" />{t.promo_status_active || 'Active'}</Badge>;
+        case 'depleted':
+            return <Badge variant="destructive"><XCircle className="h-4 w-4 mr-1" />{t.promo_status_depleted || 'Depleted'}</Badge>;
+        case 'expired':
+            return <Badge variant="outline"><AlertCircle className="h-4 w-4 mr-1" />{t.promo_status_expired || 'Expired'}</Badge>;
+        default:
+            return <Badge>{status}</Badge>
+    }
+}
+
+const PromoCodeCard = ({ code, t, getLocale }: { code: PromoCode, t: any, getLocale: () => Locale }) => {
+    const { toast } = useToast();
+    const handleCopy = () => {
+        navigator.clipboard.writeText(code.code);
+        toast({ title: t.promo_code_copied_title || "Copied!", description: (t.promo_code_copied_desc || 'Promo code {code} copied to clipboard.').replace('{code}', code.code) });
+    };
+
+    return (
+        <Card>
+            <CardHeader className="flex-row items-start justify-between">
+                <div>
+                    <CardTitle className="font-mono font-bold text-2xl tracking-wider">{code.code}</CardTitle>
+                    <CardDescription>{t.promo_table_usage}: {code.usageCount} / {code.limit}</CardDescription>
+                </div>
+                <Button variant="ghost" size="icon" onClick={handleCopy}>
+                    <Copy className="h-5 w-5" />
+                </Button>
+            </CardHeader>
+            <CardContent className="space-y-3">
+                <div>{getStatusBadge(code, t)}</div>
+                <p className="text-xs text-muted-foreground">{t.promo_table_expires}: {format(code.expiresAt.toDate(), 'PPP, HH:mm', { locale: getLocale() })}</p>
+            </CardContent>
+        </Card>
+    )
+};
+
+
+export default function PromoCodesPage() {
+    return (
+        <AdminPanelWrapper>
+            <PromoCodesPageContent />
+        </AdminPanelWrapper>
+    )
 }

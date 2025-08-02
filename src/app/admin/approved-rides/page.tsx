@@ -23,43 +23,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { AdminPanelWrapper } from '@/components/AdminPanelWrapper';
 
-function ApprovedRidesSkeleton() {
-    return (
-        <div className="container mx-auto py-8 px-4">
-            <Card>
-                <CardHeader>
-                    <Skeleton className="h-8 w-1/2" />
-                    <Skeleton className="h-5 w-1/3" />
-                </CardHeader>
-                <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead><Skeleton className="h-5 w-24" /></TableHead>
-                        <TableHead><Skeleton className="h-5 w-32" /></TableHead>
-                        <TableHead><Skeleton className="h-5 w-28" /></TableHead>
-                        <TableHead className="text-right"><Skeleton className="h-5 w-20" /></TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {[...Array(5)].map((_, i) => (
-                           <TableRow key={i}>
-                                <TableCell><Skeleton className="h-5 w-full" /></TableCell>
-                                <TableCell><Skeleton className="h-5 w-full" /></TableCell>
-                                <TableCell><Skeleton className="h-5 w-full" /></TableCell>
-                                <TableCell className="text-right"><Skeleton className="h-8 w-8 rounded-md" /></TableCell>
-                           </TableRow>
-                        ))}
-                    </TableBody>
-                  </Table>
-                </CardContent>
-            </Card>
-        </div>
-    )
-}
-
-export default function ApprovedRidesPage() {
+function ApprovedRidesPageContent() {
   const context = useContext(AppContext);
   const router = useRouter();
 
@@ -158,4 +124,47 @@ export default function ApprovedRidesPage() {
       </Card>
     </div>
   );
+}
+
+function ApprovedRidesSkeleton() {
+    return (
+        <div className="container mx-auto py-8 px-4">
+            <Card>
+                <CardHeader>
+                    <Skeleton className="h-8 w-1/2" />
+                    <Skeleton className="h-5 w-1/3" />
+                </CardHeader>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead><Skeleton className="h-5 w-24" /></TableHead>
+                        <TableHead><Skeleton className="h-5 w-32" /></TableHead>
+                        <TableHead><Skeleton className="h-5 w-28" /></TableHead>
+                        <TableHead className="text-right"><Skeleton className="h-5 w-20" /></TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {[...Array(5)].map((_, i) => (
+                           <TableRow key={i}>
+                                <TableCell><Skeleton className="h-5 w-full" /></TableCell>
+                                <TableCell><Skeleton className="h-5 w-full" /></TableCell>
+                                <TableCell><Skeleton className="h-5 w-full" /></TableCell>
+                                <TableCell className="text-right"><Skeleton className="h-8 w-8 rounded-md" /></TableCell>
+                           </TableRow>
+                        ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+            </Card>
+        </div>
+    )
+}
+
+export default function ApprovedRidesPage() {
+    return (
+        <AdminPanelWrapper>
+            <ApprovedRidesPageContent />
+        </AdminPanelWrapper>
+    )
 }
