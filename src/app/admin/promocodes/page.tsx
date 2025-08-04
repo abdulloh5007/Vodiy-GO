@@ -17,7 +17,6 @@ import { PromoCode } from '@/lib/types';
 import { format } from 'date-fns';
 import { enUS, ru, uz } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
-import { AdminPanelWrapper } from '@/components/AdminPanelWrapper';
 
 
 function PromoCodesPageContent() {
@@ -254,8 +253,6 @@ const PromoCodeCard = ({ code, t, getLocale }: { code: PromoCode, t: any, getLoc
 
 export default function PromoCodesPage() {
     return (
-        <AdminPanelWrapper>
-            <PromoCodesPageContent />
-        </AdminPanelWrapper>
+        <PromoCodesPageContent />
     )
 }

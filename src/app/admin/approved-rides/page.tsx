@@ -23,7 +23,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { AdminPanelWrapper } from '@/components/AdminPanelWrapper';
 
 function ApprovedRidesPageContent() {
   const context = useContext(AppContext);
@@ -163,8 +162,6 @@ function ApprovedRidesSkeleton() {
 
 export default function ApprovedRidesPage() {
     return (
-        <AdminPanelWrapper>
-            <ApprovedRidesPageContent />
-        </AdminPanelWrapper>
+        <ApprovedRidesPageContent />
     )
 }

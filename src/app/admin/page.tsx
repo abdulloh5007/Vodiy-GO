@@ -14,7 +14,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { Driver } from '@/lib/types';
 import { useRouter } from 'next/navigation';
-import { AdminPanelWrapper } from '@/components/AdminPanelWrapper';
 
 
 function AdminPageContent() {
@@ -210,8 +209,6 @@ const ApplicationCard = ({ driver, t, onDetailsClick }: { driver: Driver, t: any
 
 export default function AdminPage() {
     return (
-        <AdminPanelWrapper>
-            <AdminPageContent />
-        </AdminPanelWrapper>
+        <AdminPageContent />
     )
 }

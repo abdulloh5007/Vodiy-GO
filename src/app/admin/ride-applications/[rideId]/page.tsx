@@ -11,7 +11,6 @@ import { Loader2, ArrowLeft, User, Car, Hash, Shield, Check, X, MapPin, Clock, T
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { RejectionDialog } from '@/components/RejectionDialog';
-import { AdminPanelWrapper } from '@/components/AdminPanelWrapper';
 
 function RideApplicationDetailPageContent() {
     const context = useContext(AppContext);
@@ -185,8 +184,6 @@ function RideDetailSkeleton() {
 
 export default function RideApplicationDetailPage() {
     return (
-        <AdminPanelWrapper>
-            <RideApplicationDetailPageContent />
-        </AdminPanelWrapper>
+        <RideApplicationDetailPageContent />
     )
 }

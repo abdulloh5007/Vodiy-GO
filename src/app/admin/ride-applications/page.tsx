@@ -13,7 +13,6 @@ import Image from 'next/image';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { Ride, Driver } from '@/lib/types';
-import { AdminPanelWrapper } from '@/components/AdminPanelWrapper';
 
 
 function RideApplicationsPageContent() {
@@ -256,8 +255,6 @@ const RideApplicationCard = ({ ride, driver, onDetailsClick, onImageClick, t }: 
 
 export default function RideApplicationsPage() {
   return (
-    <AdminPanelWrapper>
-        <RideApplicationsPageContent />
-    </AdminPanelWrapper>
+    <RideApplicationsPageContent />
   )
 }

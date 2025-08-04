@@ -53,9 +53,18 @@ export default function AdminLayout({
     );
   }
 
-  // Если пользователь - админ, или если это страница логина, показываем контент
-  if (user?.role === 'admin' || isLoginPage) {
-     return <>{children}</>;
+  // Если это страница логина, показываем контент без защиты
+  if (isLoginPage) {
+    return <>{children}</>;
+  }
+
+  // Если пользователь - админ, показываем контент с защитой
+  if (user?.role === 'admin') {
+     return (
+      <PinLockProvider>
+        {children}
+      </PinLockProvider>
+     );
   }
   
   // В противном случае (не админ и не страница логина) показываем загрузчик, пока происходит редирект

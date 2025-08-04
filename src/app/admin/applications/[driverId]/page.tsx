@@ -9,7 +9,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Loader2, ArrowLeft, User, Car, Hash, Check, X, ShieldCheck } from 'lucide-react';
 import Image from 'next/image';
 import { RejectionDialog } from '@/components/RejectionDialog';
-import { AdminPanelWrapper } from '@/components/AdminPanelWrapper';
 
 function ApplicationDetailPageContent() {
     const context = useContext(AppContext);
@@ -198,8 +197,6 @@ const PhotoCard = ({ title, src, onImageClick }: { title: string, src: string, o
 
 export default function ApplicationDetailPage() {
     return (
-        <AdminPanelWrapper>
-            <ApplicationDetailPageContent />
-        </AdminPanelWrapper>
+        <ApplicationDetailPageContent />
     )
 }

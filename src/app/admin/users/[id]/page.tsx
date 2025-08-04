@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useContext } from 'react';
@@ -8,7 +9,6 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowLeft, User, Mail, Phone, ShoppingBag } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { AdminPanelWrapper } from '@/components/AdminPanelWrapper';
 
 
 function UserDetailPageContent() {
@@ -115,8 +115,6 @@ function UserDetailSkeleton() {
 
 export default function UserDetailPage() {
     return (
-        <AdminPanelWrapper>
-            <UserDetailPageContent />
-        </AdminPanelWrapper>
+        <UserDetailPageContent />
     )
 }

@@ -23,7 +23,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { AdminPanelWrapper } from '@/components/AdminPanelWrapper';
 
 function UserApplicationsPageContent() {
   const context = useContext(AppContext);
@@ -240,8 +239,6 @@ const ApplicationCard = ({ request, onDelete, onCopy, t }: { request: UserRegist
 
 export default function UserApplicationsPage() {
     return (
-        <AdminPanelWrapper>
-            <UserApplicationsPageContent />
-        </AdminPanelWrapper>
+        <UserApplicationsPageContent />
     )
 }

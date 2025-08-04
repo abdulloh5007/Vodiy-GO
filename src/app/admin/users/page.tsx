@@ -12,7 +12,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 import { User as UserType } from '@/lib/types';
-import { AdminPanelWrapper } from '@/components/AdminPanelWrapper';
 
 
 function UsersPageContent() {
@@ -202,8 +201,6 @@ const UserCard = ({ user, onDetailsClick, t }: { user: UserType, onDetailsClick:
 
 export default function UsersPage() {
     return (
-        <AdminPanelWrapper>
-            <UsersPageContent />
-        </AdminPanelWrapper>
+        <UsersPageContent />
     )
 }

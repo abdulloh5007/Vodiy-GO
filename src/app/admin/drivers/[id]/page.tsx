@@ -13,7 +13,6 @@ import { Badge } from '@/components/ui/badge';
 import { Driver } from '@/lib/types';
 import { RejectionDialog } from '@/components/RejectionDialog';
 import { useToast } from '@/hooks/use-toast';
-import { AdminPanelWrapper } from '@/components/AdminPanelWrapper';
 
 function DriverDetailPageContent() {
     const context = useContext(AppContext);
@@ -250,8 +249,6 @@ const StatusBadge = ({ status, t }: { status: Driver['status'], t: any }) => {
 
 export default function DriverDetailPage() {
     return (
-        <AdminPanelWrapper>
-            <DriverDetailPageContent />
-        </AdminPanelWrapper>
+        <DriverDetailPageContent />
     )
 }

@@ -654,9 +654,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       loading,
       selectedImage, setSelectedImage
     }}>
-      <PinLockProvider>
-        {children}
-      </PinLockProvider>
+      {children}
       <ImageViewer imageUrl={selectedImage} onOpenChange={(open) => !open && setSelectedImage(null)} />
     </AppContext.Provider>
   );

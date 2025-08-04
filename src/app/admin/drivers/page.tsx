@@ -13,7 +13,6 @@ import Image from 'next/image';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Driver } from '@/lib/types';
 import { cn } from '@/lib/utils';
-import { AdminPanelWrapper } from '@/components/AdminPanelWrapper';
 
 
 function DriversPageContent() {
@@ -248,8 +247,6 @@ const DriverCard = ({ driver, onDetailsClick, t }: { driver: Driver, onDetailsCl
 
 export default function DriversPage() {
   return (
-    <AdminPanelWrapper>
-        <DriversPageContent />
-    </AdminPanelWrapper>
+    <DriversPageContent />
   )
 }
