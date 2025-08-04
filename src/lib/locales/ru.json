@@ -378,5 +378,11 @@
     "toast_pin_removed_title": "PIN-код удален",
     "toast_pin_removed_desc": "Защита с помощью PIN-кода была отключена.",
     "pin_screen_title": "Введите PIN-код",
-    "pin_screen_desc": "Введите ваш PIN-код для разблокировки."
+    "pin_screen_desc": "Введите ваш PIN-код для разблокировки.",
+    "message_booking_accepted_title": "Бронирование принято",
+    "message_booking_rejected_title": "Бронирование отклонено",
+    "message_booking_accepted_passenger_body": "Ваше бронирование на поездку из {from} в {to} было принято водителем.",
+    "message_booking_rejected_passenger_body": "К сожалению, ваше бронирование на поездку из {from} в {to} было отклонено водителем.",
+    "message_booking_accepted_driver_body": "Вы приняли бронирование от {client} на поездку из {from} в {to}.",
+    "message_booking_rejected_driver_body": "Вы отклонили бронирование от {client} на поездку из {from} в {to}."
 }

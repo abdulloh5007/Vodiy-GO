@@ -344,40 +344,55 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const updateOrderStatus = async (orderId: string, status: 'accepted' | 'rejected') => {
     const orderDocRef = doc(db, "orders", orderId);
+    let orderData: Order;
+    let rideData: Ride;
     
-    await runTransaction(db, async (transaction) => {
-        const orderDoc = await transaction.get(orderDocRef);
-        if (!orderDoc.exists()) {
-            throw "Order does not exist!";
-        }
-
-        const orderData = orderDoc.data() as Order;
-        const rideDocRef = doc(db, "rides", orderData.rideId);
-        const rideDoc = await transaction.get(rideDocRef);
-
-        if (!rideDoc.exists()) {
-            throw "Ride does not exist!";
-        }
-        
-        const rideData = rideDoc.data() as Ride;
-
-        // If a new order is accepted, decrement availableSeats
-        if (orderData.status === 'new' && status === 'accepted') {
-            if (rideData.availableSeats > 0) {
-                transaction.update(rideDocRef, { availableSeats: rideData.availableSeats - 1 });
-            } else {
-                 throw "No available seats to accept order.";
+    try {
+        await runTransaction(db, async (transaction) => {
+            const orderDoc = await transaction.get(orderDocRef);
+            if (!orderDoc.exists()) {
+                throw "Order does not exist!";
             }
-        } 
-        // If an accepted order is being rejected, increment availableSeats
-        else if (orderData.status === 'accepted' && status === 'rejected') {
-             if (rideData.availableSeats < rideData.seats) {
-                transaction.update(rideDocRef, { availableSeats: rideData.availableSeats + 1 });
-             }
-        }
+
+            orderData = orderDoc.data() as Order;
+            const rideDocRef = doc(db, "rides", orderData.rideId);
+            const rideDoc = await transaction.get(rideDocRef);
+
+            if (!rideDoc.exists()) {
+                throw "Ride does not exist!";
+            }
+            
+            rideData = rideDoc.data() as Ride;
+
+            if (orderData.status === 'new' && status === 'accepted') {
+                if (rideData.availableSeats > 0) {
+                    transaction.update(rideDocRef, { availableSeats: rideData.availableSeats - 1 });
+                } else {
+                     throw "No available seats to accept order.";
+                }
+            } 
+            else if (orderData.status === 'accepted' && status === 'rejected') {
+                 if (rideData.availableSeats < rideData.seats) {
+                    transaction.update(rideDocRef, { availableSeats: rideData.availableSeats + 1 });
+                 }
+            }
+            
+            transaction.update(orderDocRef, { status });
+        });
         
-        transaction.update(orderDocRef, { status });
-    });
+        // Send notifications outside the transaction
+        const messageParams = { from: rideData!.from, to: rideData!.to, client: orderData!.clientName };
+        if (status === 'accepted') {
+            await addMessage(orderData!.passengerId, 'BOOKING_ACCEPTED', 'message_booking_accepted_title', 'message_booking_accepted_passenger_body', messageParams);
+            await addMessage(rideData!.driverId, 'BOOKING_ACCEPTED', 'message_booking_accepted_title', 'message_booking_accepted_driver_body', messageParams);
+        } else {
+            await addMessage(orderData!.passengerId, 'BOOKING_REJECTED', 'message_booking_rejected_title', 'message_booking_rejected_passenger_body', messageParams);
+            await addMessage(rideData!.driverId, 'BOOKING_REJECTED', 'message_booking_rejected_title', 'message_booking_rejected_driver_body', messageParams);
+        }
+
+    } catch (e) {
+        console.error("Transaction failed: ", e);
+    }
   }
   
    const updateRideSeats = async (rideId: string, newSeatCount: number) => {
@@ -635,6 +650,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       userRegistrationRequests, deleteUserRegistrationRequest,
       addDriverApplication, updateDriverStatus, deleteDriver, 
       updateRideStatus, deleteRide,
+      updateOrderStatus,
       updateRideSeats,
       addRide, addOrder,
       login, 

@@ -378,5 +378,11 @@
     "toast_pin_removed_title": "PIN-kod olib tashlandi",
     "toast_pin_removed_desc": "PIN-kod bilan himoya o'chirildi.",
     "pin_screen_title": "PIN-kodni kiriting",
-    "pin_screen_desc": "Qulfni ochish uchun PIN-kodingizni kiriting."
+    "pin_screen_desc": "Qulfni ochish uchun PIN-kodingizni kiriting.",
+    "message_booking_accepted_title": "Buyurtma qabul qilindi",
+    "message_booking_rejected_title": "Buyurtma rad etildi",
+    "message_booking_accepted_passenger_body": "Sizning {from} dan {to} ga bo'lgan qatnovingiz haydovchi tomonidan qabul qilindi.",
+    "message_booking_rejected_passenger_body": "Afsuski, sizning {from} dan {to} ga bo'lgan qatnovingiz haydovchi tomonidan rad etildi.",
+    "message_booking_accepted_driver_body": "Siz {client}dan {from} dan {to} ga bo'lgan qatnovni qabul qildingiz.",
+    "message_booking_rejected_driver_body": "Siz {client}dan {from} dan {to} ga bo'lgan qatnovni rad etdingiz."
 }

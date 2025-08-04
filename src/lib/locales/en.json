@@ -378,5 +378,11 @@
     "toast_pin_removed_title": "PIN Code Removed",
     "toast_pin_removed_desc": "PIN protection has been disabled.",
     "pin_screen_title": "Enter PIN",
-    "pin_screen_desc": "Enter your PIN to unlock."
+    "pin_screen_desc": "Enter your PIN to unlock.",
+    "message_booking_accepted_title": "Booking Accepted",
+    "message_booking_rejected_title": "Booking Rejected",
+    "message_booking_accepted_passenger_body": "Your booking for the ride from {from} to {to} has been accepted by the driver.",
+    "message_booking_rejected_passenger_body": "Unfortunately, your booking for the ride from {from} to {to} was rejected by the driver.",
+    "message_booking_accepted_driver_body": "You have accepted the booking from {client} for the ride from {from} to {to}.",
+    "message_booking_rejected_driver_body": "You have rejected the booking from {client} for the ride from {from} to {to}."
 }

@@ -42,10 +42,12 @@ const getMessageIcon = (type: Message['type']) => {
     switch (type) {
         case 'REGISTRATION_APPROVED':
         case 'RIDE_APPROVED':
+        case 'BOOKING_ACCEPTED':
             return <CheckCircle2 className="h-5 w-5 text-green-500" />;
         case 'REGISTRATION_REJECTED':
         case 'RIDE_REJECTED':
         case 'REGISTRATION_BLOCKED':
+        case 'BOOKING_REJECTED':
             return <Ban className="h-5 w-5 text-red-500" />;
         case 'REGISTRATION_PENDING':
             return <FileText className="h-5 w-5 text-yellow-500" />;
