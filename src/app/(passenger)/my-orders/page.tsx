@@ -5,7 +5,7 @@ import { useContext, useMemo, useEffect, useState } from 'react';
 import { AppContext } from '@/contexts/AppContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ShieldAlert, User, Car, MapPin, Clock, HelpCircle, CheckCircle2, XCircle, Loader2 } from 'lucide-react';
+import { ShieldAlert, User, Car, MapPin, Clock, HelpCircle, CheckCircle2, XCircle, Loader2, Phone } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Order, Ride, Driver } from '@/lib/types';
 import Image from 'next/image';
@@ -97,6 +97,12 @@ const OrderCard = ({ order, ride, driver, t, getLocale, setSelectedImage }: { or
                 <div className="space-y-1 pt-2">
                     <p className="font-semibold flex items-center gap-2"><User className="h-4 w-4 text-muted-foreground" />{driver.name}</p>
                     <p className="text-sm text-muted-foreground flex items-center gap-2"><Car className="h-4 w-4" />{driver.carModel}</p>
+                    {order.status === 'accepted' && (
+                         <a href={`tel:${driver.phone}`} className="text-sm text-muted-foreground flex items-center gap-2 hover:text-primary pt-1">
+                            <Phone className="h-4 w-4" />
+                            {driver.phone}
+                        </a>
+                    )}
                 </div>
                  <div className="pt-3">
                     <OrderStatusBadge status={order.status} t={t} />

@@ -52,8 +52,8 @@ export default function DriverRegisterPage() {
     try {
         await register(email, password, name, 'driver', phone);
         toast({
-            title: t.registrationSuccessTitle,
-            description: t.redirectingToApplication,
+          title: t.registrationSuccessTitle,
+          description: t.redirectingToApplication,
         });
         router.push('/driver/profile/diagnostics');
     } catch(error) {
