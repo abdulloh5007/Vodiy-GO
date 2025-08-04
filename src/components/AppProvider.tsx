@@ -561,9 +561,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         uid: firebaseUser.uid, 
         email: fakeEmail, 
         name: requestData.name, 
-        role: 'passenger', 
+        role: 'passenger',
         phone: requestData.phone,
-        password: requestData.password, 
     };
     await setDoc(userDocRef, newUser);
 
@@ -587,12 +586,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     if (!userDocSnap.exists()) {
       await signOut(auth);
       throw new Error('auth/no-user-record');
-    }
-
-    const userData = userDocSnap.data() as User;
-    if (role && userData.role !== role) {
-      await signOut(auth);
-      throw new Error('auth/unauthorized-role');
     }
     
     return userCredential.user;
@@ -631,7 +624,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         role: role,
         name: name,
         phone: phone,
-        password: password,
     };
     await setDoc(userDocRef, newUser);
 
