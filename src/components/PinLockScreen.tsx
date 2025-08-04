@@ -117,7 +117,7 @@ export function PinLockScreen({ pinLength, correctPin, onUnlock }: PinLockScreen
                                     }
                                 >
                                     {key === 'delete' ? '⌫' : key}
-                                </Button>
+                                </Button> 
                             )
                         )}
                     </div>
