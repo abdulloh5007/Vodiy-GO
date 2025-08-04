@@ -99,7 +99,7 @@ export function Header() {
       </SheetTrigger>
       <SheetContent className="flex flex-col">
         <SheetHeader>
-          <SheetTitle>{user?.name || user?.email}</SheetTitle>
+          <SheetTitle>{user?.name || user?.phone || user?.email}</SheetTitle>
         </SheetHeader>
         <div className="flex-grow py-4 overflow-y-auto">
             <div className='flex flex-col gap-4'>
