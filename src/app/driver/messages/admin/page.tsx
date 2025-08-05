@@ -79,9 +79,11 @@ export default function AdminChatPage() {
     }
     
     const sortedMessages = useMemo(() => {
+        if (!user) return [];
+        // The messages in context are already filtered for the current user.
         // Sort from oldest to newest to display top-to-bottom
         return messages.sort((a,b) => a.createdAt.toMillis() - b.createdAt.toMillis());
-    }, [messages]);
+    }, [messages, user]);
 
     const getTranslatedMessage = (message: Message): { title: string, body: string } => {
         const title = t[message.titleKey] || message.titleKey;

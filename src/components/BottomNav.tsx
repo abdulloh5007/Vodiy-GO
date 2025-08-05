@@ -39,7 +39,7 @@ export function BottomNav() {
   ];
 
   return (
-    <div className="md:hidden fixed bottom-2 left-1/2 -translate-x-1/2 z-50 
+    <div className="fixed bottom-2 left-1/2 -translate-x-1/2 z-50 
       w-[95%] h-16 bg-slate-100/80 dark:bg-black/50 border border-slate-300 dark:border-white/20 backdrop-blur-xl 
       rounded-full shadow-xl ring-1 ring-black/5 dark:ring-white/10 flex items-center px-2 py-2">
 

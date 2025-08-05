@@ -1,5 +1,4 @@
 
-
 {
     "home": "Home",
     "login": "Login",
@@ -352,7 +351,7 @@
     "delete_request_confirm_desc": "This will permanently delete the registration request.",
     "backToProfile": "Back to Profile",
     "approved_rides_title": "Approved Rides",
-    "approved_rides_desc": "List of all active rides. You can manage or delete them here.",
+    "approved_rides_desc": "List of all active rides. You can manage them or delete them here.",
     "no_approved_rides": "No approved rides at the moment.",
     "delete_ride_confirm_title": "Delete Ride?",
     "delete_ride_confirm_desc": "This action will permanently delete the ride announcement. It will no longer be visible to passengers.",

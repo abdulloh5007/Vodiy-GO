@@ -199,8 +199,8 @@ export default function CreateRidePage() {
   }, [user, rides]);
 
   useEffect(() => {
-    if (loading) return;
-    if (driverProfile && driverProfile.status !== 'verified') {
+    if (loading || !driverProfile) return;
+    if (driverProfile.status !== 'verified') {
         router.push('/driver/profile/diagnostics');
     }
   }, [loading, driverProfile, router]);
@@ -248,7 +248,7 @@ export default function CreateRidePage() {
   const fromLocations = useMemo(() => locations.filter(loc => loc !== to), [to]);
   const toLocations = useMemo(() => locations.filter(loc => loc !== from), [from]);
   
-  if (loading || !t.home || !driverProfile || driverProfile.status !== 'verified') {
+  if (loading || !t.home || !driverProfile) {
       return <CreateRideSkeleton />;
   }
 
@@ -259,6 +259,11 @@ export default function CreateRidePage() {
         </div>
     )
   }
+  
+  if (driverProfile.status !== 'verified') {
+    return <CreateRideSkeleton />;
+  }
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -423,3 +428,4 @@ export default function CreateRidePage() {
     </div>
   );
 }
+

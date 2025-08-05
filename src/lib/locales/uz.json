@@ -1,5 +1,4 @@
 
-
 {
     "home": "Bosh sahifa",
     "login": "Kirish",
@@ -152,7 +151,7 @@
     "ride_table_car": "Avtomobil",
     "ride_table_ride": "Qatnov",
     "ride_table_price": "Narx",
-    "ride_table_status": "Holat",
+    "ride_table_status": "Holati",
     "ride_table_actions": "Harakatlar",
     "noPendingRideApplications": "Kutilayotgan qatnov arizalari yo'q",
     "validationErrorDescStep1": "Iltimos, to'g'ri ism, familiya kiriting va pasport va selfi rasmlarini yuklang.",
