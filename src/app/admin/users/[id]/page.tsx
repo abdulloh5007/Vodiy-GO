@@ -56,13 +56,6 @@ function UserDetailPageContent() {
                 </CardHeader>
                 <CardContent className="space-y-6 pt-6">
                     <div className="flex items-center gap-3">
-                        <Mail className="h-5 w-5 text-muted-foreground"/>
-                        <div>
-                            <p className="text-sm text-muted-foreground">{t.email || 'Email'}</p>
-                            <p className="font-semibold">{user.email}</p>
-                        </div>
-                    </div>
-                    <div className="flex items-center gap-3">
                         <Phone className="h-5 w-5 text-muted-foreground"/>
                         <div>
                             <p className="text-sm text-muted-foreground">{t.yourPhone || 'Phone'}</p>
