@@ -198,6 +198,13 @@ export default function CreateRidePage() {
     });
   }, [user, rides]);
 
+  useEffect(() => {
+    if (loading) return;
+    if (driverProfile && driverProfile.status !== 'verified') {
+        router.push('/driver/profile/diagnostics');
+    }
+  }, [loading, driverProfile, router]);
+
 
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const rawValue = e.target.value.replace(/\s/g, '');
@@ -241,13 +248,8 @@ export default function CreateRidePage() {
   const fromLocations = useMemo(() => locations.filter(loc => loc !== to), [to]);
   const toLocations = useMemo(() => locations.filter(loc => loc !== from), [from]);
   
-  if (loading || !t.home || !driverProfile) {
+  if (loading || !t.home || !driverProfile || driverProfile.status !== 'verified') {
       return <CreateRideSkeleton />;
-  }
-
-  if (driverProfile.status !== 'verified') {
-    router.push('/driver/profile/diagnostics');
-    return <CreateRideSkeleton />;
   }
 
   if (existingRide) {
