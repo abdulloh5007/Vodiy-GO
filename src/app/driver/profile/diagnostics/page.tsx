@@ -489,7 +489,7 @@ const DriverStatusPage = ({ driverProfile, t, deleteDriver }: { driverProfile: D
                 <CardContent className="space-y-4">
                     <CardDescription>{description}</CardDescription>
                     {rejectionReason && (
-                        <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-lg text-destructive text-sm">
+                        <div className="p-3 bg-destructive border border-destructive/20 rounded-lg text-sm">
                             <p className="font-semibold mb-1">{t.reason || 'Reason'}:</p>
                             <p>{rejectionReason}</p>
                         </div>

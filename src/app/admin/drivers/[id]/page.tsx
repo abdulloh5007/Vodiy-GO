@@ -95,9 +95,9 @@ function DriverDetailPageContent() {
                         <StatusBadge status={driver.status} t={t} />
                     </div>
                     {(driver.status === 'rejected' || driver.status === 'blocked') && driver.rejectionReason && (
-                        <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
-                            <p className="text-sm font-semibold text-destructive">{driver.status === 'rejected' ? t.rejection_reason : t.block_reason}:</p>
-                            <p className="text-sm text-destructive/80">{driver.rejectionReason}</p>
+                        <div className="p-3 bg-destructive border border-destructive/20 rounded-lg">
+                            <p className="text-sm font-semibold">{driver.status === 'rejected' ? t.rejection_reason : t.block_reason}:</p>
+                            <p className="text-sm">{driver.rejectionReason}</p>
                         </div>
                     )}
 
