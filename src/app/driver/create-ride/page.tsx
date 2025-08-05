@@ -21,6 +21,14 @@ import { cn } from '@/lib/utils';
 
 const locations = ["Sirdaryo", "Navoiy", "Jizzax", "Xorazm", "Buxoro", "Surxondaryo", "Namangan", "Andijon", "Qashqadaryo", "Samarqand", "Fargʻona", "Toshkent"];
 
+const timeOptions = [
+    "00:00", "01:00", "02:00", "03:00", "04:00", "05:00", 
+    "06:00", "07:00", "08:00", "09:00", "10:00", "11:00", 
+    "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", 
+    "18:00", "19:00", "20:00", "21:00", "22:00", "23:00"
+];
+
+
 function CreateRideSkeleton() {
     return (
         <div className="container mx-auto py-8 px-4 flex justify-center">
@@ -180,12 +188,10 @@ export default function CreateRidePage() {
     return rides.find(r => {
         if (r.driverId !== user.uid) return false;
         
-        // A pending ride always blocks creation of a new one.
         if (r.status === 'pending') {
             return true;
         }
 
-        // An approved ride blocks creation only if it has not expired.
         if (r.status === 'approved' && r.approvedAt) {
             const now = Date.now();
             const rideApprovedDate = r.approvedAt.toDate().getTime();
@@ -359,7 +365,15 @@ export default function CreateRidePage() {
                 </div>
                  <div className="space-y-2">
                   <Label htmlFor="time">{t.departureTimeOptional}</Label>
-                  <Input id="time" type="text" value={time} onChange={e => setTime(e.target.value)} placeholder={t.departureTimePlaceholder || 'e.g., 09:00 or Morning'} />
+                  <Select value={time} onValueChange={setTime}>
+                        <SelectTrigger id="time">
+                            <SelectValue placeholder={t.departureTimePlaceholder || 'e.g., 09:00 or Morning'} />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="">{t.notSpecified || "Not specified"}</SelectItem>
+                            {timeOptions.map(opt => <SelectItem key={opt} value={opt}>{opt}</SelectItem>)}
+                        </SelectContent>
+                    </Select>
                 </div>
             </div>
 
@@ -428,4 +442,3 @@ export default function CreateRidePage() {
     </div>
   );
 }
-
