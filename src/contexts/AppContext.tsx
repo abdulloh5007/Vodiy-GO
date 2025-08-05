@@ -35,6 +35,7 @@ interface AppContextType {
   requestUserRegistration: (name: string, phone: string, password?: string) => Promise<void>;
   verifyUser: (phone: string, code: string) => Promise<FirebaseAuthUser>;
   register: (email: string, password: string, name: string, role: 'driver' | 'passenger', phone: string) => Promise<FirebaseAuthUser>;
+  registerDriver: (phone: string, password: string) => Promise<FirebaseAuthUser>;
   logout: () => void;
   loading: boolean;
   selectedImage: string | null;

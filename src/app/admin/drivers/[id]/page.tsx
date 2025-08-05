@@ -140,7 +140,7 @@ function DriverDetailPageContent() {
                             <CheckCircle2 /> {t.unblock_driver || 'Unblock'}
                         </Button>
                     ) : (
-                        driver.status !== 'verified' && (
+                        driver.status !== 'pending' && (
                             <Button variant="destructive" onClick={() => setIsBlockDialogOpen(true)}>
                                 <Ban /> {t.block_driver || 'Block'}
                             </Button>

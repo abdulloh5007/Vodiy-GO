@@ -68,7 +68,6 @@ function UsersPageContent() {
                   <TableHeader>
                   <TableRow>
                       <TableHead>{t.userName || 'User Name'}</TableHead>
-                      <TableHead>{t.user_email || 'Email'}</TableHead>
                       <TableHead>{t.user_phone || 'Phone'}</TableHead>
                       <TableHead className="text-right">{t.details || 'Details'}</TableHead>
                   </TableRow>
@@ -85,9 +84,6 @@ function UsersPageContent() {
                               </Avatar>
                               <div className="font-medium">{user.name || 'N/A'}</div>
                           </div>
-                          </TableCell>
-                          <TableCell>
-                              <div className="text-sm text-muted-foreground">{user.email}</div>
                           </TableCell>
                           <TableCell>
                               <div className="text-sm text-muted-foreground">{user.phone || t.notSpecified || 'Not specified'}</div>
@@ -185,7 +181,6 @@ const UserCard = ({ user, onDetailsClick, t }: { user: UserType, onDetailsClick:
             </Avatar>
             <div className="space-y-1">
                 <CardTitle className="text-lg">{user.name || 'N/A'}</CardTitle>
-                <CardDescription>{user.email}</CardDescription>
             </div>
         </CardHeader>
         <CardContent className="p-4 pt-0">
