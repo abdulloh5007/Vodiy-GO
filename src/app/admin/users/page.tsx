@@ -67,6 +67,7 @@ function UsersPageContent() {
               <Table className="min-w-[800px]">
                   <TableHeader>
                   <TableRow>
+                      <TableHead>#</TableHead>
                       <TableHead>{t.userName || 'User Name'}</TableHead>
                       <TableHead>{t.user_phone || 'Phone'}</TableHead>
                       <TableHead className="text-right">{t.details || 'Details'}</TableHead>
@@ -74,8 +75,9 @@ function UsersPageContent() {
                   </TableHeader>
                   <TableBody>
                   {passengers.length > 0 ? (
-                      passengers.map(user => (
+                      passengers.map((user, index) => (
                       <TableRow key={user.uid}>
+                          <TableCell className="font-medium">{index + 1}</TableCell>
                           <TableCell>
                           <div className="flex items-center gap-3">
                               <Avatar>
@@ -138,6 +140,7 @@ function UsersPageSkeleton() {
                   <Table>
                     <TableHeader>
                       <TableRow>
+                        <TableHead><Skeleton className="h-5 w-12" /></TableHead>
                         <TableHead><Skeleton className="h-5 w-32" /></TableHead>
                         <TableHead><Skeleton className="h-5 w-48" /></TableHead>
                         <TableHead><Skeleton className="h-5 w-24" /></TableHead>
@@ -147,6 +150,9 @@ function UsersPageSkeleton() {
                     <TableBody>
                         {[...Array(5)].map((_, i) => (
                            <TableRow key={i}>
+                                <TableCell>
+                                    <Skeleton className="h-5 w-full" />
+                                </TableCell>
                                 <TableCell>
                                      <div className="flex items-center gap-3">
                                         <Skeleton className="h-10 w-10 rounded-full" />

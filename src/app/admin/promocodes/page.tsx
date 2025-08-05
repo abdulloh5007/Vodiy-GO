@@ -150,6 +150,7 @@ function PromoCodesPageContent() {
                                     <Table className="min-w-[600px]">
                                         <TableHeader>
                                             <TableRow>
+                                                <TableHead>#</TableHead>
                                                 <TableHead>{t.promo_table_code || 'Code'}</TableHead>
                                                 <TableHead>{t.promo_table_usage || 'Usage'}</TableHead>
                                                 <TableHead>{t.promo_table_expires || 'Expires At'}</TableHead>
@@ -159,11 +160,12 @@ function PromoCodesPageContent() {
                                         <TableBody>
                                             {loading ? (
                                                 <TableRow>
-                                                    <TableCell colSpan={4} className="h-24 text-center">{t.loading}</TableCell>
+                                                    <TableCell colSpan={5} className="h-24 text-center">{t.loading}</TableCell>
                                                 </TableRow>
                                             ) : promoCodes.length > 0 ? (
-                                                promoCodes.map((code) => (
+                                                promoCodes.map((code, index) => (
                                                     <TableRow key={code.id}>
+                                                        <TableCell className="font-medium">{index + 1}</TableCell>
                                                         <TableCell className="font-mono font-bold flex items-center gap-2">
                                                             {code.code} 
                                                             <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleCopyCode(code.code)}>
@@ -177,7 +179,7 @@ function PromoCodesPageContent() {
                                                 ))
                                             ) : (
                                                 <TableRow>
-                                                    <TableCell colSpan={4} className="h-24 text-center">{t.promo_no_codes || 'No promo codes created yet.'}</TableCell>
+                                                    <TableCell colSpan={5} className="h-24 text-center">{t.promo_no_codes || 'No promo codes created yet.'}</TableCell>
                                                 </TableRow>
                                             )}
                                         </TableBody>

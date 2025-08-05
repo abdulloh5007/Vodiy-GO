@@ -86,6 +86,7 @@ function UserApplicationsPageContent() {
                         <Table className="min-w-[600px]">
                             <TableHeader>
                             <TableRow>
+                                <TableHead>#</TableHead>
                                 <TableHead>{t.applicant_name || "Name"}</TableHead>
                                 <TableHead>{t.applicant_phone || "Phone"}</TableHead>
                                 <TableHead>{t.verification_code || "Verification Code"}</TableHead>
@@ -93,8 +94,9 @@ function UserApplicationsPageContent() {
                             </TableRow>
                             </TableHeader>
                             <TableBody>
-                            {userRegistrationRequests.map(request => (
+                            {userRegistrationRequests.map((request, index) => (
                                 <TableRow key={request.id}>
+                                    <TableCell className="font-medium">{index + 1}</TableCell>
                                     <TableCell className="font-medium">{request.name}</TableCell>
                                     <TableCell>{request.phone}</TableCell>
                                     <TableCell>
@@ -165,6 +167,7 @@ function ApplicationsSkeleton() {
                   <Table>
                     <TableHeader>
                       <TableRow>
+                        <TableHead><Skeleton className="h-5 w-12" /></TableHead>
                         <TableHead><Skeleton className="h-5 w-24" /></TableHead>
                         <TableHead><Skeleton className="h-5 w-32" /></TableHead>
                         <TableHead><Skeleton className="h-5 w-28" /></TableHead>
@@ -174,6 +177,7 @@ function ApplicationsSkeleton() {
                     <TableBody>
                         {[...Array(3)].map((_, i) => (
                            <TableRow key={i}>
+                                <TableCell><Skeleton className="h-5 w-full" /></TableCell>
                                 <TableCell>
                                     <Skeleton className="h-5 w-full" />
                                 </TableCell>

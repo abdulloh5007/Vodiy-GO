@@ -207,13 +207,10 @@ export function Header() {
             <>
                 {user?.role === 'passenger' && renderPassengerMenu()}
                 {user?.role === 'admin' && renderAdminMenu()}
-                {user?.role === 'driver' && (
-                    <Button variant="ghost" className="hidden md:flex" onClick={handleLogout}><LogOut className='mr-2'/> {t.logout}</Button>
-                 )}
             </>
           )}
         </div>
       </div>
-    </header> 
+    </header>
   );
 }

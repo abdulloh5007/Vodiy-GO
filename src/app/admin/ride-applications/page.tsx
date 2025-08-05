@@ -78,6 +78,7 @@ function RideApplicationsPageContent() {
                             <Table className="min-w-[900px]">
                                 <TableHeader>
                                 <TableRow>
+                                    <TableHead>#</TableHead>
                                     <TableHead>{t.ride_table_driver || 'Driver'}</TableHead>
                                     <TableHead>{t.ride_table_car || 'Car'}</TableHead>
                                     <TableHead>{t.ride_table_ride || 'Ride'}</TableHead>
@@ -87,11 +88,12 @@ function RideApplicationsPageContent() {
                                 </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {pendingRides.map(ride => {
+                                    {pendingRides.map((ride, index) => {
                                         const driver = drivers.find(d => d.id === ride.driverId);
                                         if (!driver) return null;
                                         return (
                                             <TableRow key={ride.id}>
+                                                <TableCell className="font-medium">{index + 1}</TableCell>
                                                 <TableCell>
                                                     <div className="font-medium">{driver.name}</div>
                                                     <div className="text-sm text-muted-foreground">{driver.phone}</div>
@@ -170,6 +172,7 @@ function RideApplicationsSkeleton() {
                   <Table>
                     <TableHeader>
                       <TableRow>
+                        <TableHead><Skeleton className="h-5 w-12" /></TableHead>
                         <TableHead><Skeleton className="h-5 w-20" /></TableHead>
                         <TableHead><Skeleton className="h-5 w-24" /></TableHead>
                         <TableHead><Skeleton className="h-5 w-32" /></TableHead>
@@ -180,6 +183,7 @@ function RideApplicationsSkeleton() {
                     <TableBody>
                         {[...Array(3)].map((_, i) => (
                            <TableRow key={i}>
+                                <TableCell><Skeleton className="h-5 w-full" /></TableCell>
                                 <TableCell>
                                     <Skeleton className="h-5 w-24 mb-2" />
                                     <Skeleton className="h-4 w-32" />

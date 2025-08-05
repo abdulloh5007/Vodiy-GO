@@ -62,6 +62,7 @@ function ApprovedRidesPageContent() {
                     <Table className="min-w-[900px]">
                         <TableHeader>
                             <TableRow>
+                                <TableHead>#</TableHead>
                                 <TableHead>{t.ride_table_driver || 'Driver'}</TableHead>
                                 <TableHead>{t.ride_table_ride || 'Ride'}</TableHead>
                                 <TableHead>{t.ride_table_price || 'Price'}</TableHead>
@@ -70,11 +71,12 @@ function ApprovedRidesPageContent() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {approvedRides.map(ride => {
+                            {approvedRides.map((ride, index) => {
                                 const driver = drivers.find(d => d.id === ride.driverId);
                                 if (!driver) return null;
                                 return (
                                     <TableRow key={ride.id}>
+                                        <TableCell className="font-medium">{index + 1}</TableCell>
                                         <TableCell>
                                             <div className="font-medium">{driver.name}</div>
                                             <div className="text-sm text-muted-foreground">{driver.phone}</div>
@@ -137,6 +139,7 @@ function ApprovedRidesSkeleton() {
                   <Table>
                     <TableHeader>
                       <TableRow>
+                        <TableHead><Skeleton className="h-5 w-12" /></TableHead>
                         <TableHead><Skeleton className="h-5 w-24" /></TableHead>
                         <TableHead><Skeleton className="h-5 w-32" /></TableHead>
                         <TableHead><Skeleton className="h-5 w-28" /></TableHead>
@@ -146,6 +149,7 @@ function ApprovedRidesSkeleton() {
                     <TableBody>
                         {[...Array(5)].map((_, i) => (
                            <TableRow key={i}>
+                                <TableCell><Skeleton className="h-5 w-full" /></TableCell>
                                 <TableCell><Skeleton className="h-5 w-full" /></TableCell>
                                 <TableCell><Skeleton className="h-5 w-full" /></TableCell>
                                 <TableCell><Skeleton className="h-5 w-full" /></TableCell>

@@ -68,6 +68,7 @@ function DriversPageContent() {
                 <Table className="min-w-[800px]">
                     <TableHeader>
                     <TableRow>
+                        <TableHead>#</TableHead>
                         <TableHead>{t.driver}</TableHead>
                         <TableHead>{t.car}</TableHead>
                         <TableHead>{t.status}</TableHead>
@@ -76,8 +77,9 @@ function DriversPageContent() {
                     </TableHeader>
                     <TableBody>
                     {verifiedDrivers.length > 0 ? (
-                        verifiedDrivers.map(driver => (
+                        verifiedDrivers.map((driver, index) => (
                         <TableRow key={driver.id}>
+                            <TableCell className="font-medium">{index + 1}</TableCell>
                             <TableCell>
                             <div className="flex items-center gap-3">
                                 <Image 
@@ -111,7 +113,7 @@ function DriversPageContent() {
                         ))
                     ) : (
                         <TableRow>
-                        <TableCell colSpan={4} className="text-center h-24">{t.noDriversFound || 'No drivers found.'}</TableCell>
+                        <TableCell colSpan={5} className="text-center h-24">{t.noDriversFound || 'No drivers found.'}</TableCell>
                         </TableRow>
                     )}
                     </TableBody>
@@ -152,6 +154,7 @@ function DriversPageSkeleton() {
                   <Table>
                     <TableHeader>
                       <TableRow>
+                        <TableHead><Skeleton className="h-5 w-12" /></TableHead>
                         <TableHead><Skeleton className="h-5 w-20" /></TableHead>
                         <TableHead><Skeleton className="h-5 w-24" /></TableHead>
                         <TableHead><Skeleton className="h-5 w-16" /></TableHead>
@@ -161,6 +164,9 @@ function DriversPageSkeleton() {
                     <TableBody>
                         {[...Array(5)].map((_, i) => (
                            <TableRow key={i}>
+                                <TableCell>
+                                     <Skeleton className="h-5 w-full" />
+                                </TableCell>
                                 <TableCell>
                                     <div className="flex items-center gap-3">
                                         <Skeleton className="h-10 w-10 rounded-full" />
