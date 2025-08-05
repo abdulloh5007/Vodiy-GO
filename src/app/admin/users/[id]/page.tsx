@@ -53,7 +53,7 @@ function UserDetailPageContent() {
                     </Avatar>
                     <CardTitle className="mt-4 text-2xl font-headline">{user.name || 'N/A'}</CardTitle>
                     <CardDescription>{user.uid}</CardDescription>
-                </CardHeader>
+                </CardHeader> 
                 <CardContent className="space-y-6 pt-6">
                     <div className="flex items-center gap-3">
                         <Phone className="h-5 w-5 text-muted-foreground"/>
