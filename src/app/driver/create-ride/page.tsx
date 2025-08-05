@@ -294,7 +294,7 @@ export default function CreateRidePage() {
               to,
               price: priceValue,
               info,
-              time,
+              time: time === 'none' ? '' : time,
               seats,
               ...(activatedPromo && { promoCode: activatedPromo.code }),
             });
@@ -370,7 +370,7 @@ export default function CreateRidePage() {
                             <SelectValue placeholder={t.departureTimePlaceholder || 'e.g., 09:00 or Morning'} />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="">{t.notSpecified || "Not specified"}</SelectItem>
+                            <SelectItem value="none">{t.notSpecified || "Not specified"}</SelectItem>
                             {timeOptions.map(opt => <SelectItem key={opt} value={opt}>{opt}</SelectItem>)}
                         </SelectContent>
                     </Select>
