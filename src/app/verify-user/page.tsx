@@ -19,26 +19,6 @@ function VerifyUserComponent() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [phone, setPhone] = useState('');
 
-  // Use a ref to ensure useEffect only runs once on mount
-  const isInitialMount = useRef(true);
-
-  useEffect(() => {
-    if (isInitialMount.current) {
-      isInitialMount.current = false;
-      const phoneFromParams = searchParams.get('phone');
-      if (phoneFromParams) {
-        setPhone(phoneFromParams);
-      } else {
-        toast({
-          title: "Error",
-          description: "No phone number provided for verification.",
-          variant: "destructive"
-        });
-        router.push('/');
-      }
-    }
-  }, [searchParams, router, toast]);
-
   if (!context) {
     return (
         <div className="flex h-screen w-full items-center justify-center">
@@ -47,7 +27,30 @@ function VerifyUserComponent() {
     );
   }
 
-  const { verifyUser, translations: t } = context;
+  const { verifyUser, translations: t, user, loading } = context;
+  
+  useEffect(() => {
+    if (!loading && user) {
+        router.push('/');
+    }
+  }, [user, loading, router]);
+
+
+  useEffect(() => {
+    const phoneFromParams = searchParams.get('phone');
+    if (phoneFromParams) {
+      setPhone(phoneFromParams);
+    } else if (!user && !loading) {
+      toast({
+        title: "Error",
+        description: "No phone number provided for verification.",
+        variant: "destructive"
+      });
+      router.push('/');
+    }
+  }, [searchParams, router, toast, user, loading]);
+
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,6 +85,14 @@ function VerifyUserComponent() {
         setIsSubmitting(false);
     }
   };
+  
+  if (loading || user) {
+      return (
+         <div className="flex h-screen w-full items-center justify-center">
+            <Loader2 className="h-12 w-12 animate-spin text-primary" />
+        </div>
+      )
+  }
 
   return (
     <div className="container mx-auto py-8 px-4 flex justify-center">
