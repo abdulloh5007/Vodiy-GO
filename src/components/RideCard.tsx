@@ -165,7 +165,7 @@ export function RideCard({ ride, onImageClick }: RideCardProps) {
           <Button 
             className="w-full bg-accent hover:bg-accent/80 text-accent-foreground" 
             onClick={handleBooking}
-            disabled={!!existingOrderForThisRide || hasActiveOrder}
+            disabled={!!existingOrderForThisRide || hasActiveOrder || loading}
             title={hasActiveOrder && !existingOrderForThisRide ? t.one_booking_limit_alert : ""}
           >
             {existingOrderForThisRide ? t.bookingRequestSent : t.bookNow}

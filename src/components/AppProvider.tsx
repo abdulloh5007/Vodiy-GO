@@ -49,6 +49,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [userRegistrationRequests, setUserRegistrationRequests] = useState<UserRegistrationRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const userSnapshotUnsubscribe = useRef<() => void | null>(null);
 
   useEffect(() => {
     // Get saved language from local storage
@@ -120,18 +121,26 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     });
 
     const unsubscribeAuth = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (userSnapshotUnsubscribe.current) {
+        userSnapshotUnsubscribe.current();
+        userSnapshotUnsubscribe.current = null;
+      }
+      
       if (firebaseUser) {
         const userDocRef = doc(db, 'users', firebaseUser.uid);
-        const userDocSnap = await getDoc(userDocRef);
-        if (userDocSnap.exists()) {
-            const userData = { uid: firebaseUser.uid, ...userDocSnap.data() } as User;
-            setUser(userData);
-        } else {
-            // This case should ideally not happen with the new flow, but as a fallback:
-            const newUser: User = { uid: firebaseUser.uid, email: firebaseUser.email, role: 'passenger' };
-            await setDoc(userDocRef, newUser);
-            setUser(newUser);
-        }
+        
+        userSnapshotUnsubscribe.current = onSnapshot(userDocRef, (userDocSnap) => {
+            if (userDocSnap.exists()) {
+                const userData = { uid: firebaseUser.uid, ...userDocSnap.data() } as User;
+                setUser(userData);
+            } else {
+                 setUser(null); // Document deleted or doesn't exist.
+            }
+        }, (error) => {
+            console.error("Error listening to user document:", error);
+            setUser(null);
+        });
+
       } else {
         setUser(null);
       }
@@ -146,6 +155,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       unsubscribeUsers();
       unsubscribePromoCodes();
       unsubscribeUserRequests();
+      if (userSnapshotUnsubscribe.current) {
+          userSnapshotUnsubscribe.current();
+      }
     };
   }, []); 
   
@@ -581,6 +593,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         name: requestData.name, 
         role: 'passenger',
         phone: requestData.phone,
+        status: 'active'
     };
     await setDoc(userDocRef, newUser);
 
@@ -649,6 +662,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         role: role,
         name: name,
         phone: phone,
+        status: 'active',
     };
     await setDoc(userDocRef, newUser);
 
@@ -667,6 +681,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         email: fakeEmail,
         role: 'driver',
         phone: phone,
+        status: 'active',
     };
     await setDoc(userDocRef, newUser);
     setUser(newUser);
@@ -703,3 +718,4 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     </AppContext.Provider>
   );
 }
+
