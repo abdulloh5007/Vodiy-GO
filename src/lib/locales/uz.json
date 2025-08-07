@@ -272,6 +272,7 @@
     "unblock_driver": "Blokdan chiqarish",
     "block_reason_title": "Bloklash sababi",
     "block_reason_desc": "Iltimos, ushbu haydovchini bloklash sababini ko'rsating.",
+    "block_reason_user_desc": "Iltimos, ushbu foydalanuvchini bloklash sababini ko'rsating.",
     "admin_chat_title": "Administrator",
     "admin_chat_desc": "Ariza holatlari va bildirishnomalar",
     "admin_chat_desc_short": "Holat yangilanishlari va bildirishnomalar",
@@ -387,5 +388,8 @@
     "message_booking_accepted_passenger_body": "Sizning {from} dan {to} ga bo'lgan qatnovingiz haydovchi tomonidan qabul qilindi.",
     "message_booking_rejected_passenger_body": "Afsuski, sizning {from} dan {to} ga bo'lgan qatnovingiz haydovchi tomonidan rad etildi.",
     "message_booking_accepted_driver_body": "Siz {client}dan {from} dan {to} ga bo'lgan qatnovni qabul qildingiz.",
-    "message_booking_rejected_driver_body": "Siz {client}dan {from} dan {to} ga bo'lgan qatnovni rad etdingiz."
+    "message_booking_rejected_driver_body": "Siz {client}dan {from} dan {to} ga bo'lgan qatnovni rad etdingiz.",
+    "user_status_active": "Faol",
+    "user_blocked_title": "Hisob bloklandi",
+    "user_blocked_desc": "Hisobingiz bloklangani uchun qatnovlarni bron qila olmaysiz. Sabab: {reason}"
 }

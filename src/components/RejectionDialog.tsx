@@ -22,9 +22,10 @@ interface RejectionDialogProps {
   t: any;
   title?: string;
   description?: string;
+  confirmText?: string;
 }
 
-export function RejectionDialog({ isOpen, onClose, onConfirm, t, title, description }: RejectionDialogProps) {
+export function RejectionDialog({ isOpen, onClose, onConfirm, t, title, description, confirmText }: RejectionDialogProps) {
   const [reason, setReason] = useState('');
 
   const handleConfirm = () => {
@@ -60,7 +61,7 @@ export function RejectionDialog({ isOpen, onClose, onConfirm, t, title, descript
             </Button>
           </DialogClose>
           <Button type="button" variant="destructive" onClick={handleConfirm} disabled={!reason.trim()}>
-            {t.confirm_rejection || 'Confirm Rejection'}
+            {confirmText || t.confirm_rejection || 'Confirm Rejection'}
           </Button>
         </DialogFooter>
       </DialogContent>

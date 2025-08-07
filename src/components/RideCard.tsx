@@ -67,6 +67,16 @@ export function RideCard({ ride, onImageClick }: RideCardProps) {
          });
          return;
     }
+
+    if (user.status === 'blocked') {
+        toast({
+            title: t.user_blocked_title || "Account Blocked",
+            description: (t.user_blocked_desc || "You cannot book rides because your account is blocked. Reason: {reason}").replace('{reason}', user.blockReason || t.reason_not_specified),
+            variant: 'destructive',
+            duration: 10000
+        });
+        return;
+    }
     
     await addOrder({
         rideId: ride.id,

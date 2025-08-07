@@ -272,6 +272,7 @@
     "unblock_driver": "Разблокировать",
     "block_reason_title": "Причина блокировки",
     "block_reason_desc": "Укажите причину блокировки этого водителя.",
+    "block_reason_user_desc": "Пожалуйста, укажите причину блокировки этого пользователя.",
     "admin_chat_title": "Администратор",
     "admin_chat_desc": "Статусы заявок и уведомления",
     "admin_chat_desc_short": "Обновления статусов и уведомления",
@@ -387,5 +388,8 @@
     "message_booking_accepted_passenger_body": "Ваше бронирование на поездку из {from} в {to} было принято водителем.",
     "message_booking_rejected_passenger_body": "К сожалению, ваше бронирование на поездку из {from} в {to} было отклонено водителем.",
     "message_booking_accepted_driver_body": "Вы приняли бронирование от {client} на поездку из {from} в {to}.",
-    "message_booking_rejected_driver_body": "Вы отклонили бронирование от {client} на поездку из {from} в {to}."
+    "message_booking_rejected_driver_body": "Вы отклонили бронирование от {client} на поездку из {from} в {to}.",
+    "user_status_active": "Активен",
+    "user_blocked_title": "Аккаунт заблокирован",
+    "user_blocked_desc": "Вы не можете бронировать поездки, так как ваш аккаунт заблокирован. Причина: {reason}"
 }

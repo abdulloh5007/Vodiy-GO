@@ -349,6 +349,19 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     await addMessage(driverId, 'REGISTRATION_UNBLOCKED', 'message_reg_unblocked_title', 'message_reg_unblocked_body');
   };
 
+  const updateUserStatus = async (userId: string, status: 'active' | 'blocked', reason?: string) => {
+    const userDocRef = doc(db, "users", userId);
+    const updateData: any = { status };
+
+    if (status === 'blocked' && reason) {
+      updateData.blockReason = reason;
+    } else if (status === 'active') {
+      updateData.blockReason = ''; // Clear reason on unblock
+    }
+
+    await updateDoc(userDocRef, updateData);
+  };
+
   const updateOrderStatus = async (orderId: string, status: 'accepted' | 'rejected') => {
     const orderDocRef = doc(db, "orders", orderId);
     let orderData: Order;
@@ -665,6 +678,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       language, setLanguage, translations,
       user,
       users,
+      updateUserStatus,
       drivers, rides, orders, 
       promoCodes, createPromoCode, checkPromoCode,
       messages,

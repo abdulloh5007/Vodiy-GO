@@ -272,6 +272,7 @@
     "unblock_driver": "Unblock",
     "block_reason_title": "Reason for blocking",
     "block_reason_desc": "Please specify the reason for blocking this driver.",
+    "block_reason_user_desc": "Please specify the reason for blocking this user.",
     "admin_chat_title": "Admin",
     "admin_chat_desc": "Application status and notifications",
     "admin_chat_desc_short": "Status updates & notifications",
@@ -387,5 +388,8 @@
     "message_booking_accepted_passenger_body": "Your booking for the ride from {from} to {to} has been accepted by the driver.",
     "message_booking_rejected_passenger_body": "Unfortunately, your booking for the ride from {from} to {to} was rejected by the driver.",
     "message_booking_accepted_driver_body": "You have accepted the booking from {client} for the ride from {from} to {to}.",
-    "message_booking_rejected_driver_body": "You have rejected the booking from {client} for the ride from {from} to {to}."
+    "message_booking_rejected_driver_body": "You have rejected the booking from {client} for the ride from {from} to {to}.",
+    "user_status_active": "Active",
+    "user_blocked_title": "Account Blocked",
+    "user_blocked_desc": "You cannot book rides because your account is blocked. Reason: {reason}"
 }

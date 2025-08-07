@@ -7,6 +7,8 @@ export type User = {
   name?: string;
   phone?: string;
   password?: string;
+  status?: 'active' | 'blocked';
+  blockReason?: string;
 };
 
 export type Driver = {

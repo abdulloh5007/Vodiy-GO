@@ -12,6 +12,7 @@ interface AppContextType {
   translations: Translations;
   user: User | null;
   users: User[];
+  updateUserStatus: (userId: string, status: 'active' | 'blocked', reason?: string) => Promise<void>;
   drivers: Driver[];
   rides: Ride[];
   orders: Order[];
