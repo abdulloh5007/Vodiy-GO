@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from "@/hooks/use-toast";
 import { FirebaseError } from 'firebase/app';
-import { ShieldCheck } from 'lucide-react';
+import { ShieldCheck, Eye, EyeOff } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
 
@@ -45,6 +45,7 @@ export default function AdminLoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
   if (!context) {
     throw new Error('AdminLoginPage must be used within an AppProvider');
@@ -126,7 +127,18 @@ export default function AdminLoginPage() {
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="login-password">Password</Label>
-                        <Input id="login-password" type="password" value={password} onChange={e => setPassword(e.target.value)} required />
+                         <div className="relative">
+                            <Input id="login-password" type={isPasswordVisible ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)} required />
+                             <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                className="absolute top-1/2 right-2 -translate-y-1/2 h-7 w-7"
+                                onClick={() => setIsPasswordVisible(!isPasswordVisible)}
+                            >
+                                {isPasswordVisible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                            </Button>
+                        </div>
                     </div>
                     <Button type="submit" className="w-full" disabled={isSubmitting}>{t.login}</Button>
                 </form>

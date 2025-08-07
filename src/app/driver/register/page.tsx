@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from "@/hooks/use-toast";
-import { Loader2 } from 'lucide-react';
+import { Loader2, Eye, EyeOff } from 'lucide-react';
 import { FirebaseError } from 'firebase/app';
 import Link from 'next/link';
 import { formatPhoneNumber } from '@/lib/utils';
@@ -24,6 +24,7 @@ export default function DriverRegisterPage() {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('+998');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
   if (!context) {
     throw new Error('RegisterDriverPage must be used within an AppProvider');
@@ -103,7 +104,18 @@ export default function DriverRegisterPage() {
             </div>
             <div className="space-y-2">
                 <Label htmlFor="password">{t.password}</Label>
-                <Input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} required disabled={isSubmitting} />
+                <div className="relative">
+                    <Input id="password" type={isPasswordVisible ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)} required disabled={isSubmitting} />
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute top-1/2 right-2 -translate-y-1/2 h-7 w-7"
+                        onClick={() => setIsPasswordVisible(!isPasswordVisible)}
+                    >
+                        {isPasswordVisible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </Button>
+                </div>
             </div>
             <Button type="submit" className="w-full" disabled={isSubmitting}>
                 {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

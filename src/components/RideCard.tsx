@@ -217,6 +217,7 @@ function RegisterForm({ onAuthSuccess }: { onAuthSuccess: (phone: string) => voi
     const [phone, setPhone] = useState('+998');
     const [password, setPassword] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
     if (!context) return null;
     const { translations: t, requestUserRegistration } = context;
@@ -266,7 +267,24 @@ function RegisterForm({ onAuthSuccess }: { onAuthSuccess: (phone: string) => voi
             </div>
              <div className="space-y-2">
                 <Label htmlFor="register-password">{t.password}</Label>
-                <Input id="register-password" type="password" value={password} onChange={e => setPassword(e.target.value)} required disabled={isSubmitting}/>
+                <div className="relative">
+                    <Input 
+                        id="register-password" 
+                        type={isPasswordVisible ? "text" : "password"} 
+                        value={password} onChange={e => setPassword(e.target.value)} 
+                        required 
+                        disabled={isSubmitting}
+                    />
+                     <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute top-1/2 right-2 -translate-y-1/2 h-7 w-7"
+                        onClick={() => setIsPasswordVisible(!isPasswordVisible)}
+                    >
+                        {isPasswordVisible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </Button>
+                </div>
             </div>
             <Button type="submit" className="w-full" disabled={isSubmitting}>
                 {isSubmitting ? <Loader2 className="animate-spin" /> : t.register}
