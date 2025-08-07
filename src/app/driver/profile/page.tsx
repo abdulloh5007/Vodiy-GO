@@ -32,18 +32,23 @@ function ProfileSkeleton() {
     );
 }
 
-const ProfileCard = ({ driver, t }: { driver: Driver, t: any }) => {
+const ProfileCard = ({ driver, t, onImageClick }: { driver: Driver, t: any, onImageClick: (url: string) => void }) => {
     return (
         <Card className="overflow-hidden mb-5">
             <CardContent className="p-4 flex items-center gap-4">
-                <Image
-                    src={driver.selfieUrl || 'https://placehold.co/100x100.png'}
-                    alt={driver.name}
-                    width={80}
-                    height={80}
-                    className="rounded-full object-cover aspect-square"
-                    data-ai-hint="driver portrait"
-                />
+                <div 
+                    className="relative h-20 w-20 rounded-full overflow-hidden cursor-pointer"
+                    onClick={() => onImageClick(driver.selfieUrl || 'https://placehold.co/100x100.png')}
+                >
+                    <Image
+                        src={driver.selfieUrl || 'https://placehold.co/100x100.png'}
+                        alt={driver.name}
+                        width={80}
+                        height={80}
+                        className="object-cover aspect-square"
+                        data-ai-hint="driver portrait"
+                    />
+                </div>
                 <div className="flex-grow">
                     <h2 className="text-xl font-bold">{driver.name}</h2>
                     <p className="text-sm text-muted-foreground">{driver.carModel} ({driver.carNumber})</p>
@@ -68,7 +73,7 @@ export default function DriverProfilePage() {
         throw new Error('DriverProfilePage must be used within an AppProvider');
     }
 
-    const { user, drivers, loading, translations: t, logout } = context;
+    const { user, drivers, loading, translations: t, logout, setSelectedImage } = context;
 
     const driverProfile = user ? drivers.find(d => d.id === user.uid) : null;
 
@@ -79,7 +84,7 @@ export default function DriverProfilePage() {
     return (
         <div className="container mx-auto py-8 px-4 flex flex-col h-full">
             <div className="flex-grow space-y-4">
-                <ProfileCard driver={driverProfile} t={t} />
+                <ProfileCard driver={driverProfile} t={t} onImageClick={setSelectedImage} />
 
                 <Link href="/driver/profile/diagnostics">
                     <Button variant="outline" className="w-full justify-between h-16 text-left">
@@ -87,7 +92,7 @@ export default function DriverProfilePage() {
                          <FileText className="h-6 w-6 text-primary" />
                          <div>
                             <p className="font-semibold">{t.diagnostics_title || "Diagnostics"}</p>
-                            <p className="text-sm text-muted-foreground">{t.diagnostics_profile_button_desc || "Submit or check your verification status"}</p>
+                            <p className="text-sm text-muted-foreground whitespace-normal">{t.diagnostics_profile_button_desc || "Submit or check your verification status"}</p>
                          </div>
                        </div>
                        <ChevronRight className="h-5 w-5 text-muted-foreground" />
@@ -100,7 +105,7 @@ export default function DriverProfilePage() {
                          <History className="h-6 w-6 text-primary" />
                          <div>
                             <p className="font-semibold">{t.announcement_history_title || "Announcement History"}</p>
-                            <p className="text-sm text-muted-foreground">{t.announcement_history_desc || "View your past ride announcements"}</p>
+                            <p className="text-sm text-muted-foreground whitespace-normal">{t.announcement_history_desc || "View your past ride announcements"}</p>
                          </div>
                        </div>
                        <ChevronRight className="h-5 w-5 text-muted-foreground" />

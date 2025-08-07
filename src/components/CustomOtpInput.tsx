@@ -51,7 +51,7 @@ export function CustomOtpInput({ value, onChange, numInputs }: CustomOtpInputPro
         <Input
           key={index}
           ref={(el) => (inputsRef.current[index] = el)}
-          type="text"
+          type="number"
           maxLength={1}
           value={value[index] || ''}
           onChange={(e: ChangeEvent<HTMLInputElement>) => handleChange(e.target, index)}

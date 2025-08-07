@@ -33,7 +33,7 @@ export default function RootLayout({
           <AppProvider> 
             <div className="relative flex min-h-screen w-full flex-col">
               <Header />
-              <main className="flex-1 pt-4 pb-20 md:pb-0">
+              <main className="flex-1 pt-4 pb-20" style={{ paddingBottom: '100px' }}>
                 {children}
               </main> 
               <BottomNav />
