@@ -340,7 +340,7 @@
     "registration_request_sent_desc": "Ro'yxatdan o'tish so'rovingiz yuborildi. Administrator {phone} raqamiga SMS orqali tasdiqlash kodini yuboradi.",
     "registration_phone-exists": "Ushbu telefon raqami bilan foydalanuvchi allaqachon ro'yxatdan o'tishni so'ragan.",
     "verify_account_title": "Hisobingizni tasdiqlang",
-    "verify_account_desc": "{phone} raqamiga administrator tomonidan yuborilgan 6 xonali kodni kiriting.",
+    "verify_account_desc": "{phone} raqamiga administrator tomonidan yuborilgan 6 xonali kodni kiriting. Kod 5 daqiqa ichida keladi. Kod kelish vaqti ertalab 6:00 dan 23:00 gacha",
     "verify_button": "Tasdiqlash va ro'yxatdan o'tish",
     "verify_code_length_error": "Iltimos, 6 xonali kodni kiriting.",
     "verification_not-found": "Ro'yxatdan o'tish so'rovi topilmadi. Iltimos, qaytadan ro'yxatdan o'tishga harakat qiling.",

@@ -340,7 +340,7 @@
     "registration_request_sent_desc": "Your registration request has been sent. The admin will send a verification code to {phone} via SMS.",
     "registration_phone-exists": "A user with this phone number has already requested registration.",
     "verify_account_title": "Verify Your Account",
-    "verify_account_desc": "Enter the 6-digit code sent by the administrator to {phone}.",
+    "verify_account_desc": "Enter the 6-digit code sent by the administrator to {phone}. Code will come in 5 minutes. Code comes from 6:00 am to 11:00 pm",
     "verify_button": "Verify & Register",
     "verify_code_length_error": "Please enter the 6-digit code.",
     "verification_not-found": "Registration request not found. Please try registering again.",
