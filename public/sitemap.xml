@@ -1,4 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-
+  <url><loc>https://vodiy-go.vercel.app/driver/create-ride/</loc></url>
+  <url><loc>https://vodiy-go.vercel.app/driver/login/</loc></url>
+  <url><loc>https://vodiy-go.vercel.app/driver/messages/</loc></url>
+  <url><loc>https://vodiy-go.vercel.app/driver/my-orders/</loc></url>
+  <url><loc>https://vodiy-go.vercel.app/driver/notifications/</loc></url>
+  <url><loc>https://vodiy-go.vercel.app/driver/profile/</loc></url>
+  <url><loc>https://vodiy-go.vercel.app/driver/register/</loc></url>
+  <url><loc>https://vodiy-go.vercel.app/driver/messages/admin/</loc></url>
+  <url><loc>https://vodiy-go.vercel.app/driver/profile/announcement-history/</loc></url>
+  <url><loc>https://vodiy-go.vercel.app/driver/profile/diagnostics/</loc></url>
+  <url><loc>https://vodiy-go.vercel.app/driver/profile/rating/</loc></url>
 </urlset>
