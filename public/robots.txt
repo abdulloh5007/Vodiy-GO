@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://ТВОЙ_ДОМЕН/sitemap.xml
+Sitemap: https://vodiy-go.vercel.app/sitemap.xml
