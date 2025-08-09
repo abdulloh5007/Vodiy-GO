@@ -50,29 +50,37 @@ function AdminPageContent() {
   };
 
   useEffect(() => {
-    if ('serviceWorker' in navigator && 'PushManager' in window) {
+    if ('serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window) {
       (async () => {
         try {
+          // 0. Запрос разрешения на уведомления
+          const permission = await Notification.requestPermission();
+          if (permission !== 'granted') {
+            console.warn('Пользователь не разрешил уведомления');
+            return;
+          }
+  
           // 1. Регистрируем service worker
           const registration = await navigator.serviceWorker.register('/sw.js');
-
-          // 2. Запрашиваем публичный ключ
-          const publicKey = await fetch('http://localhost:3000/vapidPublicKey').then(res => res.text());
-
+          console.log('Service Worker зарегистрирован');
+  
+          // 2. Запрашиваем публичный ключ с backend
+          const publicKey = await fetch('https://vodiy-go-notification.onrender.com/vapidPublicKey').then(res => res.text());
+  
           // 3. Подписываемся
           const subscription = await registration.pushManager.subscribe({
             userVisibleOnly: true,
             applicationServerKey: urlBase64ToUint8Array(publicKey)
           });
-
+  
           // 4. Отправляем подписку на сервер
-          await fetch('http://localhost:3000/subscribe', {
+          await fetch('https://vodiy-go-notification.onrender.com/subscribe', {
             method: 'POST',
             body: JSON.stringify(subscription),
             headers: { 'Content-Type': 'application/json' }
           });
-
-          console.log('Push подписка оформлена');
+  
+          console.log('✅ Push подписка оформлена');
         } catch (err) {
           console.error('Ошибка подписки:', err);
         }
