@@ -67,6 +67,7 @@ export default function AdminLayout({
      );
   }
   
+  
   // В противном случае (не админ и не страница логина) показываем загрузчик, пока происходит редирект
   return (
     <div className="flex h-screen w-full items-center justify-center">

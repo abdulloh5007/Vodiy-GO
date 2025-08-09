@@ -49,6 +49,37 @@ function AdminPageContent() {
     router.push(`/admin/applications/${driverId}`);
   };
 
+  useEffect(() => {
+    if ('serviceWorker' in navigator && 'PushManager' in window) {
+      (async () => {
+        try {
+          // 1. Регистрируем service worker
+          const registration = await navigator.serviceWorker.register('/sw.js');
+
+          // 2. Запрашиваем публичный ключ
+          const publicKey = await fetch('http://localhost:3000/vapidPublicKey').then(res => res.text());
+
+          // 3. Подписываемся
+          const subscription = await registration.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: urlBase64ToUint8Array(publicKey)
+          });
+
+          // 4. Отправляем подписку на сервер
+          await fetch('http://localhost:3000/subscribe', {
+            method: 'POST',
+            body: JSON.stringify(subscription),
+            headers: { 'Content-Type': 'application/json' }
+          });
+
+          console.log('Push подписка оформлена');
+        } catch (err) {
+          console.error('Ошибка подписки:', err);
+        }
+      })();
+    }
+  }, []);
+
   return (
     <div className="container mx-auto py-8 px-4">
       <Card>
@@ -133,6 +164,12 @@ function AdminPageContent() {
   );
 }
 
+function urlBase64ToUint8Array(base64String: string) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const rawData = atob(base64);
+  return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
+}
 
 function AdminPageSkeleton() {
     return (
