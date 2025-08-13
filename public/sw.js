@@ -11,11 +11,6 @@ self.addEventListener('push', event => {
     payload = { title: 'Уведомление', body: 'Новое событие' };
   }
 
-  // Если сервер не прислал url, но это админ — ставим /admin по умолчанию
-  if (!payload.url && payload.forAdmin) {
-    payload.url = '/admin';
-  }
-
   const title = payload.title || 'Уведомление';
   const options = {
     body: payload.body || '',
