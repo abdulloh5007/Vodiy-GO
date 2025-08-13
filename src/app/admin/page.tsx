@@ -74,7 +74,7 @@ function AdminPageContent() {
           });
   
           // 4. Отправляем подписку на сервер
-          await fetch('https://vodiy-go-notification.onrender.com/subscribe', {
+          await fetch('https://vodiy-go-notification.onrender.com/subscribe-admin', {
             method: 'POST',
             body: JSON.stringify(subscription),
             headers: { 'Content-Type': 'application/json' }

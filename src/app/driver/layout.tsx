@@ -18,14 +18,14 @@ export default function DriverLayout({
   if (!context) {
     // This case should ideally not happen if the provider is at the root
     return (
-        <div className="flex h-screen w-full items-center justify-center">
-            <Loader2 className="h-12 w-12 animate-spin text-primary" />
-        </div>
+      <div className="flex h-screen w-full items-center justify-center">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+      </div>
     );
   }
 
   const { user, drivers, loading } = context;
-  
+
   const driverProfile = useMemo(() => {
     if (!user) return null;
     return drivers.find(d => d.id === user.uid);
@@ -35,7 +35,7 @@ export default function DriverLayout({
     if (loading) return;
 
     const isAuthPage = pathname === '/driver/login' || pathname === '/driver/register';
-    
+
     if (!user && !isAuthPage) {
       router.push('/driver/login');
       return;
@@ -50,18 +50,18 @@ export default function DriverLayout({
       // If a driver user exists but they haven't started the application yet,
       // and they are not on an auth or diagnostics page, redirect them.
       if (!driverProfile && pathname !== '/driver/profile/diagnostics' && !isAuthPage) {
-         router.push('/driver/profile/diagnostics');
+        router.push('/driver/profile/diagnostics');
       }
     }
   }, [user, loading, driverProfile, router, pathname]);
-  
-  const isAuthPage = pathname === '/driver/login' || pathname === '/driver/register';
 
+  const isAuthPage = pathname === '/driver/login' || pathname === '/driver/register';
+  
   if (loading || (!user && !isAuthPage)) {
     return (
-        <div className="flex h-screen w-full items-center justify-center">
-            <Loader2 className="h-12 w-12 animate-spin text-primary" />
-        </div>
+      <div className="flex h-screen w-full items-center justify-center">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+      </div>
     );
   }
 

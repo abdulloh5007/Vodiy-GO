@@ -22,9 +22,9 @@ import { cn } from '@/lib/utils';
 const locations = ["Sirdaryo", "Navoiy", "Jizzax", "Xorazm", "Buxoro", "Surxondaryo", "Namangan", "Andijon", "Qashqadaryo", "Samarqand", "Fargʻona", "Toshkent"];
 
 const timeOptions = [
-    "00:00", "01:00", "02:00", "03:00", "04:00", "05:00", 
-    "06:00", "07:00", "08:00", "09:00", "10:00", "11:00", 
-    "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", 
+    "00:00", "01:00", "02:00", "03:00", "04:00", "05:00",
+    "06:00", "07:00", "08:00", "09:00", "10:00", "11:00",
+    "12:00", "13:00", "14:00", "15:00", "16:00", "17:00",
     "18:00", "19:00", "20:00", "21:00", "22:00", "23:00"
 ];
 
@@ -44,11 +44,11 @@ function CreateRideSkeleton() {
                             <Skeleton className="h-10 w-full" />
                         </div>
                         <div className="space-y-2">
-                             <Skeleton className="h-5 w-16" />
+                            <Skeleton className="h-5 w-16" />
                             <Skeleton className="h-10 w-full" />
                         </div>
                     </div>
-                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Skeleton className="h-5 w-16" />
                             <Skeleton className="h-10 w-full" />
@@ -58,7 +58,7 @@ function CreateRideSkeleton() {
                             <Skeleton className="h-10 w-full" />
                         </div>
                     </div>
-                     <div className="space-y-2">
+                    <div className="space-y-2">
                         <Skeleton className="h-5 w-32" />
                         <Skeleton className="h-20 w-full" />
                     </div>
@@ -90,12 +90,53 @@ const ActiveRideCard = ({ ride, t, updateRideSeats }: { ride: Ride, t: any, upda
 
             const hours = Math.floor(diff / (1000 * 60 * 60));
             const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            
+
             setTimeLeft(`${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`);
         }, 1000);
 
         return () => clearInterval(interval);
     }, [ride, t.expired]);
+
+    // Регистрация Service Worker + подписка
+    useEffect(() => {
+        if ('serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window) {
+            (async () => {
+                try {
+                    // 0. Запрос разрешения на уведомления
+                    const permission = await Notification.requestPermission();
+                    if (permission !== 'granted') {
+                        console.warn('Пользователь не разрешил уведомления');
+                        return;
+                    }
+
+                    // 1. Регистрируем service worker
+                    const registration = await navigator.serviceWorker.register('/sw.js');
+                    console.log('Service Worker зарегистрирован');
+
+                    // 2. Запрашиваем публичный ключ с backend
+                    const publicKey = await fetch('https://vodiy-go-notification.onrender.com/vapidPublicKey').then(res => res.text());
+
+                    // 3. Подписываемся
+                    const subscription = await registration.pushManager.subscribe({
+                        userVisibleOnly: true,
+                        applicationServerKey: urlBase64ToUint8Array(publicKey)
+                    });
+
+                    // 4) отправляем подписку бэку
+                    await fetch('https://vodiy-go-notification.onrender.com/subscribe-driver', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ driverId: ride?.driverId, subscription })
+                    });
+
+                    console.log('Subscribed and sent to server');
+                    return subscription;
+                } catch (err) {
+                    console.log(err)
+                }
+            })();
+        }
+    }, [ride?.driverId])
 
     const handleSeatChange = async (change: number) => {
         const newSeatCount = ride.availableSeats + change;
@@ -103,7 +144,7 @@ const ActiveRideCard = ({ ride, t, updateRideSeats }: { ride: Ride, t: any, upda
             await updateRideSeats(ride.id, newSeatCount);
         }
     };
-    
+
     const statusMap = {
         pending: { variant: 'default', label: t.pending || 'Pending' },
         approved: { variant: 'secondary', label: t.verified || 'Approved' },
@@ -114,7 +155,7 @@ const ActiveRideCard = ({ ride, t, updateRideSeats }: { ride: Ride, t: any, upda
     return (
         <Card className="w-full max-w-lg text-center">
             <CardHeader className="items-center">
-                {ride.status === 'approved' 
+                {ride.status === 'approved'
                     ? <CheckCircle2 className="h-16 w-16 text-green-500" />
                     : <Info className="h-16 w-16 text-primary" />
                 }
@@ -129,24 +170,24 @@ const ActiveRideCard = ({ ride, t, updateRideSeats }: { ride: Ride, t: any, upda
                     <div><strong>{t.status}:</strong> <Badge variant={currentStatus.variant as any}>{currentStatus.label}</Badge></div>
                     {ride.status === 'approved' && (
                         <>
-                        <div className="flex items-center gap-2">
-                            <Clock className="h-4 w-4 text-muted-foreground" />
-                            <strong>{t.time_left || 'Time left'}:</strong>
-                            <span className="font-mono">{timeLeft}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                             <Armchair className="h-4 w-4 text-muted-foreground" />
-                             <strong>{t.availableSeats || 'Available Seats'}:</strong>
-                             <div className="flex items-center gap-2 ml-auto">
-                                <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => handleSeatChange(-1)} disabled={ride.availableSeats <= 0}>
-                                    <Minus className="h-4 w-4"/>
-                                </Button>
-                                <span className="font-bold text-lg w-8 text-center">{ride.availableSeats}</span>
-                                <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => handleSeatChange(1)} disabled={ride.availableSeats >= ride.seats}>
-                                    <Plus className="h-4 w-4"/>
-                                </Button>
-                             </div>
-                        </div>
+                            <div className="flex items-center gap-2">
+                                <Clock className="h-4 w-4 text-muted-foreground" />
+                                <strong>{t.time_left || 'Time left'}:</strong>
+                                <span className="font-mono">{timeLeft}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <Armchair className="h-4 w-4 text-muted-foreground" />
+                                <strong>{t.availableSeats || 'Available Seats'}:</strong>
+                                <div className="flex items-center gap-2 ml-auto">
+                                    <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => handleSeatChange(-1)} disabled={ride.availableSeats <= 0}>
+                                        <Minus className="h-4 w-4" />
+                                    </Button>
+                                    <span className="font-bold text-lg w-8 text-center">{ride.availableSeats}</span>
+                                    <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => handleSeatChange(1)} disabled={ride.availableSeats >= ride.seats}>
+                                        <Plus className="h-4 w-4" />
+                                    </Button>
+                                </div>
+                            </div>
                         </>
                     )}
                 </div>
@@ -156,289 +197,295 @@ const ActiveRideCard = ({ ride, t, updateRideSeats }: { ride: Ride, t: any, upda
 };
 
 export default function CreateRidePage() {
-  const context = useContext(AppContext);
-  const { toast } = useToast();
-  const router = useRouter();
+    const context = useContext(AppContext);
+    const { toast } = useToast();
+    const router = useRouter();
 
-  const [from, setFrom] = useState('');
-  const [to, setTo] = useState('');
-  const [price, setPrice] = useState('');
-  const [info, setInfo] = useState('');
-  const [time, setTime] = useState('');
-  const [seats, setSeats] = useState(4);
-  const [promoCodeInput, setPromoCodeInput] = useState('');
-  const [activatedPromo, setActivatedPromo] = useState<PromoCode | null>(null);
-  const [isActivatingPromo, setIsActivatingPromo] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  if (!context) {
-    throw new Error('CreateRidePage must be used within an AppProvider');
-  }
+    const [from, setFrom] = useState('');
+    const [to, setTo] = useState('');
+    const [price, setPrice] = useState('');
+    const [info, setInfo] = useState('');
+    const [time, setTime] = useState('');
+    const [seats, setSeats] = useState(4);
+    const [promoCodeInput, setPromoCodeInput] = useState('');
+    const [activatedPromo, setActivatedPromo] = useState<PromoCode | null>(null);
+    const [isActivatingPromo, setIsActivatingPromo] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { user, addRide, translations, drivers, loading, rides, checkPromoCode, updateRideSeats } = context;
-  const t = translations;
+    if (!context) {
+        throw new Error('CreateRidePage must be used within an AppProvider');
+    }
 
-  const driverProfile = useMemo(() => {
-    if (!user) return null;
-    return drivers.find(d => d.id === user.uid);
-  }, [user, drivers]);
+    const { user, addRide, translations, drivers, loading, rides, checkPromoCode, updateRideSeats } = context;
+    const t = translations;
 
-  const existingRide = useMemo(() => {
-    if (!user) return null;
-    return rides.find(r => {
-        if (r.driverId !== user.uid) return false;
-        
-        if (r.status === 'pending') {
-            return true;
+    const driverProfile = useMemo(() => {
+        if (!user) return null;
+        return drivers.find(d => d.id === user.uid);
+    }, [user, drivers]);
+
+    const existingRide = useMemo(() => {
+        if (!user) return null;
+        return rides.find(r => {
+            if (r.driverId !== user.uid) return false;
+
+            if (r.status === 'pending') {
+                return true;
+            }
+
+            if (r.status === 'approved' && r.approvedAt) {
+                const now = Date.now();
+                const rideApprovedDate = r.approvedAt.toDate().getTime();
+                const durationHours = r.promoCode ? 24 : 12;
+                const durationMillis = durationHours * 60 * 60 * 1000;
+                return (now - rideApprovedDate) < durationMillis;
+            }
+
+            return false;
+        });
+    }, [user, rides]);
+
+    useEffect(() => {
+        if (loading || !driverProfile) return;
+        if (driverProfile.status !== 'verified') {
+            router.push('/driver/profile/diagnostics');
         }
+    }, [loading, driverProfile, router]);
 
-        if (r.status === 'approved' && r.approvedAt) {
-            const now = Date.now();
-            const rideApprovedDate = r.approvedAt.toDate().getTime();
-            const durationHours = r.promoCode ? 24 : 12;
-            const durationMillis = durationHours * 60 * 60 * 1000;
-            return (now - rideApprovedDate) < durationMillis;
+    const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const rawValue = e.target.value.replace(/\s/g, '');
+        if (!isNaN(Number(rawValue)) && Number(rawValue) <= 1000000) {
+            const formattedValue = new Intl.NumberFormat('fr-FR').format(Number(rawValue));
+            setPrice(formattedValue);
+        } else if (Number(rawValue) > 1000000) {
+            toast({
+                title: "Error",
+                description: "Maximum price is 1,000,000 UZS",
+                variant: "destructive",
+            })
         }
+    };
 
-        return false;
-    });
-  }, [user, rides]);
-
-  useEffect(() => {
-    if (loading || !driverProfile) return;
-    if (driverProfile.status !== 'verified') {
-        router.push('/driver/profile/diagnostics');
-    }
-  }, [loading, driverProfile, router]);
-
-
-  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const rawValue = e.target.value.replace(/\s/g, '');
-    if (!isNaN(Number(rawValue)) && Number(rawValue) <= 1000000) {
-      const formattedValue = new Intl.NumberFormat('fr-FR').format(Number(rawValue));
-      setPrice(formattedValue);
-    } else if (Number(rawValue) > 1000000) {
-        toast({
-            title: "Error",
-            description: "Maximum price is 1,000,000 UZS",
-            variant: "destructive",
-        })
-    }
-  };
-  
-  const handleActivatePromo = async () => {
-    if (!promoCodeInput || !user) return;
-    setIsActivatingPromo(true);
-    try {
-        const promo = await checkPromoCode(promoCodeInput, user.uid);
-        setActivatedPromo(promo);
-        toast({
-            title: t.promoCode_activated_title || "Promo Code Activated!",
-            description: t.promoCode_activated_desc || "Your ride's publication time will be extended to 24 hours.",
-        })
-    } catch (error: any) {
-        let desc = t.unknownError;
-        if (error.message.startsWith('promocode/')) {
-            desc = t[error.message.replace('/', '_')] || t.promocode_invalid || 'Invalid or expired promocode.';
-        }
-        toast({
-            title: t.promoCode_activation_failed_title || "Activation Failed",
-            description: desc,
-            variant: 'destructive'
-        })
-    } finally {
-        setIsActivatingPromo(false);
-    }
-  }
-
-  const fromLocations = useMemo(() => locations.filter(loc => loc !== to), [to]);
-  const toLocations = useMemo(() => locations.filter(loc => loc !== from), [from]);
-  
-  if (loading || !t.home || !driverProfile) {
-      return <CreateRideSkeleton />;
-  }
-
-  if (existingRide) {
-    return (
-        <div className="container mx-auto py-8 px-4 flex justify-center">
-            <ActiveRideCard ride={existingRide} t={t} updateRideSeats={updateRideSeats} />
-        </div>
-    )
-  }
-  
-  if (driverProfile.status !== 'verified') {
-    return <CreateRideSkeleton />;
-  }
-
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    const priceValue = Number(price.replace(/\s/g, ''));
-
-    if (!from || !to || !price || from === to || isNaN(priceValue) || priceValue <= 0) {
-      toast({
-        title: t.validationErrorTitle || "Validation Error",
-        description: t.validationErrorRideForm || "Please fill all fields correctly. Origin and destination cannot be the same, and price must be a valid number.",
-        variant: "destructive",
-      });
-      setIsSubmitting(false);
-      return;
-    }
-    
-    if (user) {
+    const handleActivatePromo = async () => {
+        if (!promoCodeInput || !user) return;
+        setIsActivatingPromo(true);
         try {
-            await addRide({
-              driverId: user.uid,
-              from,
-              to,
-              price: priceValue,
-              info,
-              time: time === 'none' ? '' : time,
-              seats,
-              ...(activatedPromo && { promoCode: activatedPromo.code }),
-            });
-            
+            const promo = await checkPromoCode(promoCodeInput, user.uid);
+            setActivatedPromo(promo);
             toast({
-                title: t.ridePublished || "Ride Published!",
-                description: activatedPromo ? t.ridePublishedPromoSuccess || "Your ride is submitted and its duration has been extended!" : t.yourRideIsNowLive || "Your ride is submitted for review.",
-            });
-    
-            setFrom('');
-            setTo('');
-            setPrice('');
-            setInfo('');
-            setTime('');
-            setSeats(4);
-            setPromoCodeInput('');
-            setActivatedPromo(null);
+                title: t.promoCode_activated_title || "Promo Code Activated!",
+                description: t.promoCode_activated_desc || "Your ride's publication time will be extended to 24 hours.",
+            })
         } catch (error: any) {
-             console.error("Ride submission error:", error);
+            let desc = t.unknownError;
+            if (error.message.startsWith('promocode/')) {
+                desc = t[error.message.replace('/', '_')] || t.promocode_invalid || 'Invalid or expired promocode.';
+            }
             toast({
-                title: t.ridePublishedError || "Error Publishing Ride",
-                description: t.unknownError,
+                title: t.promoCode_activation_failed_title || "Activation Failed",
+                description: desc,
                 variant: 'destructive'
             })
         } finally {
-            setIsSubmitting(false);
+            setIsActivatingPromo(false);
         }
     }
-  };
 
-  return (
-    <div className="container mx-auto py-8 px-4 flex justify-center">
-      <Card className="w-full max-w-2xl">
-        <CardHeader>
-          <CardTitle className="font-headline text-2xl">{t.publishNewRide}</CardTitle>
-          <CardDescription>{t.fillTheFormToPublish}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                    <Label htmlFor="from">{t.from}</Label>
-                    <Select value={from} onValueChange={setFrom} required>
-                        <SelectTrigger id="from">
-                            <SelectValue placeholder={t.selectOrigin} />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {fromLocations.map(loc => <SelectItem key={`from-${loc}`} value={loc}>{loc}</SelectItem>)}
-                        </SelectContent>
-                    </Select>
-                </div>
-                <div className="space-y-2">
-                    <Label htmlFor="to">{t.to}</Label>
-                    <Select value={to} onValueChange={setTo} required>
-                        <SelectTrigger id="to">
-                            <SelectValue placeholder={t.selectDestination} />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {toLocations.map(loc => <SelectItem key={`to-${loc}`} value={loc}>{loc}</SelectItem>)}
-                        </SelectContent>
-                    </Select>
-                </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="price">{t.price}</Label>
-                  <Input id="price" value={price} onChange={handlePriceChange} placeholder="100 000" required />
-                </div>
-                 <div className="space-y-2">
-                  <Label htmlFor="time">{t.departureTimeOptional}</Label>
-                  <Select value={time} onValueChange={setTime}>
-                        <SelectTrigger id="time">
-                            <SelectValue placeholder={t.departureTimePlaceholder || 'e.g., 09:00 or Morning'} />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="none">{t.notSpecified || "Not specified"}</SelectItem>
-                            {timeOptions.map(opt => <SelectItem key={opt} value={opt}>{opt}</SelectItem>)}
-                        </SelectContent>
-                    </Select>
-                </div>
-            </div>
+    const fromLocations = useMemo(() => locations.filter(loc => loc !== to), [to]);
+    const toLocations = useMemo(() => locations.filter(loc => loc !== from), [from]);
 
-            <div className="space-y-2">
-                <Label htmlFor="seats">{t.selectSeats || 'Number of seats'}</Label>
-                <Select value={String(seats)} onValueChange={(val) => setSeats(Number(val) as 4 | 8)} required>
-                    <SelectTrigger id="seats">
-                        <SelectValue placeholder="Select seats" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="4">4</SelectItem>
-                        <SelectItem value="8">8</SelectItem>
-                    </SelectContent>
-                </Select>
-            </div>
+    if (loading || !t.home || !driverProfile) {
+        return <CreateRideSkeleton />;
+    }
 
-             <div className="space-y-2">
-              <Label htmlFor="info">{t.additionalInfo}</Label>
-              <Textarea id="info" value={info} onChange={e => setInfo(e.target.value)} placeholder={t.additionalInfoPlaceholder} />
+    if (existingRide) {
+        return (
+            <div className="container mx-auto py-8 px-4 flex justify-center">
+                <ActiveRideCard ride={existingRide} t={t} updateRideSeats={updateRideSeats} />
             </div>
+        )
+    }
 
-            <Card className="bg-muted/50">
-                <CardHeader className='pb-4'>
-                    <CardTitle className="text-lg flex items-center gap-2"><Ticket /> {t.promo_code_section_title || "Extend Publication"}</CardTitle>
-                    <CardDescription>{t.promo_code_section_desc || "Use a promo code to keep your ride listed for 24 hours instead of 12."}</CardDescription>
+    if (driverProfile.status !== 'verified') {
+        return <CreateRideSkeleton />;
+    }
+
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsSubmitting(true);
+        const priceValue = Number(price.replace(/\s/g, ''));
+
+        if (!from || !to || !price || from === to || isNaN(priceValue) || priceValue <= 0) {
+            toast({
+                title: t.validationErrorTitle || "Validation Error",
+                description: t.validationErrorRideForm || "Please fill all fields correctly. Origin and destination cannot be the same, and price must be a valid number.",
+                variant: "destructive",
+            });
+            setIsSubmitting(false);
+            return;
+        }
+
+        if (user) {
+            try {
+                await addRide({
+                    driverId: user.uid,
+                    from,
+                    to,
+                    price: priceValue,
+                    info,
+                    time: time === 'none' ? '' : time,
+                    seats,
+                    ...(activatedPromo && { promoCode: activatedPromo.code }),
+                });
+
+                toast({
+                    title: t.ridePublished || "Ride Published!",
+                    description: activatedPromo ? t.ridePublishedPromoSuccess || "Your ride is submitted and its duration has been extended!" : t.yourRideIsNowLive || "Your ride is submitted for review.",
+                });
+
+                setFrom('');
+                setTo('');
+                setPrice('');
+                setInfo('');
+                setTime('');
+                setSeats(4);
+                setPromoCodeInput('');
+                setActivatedPromo(null);
+            } catch (error: any) {
+                console.error("Ride submission error:", error);
+                toast({
+                    title: t.ridePublishedError || "Error Publishing Ride",
+                    description: t.unknownError,
+                    variant: 'destructive'
+                })
+            } finally {
+                setIsSubmitting(false);
+            }
+        }
+    };
+
+    return (
+        <div className="container mx-auto py-8 px-4 flex justify-center">
+            <Card className="w-full max-w-2xl">
+                <CardHeader>
+                    <CardTitle className="font-headline text-2xl">{t.publishNewRide}</CardTitle>
+                    <CardDescription>{t.fillTheFormToPublish}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    {activatedPromo ? (
-                        <Alert variant="default" className="bg-green-50 border-green-200 dark:bg-green-950 dark:border-green-800">
-                            <Sparkles className="h-5 w-5 text-green-600" />
-                            <AlertTitle className="text-green-800 dark:text-green-300">{t.promoCode_activated_title || "Promo Code Activated!"}</AlertTitle>
-                            <AlertDescription className="text-green-700 dark:text-green-400">
-                                {(t.promoCode_activated_alert || "The code {code} is active. Your ride will be published for 24 hours.").replace('{code}', activatedPromo.code)}
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="from">{t.from}</Label>
+                                <Select value={from} onValueChange={setFrom} required>
+                                    <SelectTrigger id="from">
+                                        <SelectValue placeholder={t.selectOrigin} />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {fromLocations.map(loc => <SelectItem key={`from-${loc}`} value={loc}>{loc}</SelectItem>)}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="to">{t.to}</Label>
+                                <Select value={to} onValueChange={setTo} required>
+                                    <SelectTrigger id="to">
+                                        <SelectValue placeholder={t.selectDestination} />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {toLocations.map(loc => <SelectItem key={`to-${loc}`} value={loc}>{loc}</SelectItem>)}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="price">{t.price}</Label>
+                                <Input id="price" value={price} onChange={handlePriceChange} placeholder="100 000" required />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="time">{t.departureTimeOptional}</Label>
+                                <Select value={time} onValueChange={setTime}>
+                                    <SelectTrigger id="time">
+                                        <SelectValue placeholder={t.departureTimePlaceholder || 'e.g., 09:00 or Morning'} />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="none">{t.notSpecified || "Not specified"}</SelectItem>
+                                        {timeOptions.map(opt => <SelectItem key={opt} value={opt}>{opt}</SelectItem>)}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="seats">{t.selectSeats || 'Number of seats'}</Label>
+                            <Select value={String(seats)} onValueChange={(val) => setSeats(Number(val) as 4 | 8)} required>
+                                <SelectTrigger id="seats">
+                                    <SelectValue placeholder="Select seats" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="4">4</SelectItem>
+                                    <SelectItem value="8">8</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="info">{t.additionalInfo}</Label>
+                            <Textarea id="info" value={info} onChange={e => setInfo(e.target.value)} placeholder={t.additionalInfoPlaceholder} />
+                        </div>
+
+                        <Card className="bg-muted/50">
+                            <CardHeader className='pb-4'>
+                                <CardTitle className="text-lg flex items-center gap-2"><Ticket /> {t.promo_code_section_title || "Extend Publication"}</CardTitle>
+                                <CardDescription>{t.promo_code_section_desc || "Use a promo code to keep your ride listed for 24 hours instead of 12."}</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                {activatedPromo ? (
+                                    <Alert variant="default" className="bg-green-50 border-green-200 dark:bg-green-950 dark:border-green-800">
+                                        <Sparkles className="h-5 w-5 text-green-600" />
+                                        <AlertTitle className="text-green-800 dark:text-green-300">{t.promoCode_activated_title || "Promo Code Activated!"}</AlertTitle>
+                                        <AlertDescription className="text-green-700 dark:text-green-400">
+                                            {(t.promoCode_activated_alert || "The code {code} is active. Your ride will be published for 24 hours.").replace('{code}', activatedPromo.code)}
+                                        </AlertDescription>
+                                    </Alert>
+                                ) : (
+                                    <div className="flex items-end gap-2">
+                                        <div className="flex-grow space-y-1.5">
+                                            <Label htmlFor="promocode">{t.promoCode || 'Promo Code'}</Label>
+                                            <Input id="promocode" type="text" value={promoCodeInput} onChange={e => setPromoCodeInput(e.target.value.toUpperCase())} placeholder={t.promoCodePlaceholder || "Enter code"} />
+                                        </div>
+                                        <Button type="button" onClick={handleActivatePromo} disabled={isActivatingPromo || !promoCodeInput}>
+                                            {isActivatingPromo ? <Loader2 className="h-4 w-4 animate-spin" /> : (t.activate_button || "Activate")}
+                                        </Button>
+                                    </div>
+                                )}
+                            </CardContent>
+                        </Card>
+
+                        <Alert variant="default" className="bg-yellow-50 border-yellow-200 dark:bg-yellow-950 dark:border-yellow-800">
+                            <AlertTriangle className="h-5 w-5 text-yellow-600" />
+                            <AlertTitle className="text-yellow-800 dark:text-yellow-300">{t.create_ride_warning_title || "Attention!"}</AlertTitle>
+                            <AlertDescription className="text-yellow-700 dark:text-yellow-400">
+                                {t.create_ride_warning_desc || "Please check the details carefully. You will not be able to change the route or price after submission."}
                             </AlertDescription>
                         </Alert>
-                    ) : (
-                        <div className="flex items-end gap-2">
-                            <div className="flex-grow space-y-1.5">
-                                <Label htmlFor="promocode">{t.promoCode || 'Promo Code'}</Label>
-                                <Input id="promocode" type="text" value={promoCodeInput} onChange={e => setPromoCodeInput(e.target.value.toUpperCase())} placeholder={t.promoCodePlaceholder || "Enter code"} />
-                            </div>
-                            <Button type="button" onClick={handleActivatePromo} disabled={isActivatingPromo || !promoCodeInput}>
-                                {isActivatingPromo ? <Loader2 className="h-4 w-4 animate-spin" /> : (t.activate_button || "Activate")}
-                            </Button>
-                        </div>
-                    )}
+
+
+                        <Button type="submit" className="w-full" disabled={isSubmitting}>
+                            {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            {t.publishRide}
+                        </Button>
+                    </form>
                 </CardContent>
             </Card>
-            
-            <Alert variant="default" className="bg-yellow-50 border-yellow-200 dark:bg-yellow-950 dark:border-yellow-800">
-                <AlertTriangle className="h-5 w-5 text-yellow-600" />
-                <AlertTitle className="text-yellow-800 dark:text-yellow-300">{t.create_ride_warning_title || "Attention!"}</AlertTitle>
-                <AlertDescription className="text-yellow-700 dark:text-yellow-400">
-                    {t.create_ride_warning_desc || "Please check the details carefully. You will not be able to change the route or price after submission."}
-                </AlertDescription>
-            </Alert>
+        </div>
+    );
+}
 
-
-            <Button type="submit" className="w-full" disabled={isSubmitting}>
-                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {t.publishRide}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
-    </div>
-  );
+function urlBase64ToUint8Array(base64String: string) {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+    const rawData = atob(base64);
+    return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
 }
